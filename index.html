@@ -4360,7 +4360,7 @@ function App(){
         turnTimerRef.current=null;
         if(S.current&&S.current.turn===onlineRole&&!S.current.winner){
           var opp=onlineRole==='A'?'B':'A';
-          triggerWin(opp);
+          if(afkTriggerRef.current) afkTriggerRef.current(opp);
         }
       }
     },1000);
@@ -4585,10 +4585,12 @@ function App(){
   };
   const winSound=w=>{ if(!isOwnLoss(w)) playSound('win'); };
   const winnerFiredRef=useRef(false);
+  const afkTriggerRef=useRef(null); // Ref für triggerWin - vermeidet TDZ in Safari
 
   const triggerWin=(p,skipAnim,finalMoveHist)=>{
     if(winnerFiredRef.current||S.current.winner)return;
     winnerFiredRef.current=true;
+    afkTriggerRef.current=null; // Reset nach Spielende
     winSound(p);
     setWinner(p);
     if(S.current.gameMode==='online'&&S.current.playerNames&&S.current.playerNames[p]){
@@ -4696,6 +4698,7 @@ function App(){
     setCelebrating(true);
     setTimeout(()=>{setCelebrating(false);setScreen('end');},2200);
   };
+  afkTriggerRef.current=triggerWin; // Ref aktuell halten - vermeidet TDZ in Safari
   const EMOTE_DUR=2600;
   const playEmoteSound=type=>{
     if(type==='laugh')playSound('laugh');
