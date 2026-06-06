@@ -4164,19 +4164,25 @@ function App(){
   };
   const openOppProfile=async()=>{
     if(!oppAccountKey)return;
-    setOppProfileModal({loading:true,name:'',profilePublic:true});
+    var oppName=playerNames[onlineRole==='A'?'B':'A']||'?';
+    setOppProfileModal({loading:true,name:oppName,profilePublic:true,color:'#8b5cf6'});
     try{
       const prof=await stoGet(PROFILE_KEY(oppAccountKey));
-      if(!prof){setOppProfileModal(null);return;}
+      if(!prof){
+        setOppProfileModal({loading:false,name:oppName,color:'#8b5cf6',profilePublic:true,stats:null,ranked:null});
+        return;
+      }
       setOppProfileModal({
         loading:false,
-        name:prof.name||'Spieler',
+        name:prof.name||oppName,
         color:prof.color||'#8b5cf6',
-        profilePublic:prof.profilePublic!==false, // default public
+        profilePublic:prof.profilePublic!==false,
         stats:prof.profilePublic!==false?prof.stats:null,
         ranked:prof.profilePublic!==false?(prof.stats&&prof.stats.ranked):null,
       });
-    }catch{setOppProfileModal(null);}
+    }catch(e){
+      setOppProfileModal({loading:false,name:oppName,color:'#8b5cf6',profilePublic:true,stats:null,ranked:null});
+    }
   };
 
   const doStartRanked=(code,role,mode,oppKey,oppRating)=>{    const acc=accRef.current;
@@ -4249,6 +4255,8 @@ function App(){
   const[bcImportance,setBcImportance]=useState('normal');
   const[bcFontSize,setBcFontSize]=useState('medium');
   const[bcDays,setBcDays]=useState(7);
+  const[adminAccounts,setAdminAccounts]=useState(null);
+  const[adminAccountsLoading,setAdminAccountsLoading]=useState(false);
   const[announceDur,setAnnounceDur]=useState(0);
   const[announceVisible,setAnnounceVisible]=useState(true);
   const[aiDifficulty,setAiDifficulty]=useState('normal');
@@ -6668,6 +6676,71 @@ function App(){
               </div>
             </AdminSection>
 
+            {/* ── ACCOUNTS ── */}
+            <AdminSection label="ACCOUNTS">
+              <button onClick={async function(){
+                setAdminAccountsLoading(true);
+                try{
+                  var snap=await window.db.ref('ww_profiles').once('value');
+                  var val=snap.val();
+                  if(!val){setAdminAccounts([]);setAdminAccountsLoading(false);return;}
+                  var list=Object.entries(val).map(function(e){
+                    var uid=e[0];var raw=e[1];
+                    try{
+                      var p=typeof raw==='string'?JSON.parse(raw):raw;
+                      return{uid:uid,name:p.name||'?',color:p.color||'#8b5cf6',
+                        games:(p.stats&&p.stats.games)||0,wins:(p.stats&&p.stats.wins)||0,
+                        created:p.created||0,
+                        eloClassic:(p.stats&&p.stats.ranked&&p.stats.ranked.classic&&p.stats.ranked.classic.rating)||null,
+                        eloDuel:(p.stats&&p.stats.ranked&&p.stats.ranked.duel&&p.stats.ranked.duel.rating)||null};
+                    }catch(e2){return{uid:uid,name:'[Fehler]',games:0,wins:0,created:0,color:'#64748b',eloClassic:null,eloDuel:null};}
+                  }).sort(function(a,b){return b.created-a.created;});
+                  setAdminAccounts(list);
+                }catch(e){setAdminAccounts([]);}
+                setAdminAccountsLoading(false);
+              }} style={{width:'100%',padding:'10px',borderRadius:10,
+                background:'#3b82f6',color:'white',border:'none',cursor:'pointer',
+                fontWeight:800,fontSize:13,fontFamily:'system-ui,-apple-system,sans-serif',marginBottom:10}}>
+                {adminAccountsLoading?'Lädt...':'Accounts laden'}
+              </button>
+              {adminAccounts!==null&&(
+                <div>
+                  <div style={{fontSize:11,color:'var(--subtle)',fontWeight:700,marginBottom:8}}>
+                    {adminAccounts.length} Accounts gesamt
+                  </div>
+                  <div style={{maxHeight:320,overflowY:'auto',WebkitOverflowScrolling:'touch',
+                    border:'1px solid var(--border)',borderRadius:10,background:'var(--bg)'}}>
+                    {adminAccounts.length===0?(
+                      <div style={{padding:'20px',textAlign:'center',color:'var(--subtle)',fontSize:12}}>Keine Accounts</div>
+                    ):adminAccounts.map(function(acc,i){
+                      var d=acc.created?new Date(acc.created):null;
+                      var dateStr=d?(d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()):'?';
+                      var wr=acc.games>0?Math.round((acc.wins/acc.games)*100):0;
+                      return(
+                        <div key={acc.uid} style={{
+                          padding:'10px 12px',
+                          borderBottom:i<adminAccounts.length-1?'1px solid var(--border)':'none',
+                          display:'flex',alignItems:'center',gap:10}}>
+                          <div style={{width:28,height:28,borderRadius:'50%',background:acc.color,
+                            display:'flex',alignItems:'center',justifyContent:'center',
+                            flexShrink:0,fontSize:12,fontWeight:900,color:'#fff'}}>
+                            {(acc.name||'?').slice(0,1).toUpperCase()}
+                          </div>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontSize:13,fontWeight:800,color:'var(--text)',
+                              overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{acc.name}</div>
+                            <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600}}>
+                              {dateStr} · {acc.games}G · {wr}% · {acc.eloClassic?('R:'+acc.eloClassic):''}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </AdminSection>
+
             {/* ── NACHRICHTEN ── */}
             <AdminSection label="NACHRICHTEN (POSTKASTEN)">
               <div style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:0.8,marginBottom:6}}>TITEL (optional)</div>
@@ -8513,7 +8586,7 @@ function App(){
         {(gameMode==='online'&&onlineRole==='B'?['B','A']:['A','B']).map(p=>{
           const active=turn===p&&!winner;
           const isOpp=(gameMode==='online'&&p!==onlineRole)||(gameMode==='pvc'&&p==='B');
-          const canTapProfile=isOpp&&oppAccountKey&&!winner;
+          const canTapProfile=isOpp&&oppAccountKey;
           const eyeCol=p==='A'?'#ef4444':'#3b82f6';
           return(
             <div key={p} onClick={canTapProfile?openOppProfile:undefined}
