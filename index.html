@@ -3929,7 +3929,13 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
     </div>
   );
 }
-function LegalScreen({lang,darkMode,goBack,legalTab,setLegalTab,setCookieConsent,pageAnim,backChevron}){
+function LegalScreen({lang,darkMode,goBack,legalTab,setLegalTab,setCookieConsent}){
+  var bk={position:'fixed',left:'calc(10px + env(safe-area-inset-left,0px))',top:'calc(env(safe-area-inset-top) + 14px)',zIndex:300,
+    display:'flex',alignItems:'center',gap:4,padding:'7px 12px 7px 8px',borderRadius:20,
+    background:'var(--card)',border:'1.5px solid var(--border)',cursor:'pointer',
+    fontSize:13,fontWeight:700,color:'var(--text)',fontFamily:'system-ui,-apple-system,sans-serif',
+    boxShadow:'0 2px 8px rgba(0,0,0,0.08)'};
+  var anim='slide-in-right 0.38s cubic-bezier(0.22,1,0.36,1) both';
   var LEGAL={
     impressum:{
       de:{title:'Impressum',sub:'Angaben gem. \u00a75 DDG (Deutschland) & 6563 TCK (T\u00fcrkei)',operator:'Betreiber',operatorVal:'H\u00fcseyin Tunay',address:'Anschrift',addressVal:'[Adresse wird nach Umzug eingetragen]',contact:'Kontakt',contactVal:'wrongway.game@gmail.com',note:'EU-Streitschlichtung: Die EU-Kommission stellt eine Plattform bereit: ec.europa.eu/consumers/odr. Wir sind nicht verpflichtet an Streitbeilegungsverfahren teilzunehmen.',platform:'Plattform',platformVal:'Wrong Way: Don\'t be mad \u2014 Browser-PWA unter yavrukusch.github.io'},
@@ -3959,9 +3965,9 @@ function LegalScreen({lang,darkMode,goBack,legalTab,setLegalTab,setCookieConsent
   return(
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',minHeight:'100vh',
       padding:'0 16px 48px',paddingTop:'calc(env(safe-area-inset-top) + 20px)',
-      background:'transparent',position:'relative',zIndex:1,animation:pageAnim}}>
+      background:'transparent',position:'relative',zIndex:1,animation:anim}}>
       <MenuBG dark={darkMode}/>
-      <button onClick={goBack} style={backChevron}>
+      <button onClick={goBack} style={bk}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         {ll==='de'?'Zur\u00fcck':ll==='tr'?'Geri':ll==='fr'?'Retour':'Back'}
       </button>
@@ -6921,7 +6927,7 @@ function App(){
       }}/>;
   }
 
-  if(screen==='legal') return <LegalScreen lang={lang} darkMode={darkMode} goBack={goBack} legalTab={legalTab} setLegalTab={setLegalTab} setCookieConsent={setCookieConsent} pageAnim={pageAnim} backChevron={backChevron}/>;
+  if(screen==='legal') return <LegalScreen lang={lang} darkMode={darkMode} goBack={goBack} legalTab={legalTab} setLegalTab={setLegalTab} setCookieConsent={setCookieConsent}/>;
 
   const doGoogleSignIn=()=>{
     const provider=new firebase.auth.GoogleAuthProvider();
