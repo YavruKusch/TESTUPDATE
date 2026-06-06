@@ -3925,7 +3925,7 @@ function App(){
   const[broadcasts,setBroadcasts]=useState([]);
   const[readIds,setReadIds]=useState(()=>{try{var r=localStorage.getItem('ww_read_ids');return r?JSON.parse(r):{};}catch(e){return {};}});
   const[dismissedIds,setDismissedIds]=useState(()=>{try{var r=localStorage.getItem('ww_dismissed_ids');return r?JSON.parse(r):{};}catch(e){return {};}});
-  const[turnTimeLeft,setTurnTimeLeft]=useState(0);
+  const[afkTimeLeft,setAfkTimeLeft]=useState(0);
   const[inactiveWarning,setInactiveWarning]=useState(false);
   const[inactiveSecs,setInactiveSecs]=useState(15);
   const[optionsTab,setOptionsTab]=useState('main');
@@ -4347,14 +4347,14 @@ function App(){
   // AFK-Zug-Timer: 60s pro Zug, nur Online ohne Timer, kein Ranked
   useEffect(function(){
     if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
-    setTurnTimeLeft(0);
+    setAfkTimeLeft(0);
     if(screen!=='game'||gameMode!=='online'||winner||turn!==onlineRole||isRanked)return;
     if(gameTimeMode&&gameTimeMode!=='none')return;
     var secs=60;
-    setTurnTimeLeft(secs);
+    setAfkTimeLeft(secs);
     turnTimerRef.current=setInterval(function(){
       secs--;
-      setTurnTimeLeft(secs);
+      setAfkTimeLeft(secs);
       if(secs<=0){
         clearInterval(turnTimerRef.current);
         turnTimerRef.current=null;
@@ -4366,7 +4366,7 @@ function App(){
     },1000);
     return function(){
       if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
-      setTurnTimeLeft(0);
+      setAfkTimeLeft(0);
     };
   },[turn,winner,screen,onlineRole,gameMode,gameTimeMode,isRanked]);
 
@@ -8519,15 +8519,15 @@ function App(){
         </div>
         {!winner&&(
           <div style={{display:'flex',alignItems:'center',gap:8}}>
-            {turnTimeLeft>0&&turnTimeLeft<=20&&gameMode==='online'&&turn===onlineRole&&(
+            {afkTimeLeft>0&&afkTimeLeft<=20&&gameMode==='online'&&turn===onlineRole&&(
               <div style={{
                 padding:'5px 10px',borderRadius:12,
-                background:turnTimeLeft<=10?'#ef4444':'#f59e0b',
+                background:afkTimeLeft<=10?'#ef4444':'#f59e0b',
                 color:'white',fontSize:12,fontWeight:900,
                 fontFamily:'system-ui,-apple-system,sans-serif',
-                boxShadow:turnTimeLeft<=10?'0 2px 10px rgba(239,68,68,0.5)':'0 2px 10px rgba(245,158,11,0.4)',
-                animation:turnTimeLeft<=10?'pulse-inbox 0.8s ease-in-out infinite':'none'}}>
-                {turnTimeLeft}s
+                boxShadow:afkTimeLeft<=10?'0 2px 10px rgba(239,68,68,0.5)':'0 2px 10px rgba(245,158,11,0.4)',
+                animation:afkTimeLeft<=10?'pulse-inbox 0.8s ease-in-out infinite':'none'}}>
+                {afkTimeLeft}s
               </div>
             )}
             <button onClick={handleGiveUp} style={{
