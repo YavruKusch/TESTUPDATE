@@ -3925,6 +3925,9 @@ function App(){
   const[broadcasts,setBroadcasts]=useState([]);
   const[readIds,setReadIds]=useState(()=>{try{var r=localStorage.getItem('ww_read_ids');return r?JSON.parse(r):{};}catch(e){return {};}});
   const[dismissedIds,setDismissedIds]=useState(()=>{try{var r=localStorage.getItem('ww_dismissed_ids');return r?JSON.parse(r):{};}catch(e){return {};}});
+  const[turnTimeLeft,setTurnTimeLeft]=useState(0);
+  const[inactiveWarning,setInactiveWarning]=useState(false);
+  const[inactiveSecs,setInactiveSecs]=useState(15);
   const[optionsTab,setOptionsTab]=useState('main');
   const[showLang,setShowLang]=useState(false);
   const[hapticOn,setHapticOn]=useState(()=>{try{return localStorage.getItem('ww_haptic')!=='0';}catch{return true;}});
@@ -4332,6 +4335,66 @@ function App(){
     cycle();
     return function(){clearTimeout(timer);};
   },[adminCfg.announce]);
+
+  // AFK-Zug-Timer: 60s pro Zug, nur Online ohne Timer, kein Ranked
+  useEffect(function(){
+    if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
+    setTurnTimeLeft(0);
+    if(screen!=='game'||gameMode!=='online'||winner||turn!==onlineRole||isRanked)return;
+    if(gameTimeMode&&gameTimeMode!=='none')return;
+    var secs=60;
+    setTurnTimeLeft(secs);
+    turnTimerRef.current=setInterval(function(){
+      secs--;
+      setTurnTimeLeft(secs);
+      if(secs<=0){
+        clearInterval(turnTimerRef.current);
+        turnTimerRef.current=null;
+        if(S.current&&S.current.turn===onlineRole&&!S.current.winner){
+          var opp=onlineRole==='A'?'B':'A';
+          triggerWin(opp);
+        }
+      }
+    },1000);
+    return function(){
+      if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
+      setTurnTimeLeft(0);
+    };
+  },[turn,winner,screen,onlineRole,gameMode,gameTimeMode,isRanked]);
+
+  // Inaktivitäts-Kick: 2min kein Touch → Warnung → Menü
+  useEffect(function(){
+    function resetInactivity(){
+      clearTimeout(inactivityTimerRef.current);
+      clearTimeout(inactivityWarnRef.current);
+      clearInterval(inactiveCountRef.current);
+      setInactiveWarning(false);
+      setInactiveSecs(15);
+      inactivityWarnRef.current=setTimeout(function(){
+        setInactiveWarning(true);
+        var s=15;
+        setInactiveSecs(s);
+        inactiveCountRef.current=setInterval(function(){
+          s--;
+          setInactiveSecs(s);
+          if(s<=0)clearInterval(inactiveCountRef.current);
+        },1000);
+      },105000);
+      inactivityTimerRef.current=setTimeout(function(){
+        setInactiveWarning(false);
+        setScreen('menu');
+      },120000);
+    }
+    var evts=['touchstart','mousedown','click','keydown'];
+    evts.forEach(function(e){document.addEventListener(e,resetInactivity,{passive:true,capture:true});});
+    resetInactivity();
+    return function(){
+      evts.forEach(function(e){document.removeEventListener(e,resetInactivity,{capture:true});});
+      clearTimeout(inactivityTimerRef.current);
+      clearTimeout(inactivityWarnRef.current);
+      clearInterval(inactiveCountRef.current);
+    };
+  },[]);
 
   // URL ?join=CODE → automatisch zum Freund-Beitritt
   useEffect(()=>{
@@ -4800,6 +4863,10 @@ function App(){
 
   // ── Hammer 2. Welle: Countdown startet wenn alle Wave-1 weg, spawnt nach 50 Zügen ──
   const hammerWave1ClearedRef=useRef(null); // moveHist.length zu dem Zeitpunkt
+  const turnTimerRef=useRef(null);
+  const inactivityTimerRef=useRef(null);
+  const inactivityWarnRef=useRef(null);
+  const inactiveCountRef=useRef(null);
   useEffect(()=>{
     if(!hammerMode||isRanked||hammerDrops!==2||winner||screen!=='game')return;
     if(hammerWave2Ref.current)return;
@@ -6376,6 +6443,36 @@ function App(){
               )}
 
             </div>
+          </div>
+        </div>
+      )}
+      {inactiveWarning&&(
+        <div onClick={function(){setInactiveWarning(false);}} style={{position:'fixed',inset:0,
+          background:'rgba(0,0,0,0.6)',zIndex:9000,display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+          <div onClick={function(e){e.stopPropagation();}} style={{
+            background:'var(--card)',borderRadius:20,padding:'28px 24px',
+            border:'1.5px solid var(--border)',boxShadow:'var(--shadow-card)',
+            maxWidth:300,width:'100%',textAlign:'center',
+            animation:'screen-pop 0.2s cubic-bezier(0.25,1,0.5,1) both'}}>
+            <div style={{fontSize:36,marginBottom:8}}>{'(~_~)'}</div>
+            <div style={{fontSize:17,fontWeight:900,color:'var(--text)',marginBottom:6,
+              fontFamily:'system-ui,-apple-system,sans-serif'}}>
+              {lang==='de'?'Noch da?':lang==='tr'?'Hâlâ buradasın?':lang==='fr'?'Toujours là ?':'Still there?'}
+            </div>
+            <div style={{fontSize:13,color:'var(--subtle)',marginBottom:20,fontFamily:'system-ui,-apple-system,sans-serif'}}>
+              {lang==='de'?'Du wirst in ':lang==='tr'?'':lang==='fr'?'Déconnexion dans ':''}{inactiveSecs}s{lang==='tr'?' içinde atılacaksın':''}
+              {lang==='en'?' until disconnect':''}
+              {lang==='de'?' Sek. abgemeldet':''}
+              {lang==='fr'?'':''} 
+            </div>
+            <button onClick={function(){setInactiveWarning(false);}} style={{
+              width:'100%',padding:'12px',borderRadius:12,
+              background:'linear-gradient(135deg,#3b82f6,#6366f1)',
+              color:'white',border:'none',cursor:'pointer',
+              fontWeight:800,fontSize:14,fontFamily:'system-ui,-apple-system,sans-serif',
+              boxShadow:'0 4px 14px rgba(99,102,241,0.35)'}}>
+              {lang==='de'?'Ich bin noch da!':lang==='tr'?'Hâlâ buradayım!':lang==='fr'?'Je suis là !':'I\'m still here!'}
+            </button>
           </div>
         </div>
       )}
@@ -8348,15 +8445,28 @@ function App(){
           <div style={{fontSize:15,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>{t('title')}</div>
         </div>
         {!winner&&(
-          <button onClick={handleGiveUp} style={{
-            padding:'6px 15px',fontSize:11,fontWeight:800,cursor:'pointer',
-            background:giveUpArmed?'#ef4444':'var(--card)',
-            color:giveUpArmed?'white':'var(--subtle)',
-            border:`1.5px solid ${giveUpArmed?'#ef4444':'var(--border)'}`,
-            borderRadius:20,transition:'all 0.2s',boxShadow:giveUpArmed?'0 2px 10px rgba(239,68,68,0.35)':'var(--shadow-soft)',
-            fontFamily:'system-ui,-apple-system,sans-serif'}}>
-            {giveUpArmed?t('sure'):t('giveUp')}
-          </button>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            {turnTimeLeft>0&&turnTimeLeft<=20&&gameMode==='online'&&turn===onlineRole&&(
+              <div style={{
+                padding:'5px 10px',borderRadius:12,
+                background:turnTimeLeft<=10?'#ef4444':'#f59e0b',
+                color:'white',fontSize:12,fontWeight:900,
+                fontFamily:'system-ui,-apple-system,sans-serif',
+                boxShadow:turnTimeLeft<=10?'0 2px 10px rgba(239,68,68,0.5)':'0 2px 10px rgba(245,158,11,0.4)',
+                animation:turnTimeLeft<=10?'pulse-inbox 0.8s ease-in-out infinite':'none'}}>
+                {turnTimeLeft}s
+              </div>
+            )}
+            <button onClick={handleGiveUp} style={{
+              padding:'6px 15px',fontSize:11,fontWeight:800,cursor:'pointer',
+              background:giveUpArmed?'#ef4444':'var(--card)',
+              color:giveUpArmed?'white':'var(--subtle)',
+              border:'1.5px solid '+(giveUpArmed?'#ef4444':'var(--border)'),
+              borderRadius:20,transition:'all 0.2s',boxShadow:giveUpArmed?'0 2px 10px rgba(239,68,68,0.35)':'var(--shadow-soft)',
+              fontFamily:'system-ui,-apple-system,sans-serif'}}>
+              {giveUpArmed?t('sure'):t('giveUp')}
+            </button>
+          </div>
         )}
       </div>
 
