@@ -1004,67 +1004,6 @@ fr:{
 };
 function getInitialLang(){try{const s=localStorage.getItem('ww_lang');if(s&&I18N[s])return s;}catch{}return 'en';}
 function getInitialDark(){try{return localStorage.getItem('ww_dark')==='1';}catch{return false;}}
-function getInitialCookieConsent(){try{return localStorage.getItem('ww_cookie_consent')||null;}catch{return null;}}
-
-// ── Cookie-Consent-Banner ─────────────────────────────────
-function CookieBanner({lang,onAccept,onNecessary}){
-  var txt={
-    de:{title:'Cookies & Einwilligungen',
-      body:'Wir nutzen technisch notwendige Cookies f\u00fcr den Spielbetrieb (Konto, Sitzung). Mit deiner Einwilligung k\u00f6nnen zuk\u00fcnftig auch personalisierte Werbeanzeigen eingeblendet werden.',
-      all:'Alle akzeptieren',nec:'Nur notwendige',info:'Datenschutz'},
-    en:{title:'Cookies & Consent',
-      body:'We use technically necessary cookies for the game (account, session). With your consent, personalized ads may also be shown in the future.',
-      all:'Accept all',nec:'Necessary only',info:'Privacy Policy'},
-    tr:{title:'\u00c7erezler & Onay',
-      body:'Oyun i\u00e7in teknik olarak gerekli \u00e7erezler kullan\u0131yoruz (hesap, oturum). Onay\u0131n\u0131zla gelecekte ki\u015fiselle\u015ftirilmi\u015f reklamlar da g\u00f6sterilebilir.',
-      all:'T\u00fcm\u00fcn\u00fc kabul et',nec:'Yaln\u0131zca gerekli',info:'Gizlilik Politikas\u0131'},
-    fr:{title:'Cookies & Consentement',
-      body:'Nous utilisons des cookies techniquement n\u00e9cessaires pour le jeu (compte, session). Avec votre consentement, des publicit\u00e9s personnalis\u00e9es pourront \u00eatre affich\u00e9es \u00e0 l\'avenir.',
-      all:'Tout accepter',nec:'N\u00e9cessaires uniquement',info:'Confidentialit\u00e9'}
-  };
-  var l=txt[lang]||txt.en;
-  return(
-    <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:3000,
-      padding:'0 0 calc(env(safe-area-inset-bottom) + 0px) 0'}}>
-      <div style={{background:'var(--card)',borderTop:'2px solid var(--border)',
-        boxShadow:'0 -8px 32px rgba(0,0,0,0.18)',padding:'18px 18px 20px',
-        borderRadius:'18px 18px 0 0'}}>
-        <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
-          <div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,#1e293b,#334155)',
-            display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-            <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
-              <circle cx="16" cy="16" r="13" stroke="#94a3b8" strokeWidth="2"/>
-              <circle cx="10" cy="12" r="2.5" fill="#94a3b8"/>
-              <circle cx="20" cy="10" r="2" fill="#94a3b8"/>
-              <circle cx="22" cy="20" r="2.5" fill="#94a3b8"/>
-              <circle cx="12" cy="22" r="2" fill="#94a3b8"/>
-            </svg>
-          </div>
-          <div style={{fontSize:14,fontWeight:900,color:'var(--text)',letterSpacing:-0.2}}>{l.title}</div>
-        </div>
-        <div style={{fontSize:12,color:'var(--subtle)',lineHeight:1.6,marginBottom:14,fontWeight:500}}>
-          {l.body}
-        </div>
-        <div style={{display:'flex',gap:8,marginBottom:10}}>
-          <button onClick={onNecessary} style={{flex:1,padding:'11px 8px',borderRadius:11,
-            background:'var(--bg)',color:'var(--text)',border:'1.5px solid var(--border)',
-            cursor:'pointer',fontWeight:700,fontSize:12,fontFamily:'system-ui,-apple-system,sans-serif'}}>
-            {l.nec}
-          </button>
-          <button onClick={onAccept} style={{flex:1.4,padding:'11px 8px',borderRadius:11,
-            background:'linear-gradient(135deg,#16a34a,#15803d)',color:'#fff',border:'none',
-            cursor:'pointer',fontWeight:800,fontSize:12,fontFamily:'system-ui,-apple-system,sans-serif',
-            boxShadow:'0 2px 10px rgba(22,163,74,0.35)'}}>
-            {l.all}
-          </button>
-        </div>
-        <div style={{fontSize:10,color:'var(--subtle)',textAlign:'center',fontWeight:500}}>
-          {l.info} &middot; wrongway.game@gmail.com
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── Game logic ─────────────────────────────────────────────
 function ck(r,c){return `${r},${c}`;}
@@ -3929,148 +3868,10 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
     </div>
   );
 }
-function LegalScreen({lang,darkMode,goBack,legalTab,setLegalTab,setCookieConsent}){
-  var bk={position:'fixed',left:'calc(10px + env(safe-area-inset-left,0px))',top:'calc(env(safe-area-inset-top) + 14px)',zIndex:300,
-    display:'flex',alignItems:'center',gap:4,padding:'7px 12px 7px 8px',borderRadius:20,
-    background:'var(--card)',border:'1.5px solid var(--border)',cursor:'pointer',
-    fontSize:13,fontWeight:700,color:'var(--text)',fontFamily:'system-ui,-apple-system,sans-serif',
-    boxShadow:'0 2px 8px rgba(0,0,0,0.08)'};
-  var anim='slide-in-right 0.38s cubic-bezier(0.22,1,0.36,1) both';
-  var LEGAL={
-    impressum:{
-      de:{title:'Impressum',sub:'Angaben gem. \u00a75 DDG (Deutschland) & 6563 TCK (T\u00fcrkei)',operator:'Betreiber',operatorVal:'H\u00fcseyin Tunay',address:'Anschrift',addressVal:'[Adresse wird nach Umzug eingetragen]',contact:'Kontakt',contactVal:'wrongway.game@gmail.com',note:'EU-Streitschlichtung: Die EU-Kommission stellt eine Plattform bereit: ec.europa.eu/consumers/odr. Wir sind nicht verpflichtet an Streitbeilegungsverfahren teilzunehmen.',platform:'Plattform',platformVal:'Wrong Way: Don\'t be mad \u2014 Browser-PWA unter yavrukusch.github.io'},
-      en:{title:'Legal Notice',sub:'Information acc. to \u00a75 DDG & Turkish law',operator:'Operator',operatorVal:'H\u00fcseyin Tunay',address:'Address',addressVal:'[Address to be added after relocation to Turkey]',contact:'Contact',contactVal:'wrongway.game@gmail.com',note:'EU Dispute Resolution: ec.europa.eu/consumers/odr. We are not obliged to participate in dispute resolution proceedings.',platform:'Platform',platformVal:'Wrong Way: Don\'t be mad \u2014 Browser PWA at yavrukusch.github.io'},
-      tr:{title:'K\u00fcnye',sub:'6563 say\u0131l\u0131 TCK ve DSGVO kapsam\u0131nda',operator:'Operat\u00f6r',operatorVal:'H\u00fcseyin Tunay',address:'Adres',addressVal:'[T\u00fcrkiye\'ye ta\u015f\u0131nd\u0131ktan sonra eklenecek]',contact:'\u0130leti\u015fim',contactVal:'wrongway.game@gmail.com',note:'AB anla\u015fmazl\u0131k platformu: ec.europa.eu/consumers/odr.',platform:'Platform',platformVal:'Wrong Way: Don\'t be mad \u2014 yavrukusch.github.io'},
-      fr:{title:'Mentions l\u00e9gales',sub:'Informations selon \u00a75 DDG et droit turc',operator:'Op\u00e9rateur',operatorVal:'H\u00fcseyin Tunay',address:'Adresse',addressVal:'[Adresse \u00e0 compl\u00e9ter apr\u00e8s d\u00e9m\u00e9nagement]',contact:'Contact',contactVal:'wrongway.game@gmail.com',note:'R\u00e8glement UE: ec.europa.eu/consumers/odr.',platform:'Plateforme',platformVal:'Wrong Way: Don\'t be mad \u2014 yavrukusch.github.io'}
-    },
-    privacy:{
-      de:{title:'Datenschutz',sub:'DSGVO (EU) & KVKK (T\u00fcrkei)',sections:[['1. Verantwortlicher','H\u00fcseyin Tunay, wrongway.game@gmail.com'],['2. Erhobene Daten','E-Mail, Benutzername, Passwort (gehasht), Spielstatistiken, ELO. Gastnutzer: nur anonyme Sitzungs-ID.'],['3. Zweck','Spielbetrieb, Konto, Rangliste, Online-Multiplayer. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.'],['4. Hosting','GitHub Pages (GitHub, Inc., USA) f\u00fcr den Code. Google Firebase (Google Ireland Ltd., Dublin 4) f\u00fcr Datenbank & Auth. Server: EU (europe-west1, Frankfurt).'],['5. Passw\u00f6rter','Ausschlie\u00dflich von Firebase gehasht (bcrypt). Kein Zugriff auf Klartextpassw\u00f6rter.'],['6. Google-Login','Name & E-Mail werden von Google \u00fcbermittelt. Googlekonto unterliegt Googles Datenschutz.'],['7. Werbung (zuk\u00fcnftig)','Vor Aktivierung von Werbung wird ein Einwilligungsbanner angezeigt. Keine Daten ohne Zustimmung.'],['8. In-App-K\u00e4ufe (zuk\u00fcnftig)','Zahlung nur \u00fcber Google Play / Apple App Store. Keine Speicherung von Zahlungsdaten.'],['9. Speicherdauer','Bis zur Konto-L\u00f6schung. L\u00f6schung jederzeit in den Profileinstellungen.'],['10. Deine Rechte (DSGVO)','Auskunft, Berichtigung, L\u00f6schung, Einschr\u00e4nkung, Portabilit\u00e4t, Widerspruch. Kontakt: wrongway.game@gmail.com'],['11. KVKK (T\u00fcrkei)','Recht auf Auskunft, Berichtigung, L\u00f6schung (www.kvkk.gov.tr). Kontakt: wrongway.game@gmail.com']]},
-      en:{title:'Privacy Policy',sub:'GDPR (EU) & KVKK (Turkey)',sections:[['1. Controller','H\u00fcseyin Tunay, wrongway.game@gmail.com'],['2. Data Collected','Email, username, password (hashed), game stats, ELO. Guests: anonymous session ID only.'],['3. Purpose','Game operation, account, leaderboard, online multiplayer. Legal basis: Art. 6(1)(b) GDPR.'],['4. Hosting','GitHub Pages (GitHub, Inc., USA) for code. Google Firebase (Google Ireland Ltd., Dublin 4) for database & auth. Server: EU (europe-west1, Frankfurt).'],['5. Passwords','Hashed exclusively by Firebase (bcrypt). No access to plaintext passwords.'],['6. Google Sign-In','Name & email transmitted by Google. Subject to Google\'s privacy policy.'],['7. Advertising (future)','A consent banner will appear before any ads are activated. No data loaded without consent.'],['8. In-App Purchases (future)','Payments via Google Play / Apple App Store only. No payment data stored.'],['9. Retention','Until account deletion. Deletable anytime in profile settings.'],['10. Your Rights (GDPR)','Access, rectification, erasure, restriction, portability, objection. Contact: wrongway.game@gmail.com'],['11. KVKK (Turkey)','Access, correction, deletion rights (www.kvkk.gov.tr). Contact: wrongway.game@gmail.com']]},
-      tr:{title:'Gizlilik Politikas\u0131',sub:'KVKK (T\u00fcrkiye) & GDPR (AB)',sections:[['1. Veri Sorumlusu','H\u00fcseyin Tunay, wrongway.game@gmail.com'],['2. Toplanan Veriler','E-posta, kullan\u0131c\u0131 ad\u0131, \u015fifre (karma\u015f\u0131k), oyun istatistikleri, ELO. Misafir: yaln\u0131zca anonim oturum.'],['3. Ama\u00e7','Oyun, hesap, s\u0131ralama, \u00e7evrimde \u00e7ok oyunculu. KVKK Md. 5 / GDPR Md. 6(1)(b).'],['4. Bar\u0131nd\u0131rma','GitHub Pages (ABD) kod i\u00e7in. Google Firebase (Google Ireland Ltd., Dublin 4) veri taban\u0131 & kimlik do\u011frulama. Sunucu: AB (Frankfurt).'],['5. \u015eifreler','Yaln\u0131zca Firebase taraf\u0131ndan karma\u015f\u0131kla\u015ft\u0131r\u0131l\u0131r. A\u00e7\u0131k \u015fifrelere eri\u015femeyiz.'],['6. Google Giri\u015fi','Ad ve e-posta Google taraf\u0131ndan iletilir.'],['7. Reklam (gelecekte)','Reklamlar etkinle\u015fmeden \u00f6nce onay banner\u0131 g\u00f6sterilir.'],['8. Uygulama \u0130\u00e7i Al\u0131mlar','\u00d6demeler yaln\u0131zca Google Play / Apple App Store \u00fczerinden.'],['9. Saklama S\u00fcresi','Hesap silinene kadar. Profil ayarlar\u0131ndan silinebilir.'],['10. Haklar\u0131n\u0131z (KVKK)','6698 say\u0131l\u0131 KVKK: bilgi alma, d\u00fczeltme, silme (www.kvkk.gov.tr). wrongway.game@gmail.com'],['11. Haklar\u0131n\u0131z (GDPR)','Eri\u015fim, d\u00fczeltme, silme, k\u0131s\u0131tlama, ta\u015f\u0131nabilirlik. wrongway.game@gmail.com']]},
-      fr:{title:'Confidentialit\u00e9',sub:'RGPD (UE) & KVKK (Turquie)',sections:[['1. Responsable','H\u00fcseyin Tunay, wrongway.game@gmail.com'],['2. Donn\u00e9es','E-mail, pseudo, mot de passe (hach\u00e9), stats, ELO. Invit\u00e9s: session anonyme uniquement.'],['3. Finalit\u00e9','Jeu, compte, classement, multijoueur. Base l\u00e9gale: Art. 6(1)(b) RGPD.'],['4. H\u00e9bergement','GitHub Pages (USA) pour le code. Google Firebase (Google Ireland Ltd., Dublin 4) pour la base de donn\u00e9es. Serveur: UE (Francfort).'],['5. Mots de passe','Hach\u00e9s uniquement par Firebase. Aucun acc\u00e8s en clair.'],['6. Google','Nom et e-mail transmis par Google.'],['7. Publicit\u00e9 (futur)','Bandeau de consentement avant toute activation.'],['8. Achats (futur)','Via Google Play / Apple App Store uniquement.'],['9. Conservation','Jusqu\'au compte supprim\u00e9. Supprimable dans les param\u00e8tres.'],['10. Droits (RGPD)','Acc\u00e8s, rectification, effacement, limitation, portabilit\u00e9. wrongway.game@gmail.com'],['11. KVKK','Droits turcs: www.kvkk.gov.tr. wrongway.game@gmail.com']]}
-    },
-    terms:{
-      de:{title:'Nutzungsbedingungen',sub:'Bitte vor der Nutzung lesen',sections:[['1. Geltungsbereich','Diese Bedingungen gelten f\u00fcr Wrong Way: Don\'t be mad, betrieben von H\u00fcseyin Tunay.'],['2. Konten','Kostenlos spielbar. Online-Funktionen erfordern Registrierung mit g\u00fcltiger E-Mail. Ein Konto pro Person.'],['3. Verbote','Cheating, Bots, Exploits f\u00fchren zur sofortigen Sperrung. Beleidigende Nutzernamen werden entfernt.'],['4. Altersgrenze','Ab 13 Jahren. Unter 18 Jahren ist Elternzustimmung f\u00fcr kostenpflichtige Inhalte erforderlich.'],['5. In-App-K\u00e4ufe','K\u00fcnftig m\u00f6glich. Virtuelle G\u00fcter sind grunds\u00e4tzlich nicht erstattungsf\u00e4hig. EU: 14-t\u00e4giges Widerrufsrecht bei digitalen Inhalten. Zahlung via Google Play / Apple Store.'],['6. Werbung','Personalisierte Werbung nur mit ausdr\u00fccklicher Einwilligung (Cookie-Banner).'],['7. Haftung','Kein Geldwert f\u00fcr virtuelle G\u00fcter. Kein Ersatz bei Datenverlust durch Serverausf\u00e4lle.'],['8. Geistiges Eigentum','Spiel, Design, Code geh\u00f6ren H\u00fcseyin Tunay. Unautorisierte Nutzung verboten.'],['9. \u00c4nderungen','Jederzeit m\u00f6glich. Weitere Nutzung gilt als Zustimmung.'],['10. Recht','T\u00fcrkisches Recht. Zwingende EU-Verbraucherschutzregeln bleiben g\u00fcltig.']]},
-      en:{title:'Terms of Service',sub:'Please read before using',sections:[['1. Scope','These terms apply to Wrong Way: Don\'t be mad, operated by H\u00fcseyin Tunay.'],['2. Accounts','Free to play. Online features require email registration. One account per person.'],['3. Prohibited','Cheating, bots, exploits lead to immediate suspension. Offensive usernames removed.'],['4. Age','13+ required. Under 18 needs parental consent for paid features.'],['5. In-App Purchases','May be offered in future. Virtual goods generally non-refundable. EU: 14-day withdrawal right. Payments via Google Play / Apple Store.'],['6. Advertising','Personalized ads only with explicit consent (cookie banner).'],['7. Liability','Virtual goods have no monetary value. No liability for data loss from outages.'],['8. IP','Game, design, code owned by H\u00fcseyin Tunay. Unauthorized use prohibited.'],['9. Changes','May change anytime. Continued use = acceptance.'],['10. Law','Turkish law applies. Mandatory EU consumer rules remain valid.']]},
-      tr:{title:'Kullan\u0131m Ko\u015fullar\u0131',sub:'L\u00fctfen kullanmadan \u00f6nce okuyun',sections:[['1. Kapsam','Bu ko\u015fullar H\u00fcseyin Tunay taraf\u0131ndan i\u015fletilen Wrong Way: Don\'t be mad i\u00e7in ge\u00e7erlidir.'],['2. Hesaplar','\u00dccretsiz oynanabilir. \u00c7evrimde \u00f6zellikler e-posta kayd\u0131 gerektirir. Ki\u015fi ba\u015f\u0131na bir hesap.'],['3. Yasaklar','Hile, bot, exploit an\u0131nda askiya al\u0131nma. Uygunsuz kullan\u0131c\u0131 adlar\u0131 silinir.'],['4. Ya\u015f','13 ya\u015f ve \u00fcstü. 18 alt\u0131 \u00fccretli i\u00e7in ebeveyn onay\u0131.'],['5. Uygulama \u0130\u00e7i Al\u0131mlar','Gelecekte sunulabilir. Sanal mallar iade edilmez. \u00d6deme yaln\u0131zca Google Play / Apple Store.'],['6. Reklam','Ki\u015fiselle\u015ftirilmi\u015f reklam yaln\u0131zca onay ile g\u00f6sterilir.'],['7. Sorumluluk','Sanal mallar\u0131n parasal de\u011feri yoktur. Sunucu kesintilerinden sorumluluk yoktur.'],['8. Fikri M\u00fclkiyet','Oyun, tasar\u0131m, kod H\u00fcseyin Tunay\'a aittir.'],['9. De\u011fi\u015fiklikler','Her an de\u011fi\u015ftirilebilir. Kullanmaya devam etmek kabul say\u0131l\u0131r.'],['10. Hukuk','T\u00fcrkiye Cumhuriyeti hukuku uygulan\u0131r.']]},
-      fr:{title:'Conditions d\'utilisation',sub:'Veuillez lire avant d\'utiliser',sections:[['1. Champ','Ces conditions s\'appliquent \u00e0 Wrong Way, exploit\u00e9 par H\u00fcseyin Tunay.'],['2. Comptes','Gratuit. Fonctions en ligne n\u00e9cessitent un e-mail. Un compte par personne.'],['3. Interdictions','Triche, bots, exploits entra\u00eenent suspension imm\u00e9diate.'],['4. \u00c2ge','13 ans minimum. Moins de 18 ans: consentement parental pour contenus payants.'],['5. Achats','Possibles \u00e0 l\'avenir. Biens virtuels non remboursables. Paiements via Google Play / Apple Store.'],['6. Publicit\u00e9','Publicit\u00e9s personnalis\u00e9es uniquement avec consentement explicite.'],['7. Responsabilit\u00e9','Biens virtuels sans valeur mon\u00e9taire. Pas de responsabilit\u00e9 pour pannes.'],['8. Propri\u00e9t\u00e9','Jeu, design, code propri\u00e9t\u00e9 de H\u00fcseyin Tunay.'],['9. Modifications','Modifiables \u00e0 tout moment. Utilisation continue = acceptation.'],['10. Droit','Droit turc. R\u00e8gles UE imp\u00e9ratives restent valables.']]}
-    }
-  };
-  var ll=LEGAL.impressum[lang]?lang:'en';
-  var imp=LEGAL.impressum[ll];
-  var priv=LEGAL.privacy[ll];
-  var terms=LEGAL.terms[ll];
-  var card={background:'var(--card)',border:'1.5px solid var(--border)',borderRadius:14,padding:'16px',marginBottom:10};
-  var tabBtnSt=function(k){return{flex:1,padding:'9px 4px',border:'none',cursor:'pointer',fontWeight:700,fontSize:11,fontFamily:'system-ui,-apple-system,sans-serif',borderRadius:8,background:legalTab===k?'var(--text)':'transparent',color:legalTab===k?'var(--bg)':'var(--subtle)'};};
-  return(
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',minHeight:'100vh',
-      padding:'0 16px 48px',paddingTop:'calc(env(safe-area-inset-top) + 20px)',
-      background:'transparent',position:'relative',zIndex:1,animation:anim}}>
-      <MenuBG dark={darkMode}/>
-      <button onClick={goBack} style={bk}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        {ll==='de'?'Zur\u00fcck':ll==='tr'?'Geri':ll==='fr'?'Retour':'Back'}
-      </button>
-      <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
-        <div style={{textAlign:'center',marginBottom:18,paddingTop:8}}>
-          <div style={{width:52,height:52,borderRadius:14,margin:'0 auto 10px',
-            background:'linear-gradient(135deg,#1e293b,#334155)',
-            display:'flex',alignItems:'center',justifyContent:'center',
-            boxShadow:'0 4px 16px rgba(0,0,0,0.25)'}}>
-            <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><path d="M16 3 L28 7 V16 C28 23 16 29 16 29 C16 29 4 23 4 16 V7 Z" fill="#94a3b8"/><path d="M11 16 L14 19 L21 13" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
-          <div style={{fontSize:17,fontWeight:900,color:'var(--text)',letterSpacing:-0.3}}>Wrong Way</div>
-          <div style={{fontSize:11,color:'var(--subtle)',fontWeight:600,marginTop:2}}>
-            {ll==='de'?'Rechtliches':ll==='tr'?'Yasal Bilgiler':ll==='fr'?'Informations l\u00e9gales':'Legal Information'}
-          </div>
-        </div>
-        <div style={{display:'flex',gap:3,background:'var(--bg)',borderRadius:10,padding:3,border:'1.5px solid var(--border)',marginBottom:14}}>
-          <button onClick={function(){setLegalTab('impressum');}} style={tabBtnSt('impressum')}>
-            {ll==='de'?'Impressum':ll==='tr'?'K\u00fcnye':ll==='fr'?'Mentions':'Imprint'}
-          </button>
-          <button onClick={function(){setLegalTab('privacy');}} style={tabBtnSt('privacy')}>
-            {ll==='de'?'Datenschutz':ll==='tr'?'Gizlilik':ll==='fr'?'Confidentialit\u00e9':'Privacy'}
-          </button>
-          <button onClick={function(){setLegalTab('terms');}} style={tabBtnSt('terms')}>
-            {ll==='de'?'AGB':ll==='tr'?'Ko\u015fullar':ll==='fr'?'CGU':'Terms'}
-          </button>
-        </div>
-
-        {legalTab==='impressum'&&(
-          <div style={card}>
-            <div style={{fontSize:14,fontWeight:900,color:'var(--text)',marginBottom:4}}>{imp.title}</div>
-            <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:14}}>{imp.sub}</div>
-            <div style={{fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:4,marginTop:10}}>{imp.operator}</div>
-            <div style={{fontSize:12,color:'var(--subtle)',lineHeight:1.6}}>{imp.operatorVal}</div>
-            <div style={{fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:4,marginTop:10}}>{imp.address}</div>
-            <div style={{fontSize:12,color:imp.addressVal.indexOf('[')===0?'#f59e0b':'var(--subtle)',lineHeight:1.6}}>{imp.addressVal}</div>
-            {imp.addressVal.indexOf('[')===0&&(
-              <div style={{fontSize:10,background:'rgba(245,158,11,0.1)',border:'1px solid rgba(245,158,11,0.3)',borderRadius:6,padding:'5px 8px',marginTop:4,color:'#d97706',fontWeight:600}}>
-                {ll==='de'?'Bitte Adresse nach Umzug eintragen':ll==='tr'?'Ta\u015f\u0131nd\u0131ktan sonra ekleyin':'Please add address after relocation'}
-              </div>
-            )}
-            <div style={{fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:4,marginTop:10}}>{imp.contact}</div>
-            <div style={{fontSize:12,color:'#3b82f6'}}>{imp.contactVal}</div>
-            <div style={{fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:4,marginTop:10}}>{imp.platform}</div>
-            <div style={{fontSize:12,color:'var(--subtle)',lineHeight:1.6}}>{imp.platformVal}</div>
-            <div style={{marginTop:14,padding:'10px 12px',borderRadius:9,background:'var(--bg)',border:'1px solid var(--border)'}}>
-              <div style={{fontSize:11,color:'var(--subtle)',lineHeight:1.6}}>{imp.note}</div>
-            </div>
-          </div>
-        )}
-
-        {legalTab==='privacy'&&(
-          <div style={card}>
-            <div style={{fontSize:14,fontWeight:900,color:'var(--text)',marginBottom:4}}>{priv.title}</div>
-            <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:14}}>{priv.sub}</div>
-            {priv.sections.map(function(s){return(
-              <div key={s[0]} style={{marginBottom:12}}>
-                <div style={{fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:3}}>{s[0]}</div>
-                <div style={{fontSize:12,color:'var(--subtle)',lineHeight:1.65}}>{s[1]}</div>
-              </div>
-            );})}
-          </div>
-        )}
-
-        {legalTab==='terms'&&(
-          <div style={card}>
-            <div style={{fontSize:14,fontWeight:900,color:'var(--text)',marginBottom:4}}>{terms.title}</div>
-            <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:14}}>{terms.sub}</div>
-            {terms.sections.map(function(s){return(
-              <div key={s[0]} style={{marginBottom:12}}>
-                <div style={{fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:3}}>{s[0]}</div>
-                <div style={{fontSize:12,color:'var(--subtle)',lineHeight:1.65}}>{s[1]}</div>
-              </div>
-            );})}
-          </div>
-        )}
-
-        <div style={{textAlign:'center',marginTop:10}}>
-          <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600}}>
-            {'\u00a9'} {new Date().getFullYear()} Wrong Way \u00b7 H\u00fcseyin Tunay
-          </div>
-          <div style={{fontSize:10,color:'var(--subtle)',fontWeight:500,marginTop:2}}>wrongway.game@gmail.com</div>
-        </div>
-        <div style={{marginTop:14,textAlign:'center'}}>
-          <button onClick={function(){
-            try{localStorage.removeItem('ww_cookie_consent');}catch(e){}
-            setCookieConsent(null);
-            goBack();
-          }} style={{background:'none',border:'1px solid var(--border)',color:'var(--subtle)',
-            cursor:'pointer',fontSize:11,fontWeight:600,
-            fontFamily:'system-ui,-apple-system,sans-serif',padding:'8px 16px',borderRadius:8}}>
-            {ll==='de'?'Cookie-Einstellungen zur\u00fccksetzen':ll==='tr'?'\u00c7erez ayarlar\u0131n\u0131 s\u0131f\u0131rla':ll==='fr'?'R\u00e9initialiser les cookies':'Reset cookie settings'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function App(){
   const[screen,setScreen]=useState('menu');
-  const[cookieConsent,setCookieConsent]=useState(getInitialCookieConsent);
   const[legalTab,setLegalTab]=useState('impressum');
+  const[cookieConsent,setCookieConsent]=useState(function(){try{return localStorage.getItem('ww_cookie_consent')||null;}catch(e){return null;}});
   const[navDir,setNavDir]=useState('fwd'); // Richtung für Seitenwechsel-Animation
   const[gameMode,setGameMode]=useState(null);
   const[onlineRole,setOnlineRole]=useState(null);
@@ -6534,7 +6335,7 @@ function App(){
         </div>
       )}
 
-      {/* Rechtliches-Link */}
+      {/* Datenschutz-Link */}
       <button onClick={function(){setNavDir('fwd');setScreen('legal');}} style={{
         background:'none',border:'none',
         color:'var(--subtle)',cursor:'pointer',fontSize:11,fontWeight:600,
@@ -6543,19 +6344,33 @@ function App(){
         {lang==='de'?'Datenschutz & Impressum':lang==='tr'?'Gizlilik & K\u00fcnye':lang==='fr'?'Confidentialit\u00e9 & Mentions':'Privacy & Legal'}
       </button>
 
-      {/* Cookie-Consent-Banner — erscheint beim ersten Besuch */}
+      {/* Cookie Banner */}
       {!cookieConsent&&(
-        <CookieBanner lang={lang}
-          onAccept={function(){
-            try{localStorage.setItem('ww_cookie_consent','all');}catch(e){}
-            setCookieConsent('all');
-          }}
-          onNecessary={function(){
-            try{localStorage.setItem('ww_cookie_consent','necessary');}catch(e){}
-            setCookieConsent('necessary');
-          }}
-        />
+        <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:3000,padding:'0 0 calc(env(safe-area-inset-bottom) + 0px) 0'}}>
+          <div style={{background:'var(--card)',borderTop:'2px solid var(--border)',boxShadow:'0 -8px 32px rgba(0,0,0,0.18)',padding:'18px 18px 20px',borderRadius:'18px 18px 0 0'}}>
+            <div style={{fontSize:14,fontWeight:900,color:'var(--text)',marginBottom:8}}>
+              {lang==='de'?'Cookies & Einwilligungen':lang==='tr'?'\u00c7erezler & Onay':lang==='fr'?'Cookies & Consentement':'Cookies & Consent'}
+            </div>
+            <div style={{fontSize:12,color:'var(--subtle)',lineHeight:1.6,marginBottom:14}}>
+              {lang==='de'?'Wir nutzen notwendige Cookies f\u00fcr den Spielbetrieb. Mit deiner Einwilligung k\u00f6nnen zuk\u00fcnftig personalisierte Werbeanzeigen eingeblendet werden.':
+               lang==='tr'?'Oyun i\u00e7in gerekli \u00e7erezler kullan\u0131yoruz. Onay\u0131n\u0131zla gelecekte ki\u015fiselle\u015ftirilmi\u015f reklamlar g\u00f6sterilebilir.':
+               lang==='fr'?'Nous utilisons des cookies n\u00e9cessaires au jeu. Avec votre consentement, des publicit\u00e9s personnalis\u00e9es pourront \u00eatre affich\u00e9es.':
+               'We use necessary cookies for the game. With your consent, personalized ads may be shown in the future.'}
+            </div>
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={function(){try{localStorage.setItem('ww_cookie_consent','necessary');}catch(e){}setCookieConsent('necessary');}}
+                style={{flex:1,padding:'11px 8px',borderRadius:11,background:'var(--bg)',color:'var(--text)',border:'1.5px solid var(--border)',cursor:'pointer',fontWeight:700,fontSize:12,fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                {lang==='de'?'Nur notwendige':lang==='tr'?'Yaln\u0131zca gerekli':lang==='fr'?'N\u00e9cessaires':'Necessary only'}
+              </button>
+              <button onClick={function(){try{localStorage.setItem('ww_cookie_consent','all');}catch(e){}setCookieConsent('all');}}
+                style={{flex:1.4,padding:'11px 8px',borderRadius:11,background:'linear-gradient(135deg,#16a34a,#15803d)',color:'#fff',border:'none',cursor:'pointer',fontWeight:800,fontSize:12,fontFamily:'system-ui,-apple-system,sans-serif',boxShadow:'0 2px 10px rgba(22,163,74,0.35)'}}>
+                {lang==='de'?'Alle akzeptieren':lang==='tr'?'T\u00fcm\u00fcn\u00fc kabul et':lang==='fr'?'Tout accepter':'Accept all'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
+
 
     </div>
     );
@@ -6927,7 +6742,65 @@ function App(){
       }}/>;
   }
 
-  if(screen==='legal') return <LegalScreen lang={lang} darkMode={darkMode} goBack={goBack} legalTab={legalTab} setLegalTab={setLegalTab} setCookieConsent={setCookieConsent}/>;
+  if(screen==='legal'){
+    var legalData={
+      impressum:{
+        de:['Impressum','Angaben gem. \u00a75 DDG','Betreiber: H\u00fcseyin Tunay','Adresse: [wird nach Umzug eingetragen]','Kontakt: wrongway.game@gmail.com','Plattform: yavrukusch.github.io'],
+        en:['Legal Notice','Information acc. to \u00a75 DDG','Operator: H\u00fcseyin Tunay','Address: [to be added after relocation]','Contact: wrongway.game@gmail.com','Platform: yavrukusch.github.io'],
+        tr:['K\u00fcnye','6563 say\u0131l\u0131 TCK kapsam\u0131nda','Operat\u00f6r: H\u00fcseyin Tunay','Adres: [ta\u015f\u0131nd\u0131ktan sonra eklenecek]','\u0130leti\u015fim: wrongway.game@gmail.com','Platform: yavrukusch.github.io'],
+        fr:['Mentions l\u00e9gales','Informations selon \u00a75 DDG','Op\u00e9rateur: H\u00fcseyin Tunay','Adresse: [\u00e0 compl\u00e9ter apr\u00e8s d\u00e9m\u00e9nagement]','Contact: wrongway.game@gmail.com','Plateforme: yavrukusch.github.io']
+      },
+      privacy:{
+        de:['Datenschutz (DSGVO & KVKK)','Verantwortlicher: H\u00fcseyin Tunay, wrongway.game@gmail.com','Gespeicherte Daten: E-Mail, Benutzername, Passwort (gehasht), Spielstatistiken, ELO.','Hosting: GitHub Pages (USA) + Google Firebase EU (europe-west1, Frankfurt).','Passw\u00f6rter werden von Firebase gehasht. Kein Zugriff auf Klartextpassw\u00f6rter.','Werbung (zuk\u00fcnftig): Einwilligungsbanner vor Aktivierung. Keine Daten ohne Zustimmung.','Speicherdauer: Bis zur Kontol\u00f6schung. L\u00f6schung in den Profileinstellungen.','Rechte (DSGVO): Auskunft, Berichtigung, L\u00f6schung, Portabilit\u00e4t. wrongway.game@gmail.com','KVKK (T\u00fcrkei): Rechte gem. Gesetz 6698. www.kvkk.gov.tr'],
+        en:['Privacy Policy (GDPR & KVKK)','Controller: H\u00fcseyin Tunay, wrongway.game@gmail.com','Data collected: email, username, password (hashed), game stats, ELO.','Hosting: GitHub Pages (USA) + Google Firebase EU (europe-west1, Frankfurt).','Passwords hashed by Firebase only. No access to plaintext passwords.','Advertising (future): consent banner before activation. No data without consent.','Retention: until account deletion. Deletable in profile settings.','Your rights (GDPR): access, rectification, erasure, portability. wrongway.game@gmail.com','KVKK (Turkey): rights under Law 6698. www.kvkk.gov.tr'],
+        tr:['Gizlilik Politikas\u0131 (KVKK & GDPR)','Veri sorumlusu: H\u00fcseyin Tunay, wrongway.game@gmail.com','Toplanan veriler: e-posta, kullan\u0131c\u0131 ad\u0131, \u015fifre (karma\u015f\u0131k), oyun istatistikleri, ELO.','Bar\u0131nd\u0131rma: GitHub Pages (ABD) + Google Firebase AB (europe-west1, Frankfurt).','\u015eifreler yaln\u0131zca Firebase taraf\u0131ndan karma\u015f\u0131kla\u015ft\u0131r\u0131l\u0131r.','Reklam (gelecekte): onay banner\u0131 \u00f6nce g\u00f6sterilir.','Saklama: hesap silinene kadar. Profil ayarlar\u0131ndan silinebilir.','Haklar\u0131n\u0131z (KVKK): bilgi alma, d\u00fczeltme, silme. www.kvkk.gov.tr','GDPR (AB): eri\u015fim, d\u00fczeltme, silme, ta\u015f\u0131nabilirlik. wrongway.game@gmail.com'],
+        fr:['Politique de confidentialit\u00e9 (RGPD & KVKK)','Responsable: H\u00fcseyin Tunay, wrongway.game@gmail.com','Donn\u00e9es collect\u00e9es: e-mail, pseudo, mot de passe (hach\u00e9), stats, ELO.','H\u00e9bergement: GitHub Pages (USA) + Google Firebase UE (europe-west1, Francfort).','Mots de passe hach\u00e9s uniquement par Firebase.','Publicit\u00e9 (futur): bandeau de consentement avant activation.','Conservation: jusqu\'au compte supprim\u00e9. Supprimable dans les param\u00e8tres.','Droits (RGPD): acc\u00e8s, rectification, effacement, portabilit\u00e9. wrongway.game@gmail.com','KVKK (Turquie): droits selon loi 6698. www.kvkk.gov.tr']
+      },
+      terms:{
+        de:['Nutzungsbedingungen','Geltungsbereich: Wrong Way: Don\'t be mad, betrieben von H\u00fcseyin Tunay.','Konten: kostenlos spielbar. Online erfordert g\u00fcltige E-Mail. Ein Konto pro Person.','Verbote: Cheating, Bots, Exploits f\u00fchren zur sofortigen Sperrung.','Altersgrenze: ab 13 Jahren. Unter 18 Jahren Elternzustimmung f\u00fcr Eink\u00e4ufe erforderlich.','In-App-K\u00e4ufe (zuk\u00fcnftig): Zahlung nur \u00fcber Google Play / Apple Store. Kein Geldwert f\u00fcr virtuelle G\u00fcter.','Werbung: personalisierte Werbung nur mit Einwilligung (Cookie-Banner).','Haftung: kein Ersatz bei Datenverlust durch Serverausf\u00e4lle.','Geltendes Recht: T\u00fcrkisches Recht. Zwingende EU-Regeln bleiben wirksam.'],
+        en:['Terms of Service','Scope: Wrong Way: Don\'t be mad, operated by H\u00fcseyin Tunay.','Accounts: free to play. Online requires valid email. One account per person.','Prohibited: cheating, bots, exploits lead to immediate suspension.','Age: 13+ required. Under 18 needs parental consent for purchases.','In-App Purchases (future): payments via Google Play / Apple Store only. Virtual goods have no monetary value.','Advertising: personalized ads only with explicit consent (cookie banner).','Liability: no compensation for data loss due to server outages.','Governing law: Turkish law. Mandatory EU consumer rules remain valid.'],
+        tr:['Kullan\u0131m Ko\u015fullar\u0131','Kapsam: H\u00fcseyin Tunay taraf\u0131ndan i\u015fletilen Wrong Way: Don\'t be mad.','Hesaplar: \u00fccretsiz oynanabilir. \u00c7evrimde ge\u00e7erli e-posta gerektirir. Ki\u015fi ba\u015f\u0131na bir hesap.','Yasaklar: hile, bot, exploit an\u0131nda hesap askiya al\u0131nmas\u0131na yol a\u00e7ar.','Ya\u015f: 13 ve \u00fcst\u00fc. 18 alt\u0131 \u00fccretli i\u00e7erik i\u00e7in ebeveyn onay\u0131 gerekir.','Uygulama \u0130\u00e7i Al\u0131mlar (gelecekte): \u00f6deme yaln\u0131zca Google Play / Apple Store. Sanal mallar\u0131n de\u011feri yoktur.','Reklam: ki\u015fiselle\u015ftirilmi\u015f reklam yaln\u0131zca \u00e7erez onay\u0131yla g\u00f6sterilir.','Sorumluluk: sunucu ar\u0131zalar\u0131ndan kaynaklanan kay\u0131plardan sorumluluk yoktur.','Ge\u00e7erli hukuk: T\u00fcrkiye Cumhuriyeti hukuku.'],
+        fr:['Conditions d\'utilisation','Champ: Wrong Way: Don\'t be mad, exploit\u00e9 par H\u00fcseyin Tunay.','Comptes: gratuit. En ligne n\u00e9cessite un e-mail valide. Un compte par personne.','Interdictions: triche, bots, exploits entra\u00eenent suspension imm\u00e9diate.','\u00c2ge: 13 ans minimum. Moins de 18 ans: consentement parental pour achats.','Achats in-app (futur): paiements via Google Play / Apple Store uniquement.','Publicit\u00e9: publicit\u00e9s personnalis\u00e9es uniquement avec consentement explicite.','Responsabilit\u00e9: pas de compensation pour pertes dues aux pannes.','Droit applicable: droit turc. R\u00e8gles UE imp\u00e9ratives restent valables.']
+      }
+    };
+    var ll=legalData.impressum[lang]?lang:'en';
+    var sections=legalData[legalTab]?legalData[legalTab][ll]:legalData.impressum[ll];
+    var cardSt={background:'var(--card)',border:'1.5px solid var(--border)',borderRadius:14,padding:'16px',marginBottom:10};
+    var tabSt=function(k){return{flex:1,padding:'9px 4px',border:'none',cursor:'pointer',fontWeight:700,fontSize:11,fontFamily:'system-ui,-apple-system,sans-serif',borderRadius:8,background:legalTab===k?'var(--text)':'transparent',color:legalTab===k?'var(--bg)':'var(--subtle)'};};
+    return(
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',minHeight:'100vh',padding:'0 16px 48px',paddingTop:'calc(env(safe-area-inset-top) + 20px)',background:'transparent',position:'relative',zIndex:1}}>
+        <MenuBG dark={darkMode}/>
+        <button onClick={goBack} style={{position:'fixed',top:'calc(env(safe-area-inset-top)+14px)',left:14,zIndex:300,display:'flex',alignItems:'center',gap:4,padding:'7px 12px 7px 8px',borderRadius:20,background:'var(--card)',border:'1.5px solid var(--border)',cursor:'pointer',fontSize:13,fontWeight:700,color:'var(--text)',fontFamily:'system-ui,-apple-system,sans-serif'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          {t('tutBack')}
+        </button>
+        <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
+          <div style={{textAlign:'center',marginBottom:18,paddingTop:8}}>
+            <div style={{fontSize:17,fontWeight:900,color:'var(--text)'}}>Wrong Way</div>
+            <div style={{fontSize:11,color:'var(--subtle)',fontWeight:600,marginTop:2}}>{ll==='de'?'Rechtliches':ll==='tr'?'Yasal':'Legal'}</div>
+          </div>
+          <div style={{display:'flex',gap:3,background:'var(--bg)',borderRadius:10,padding:3,border:'1.5px solid var(--border)',marginBottom:14}}>
+            <button onClick={function(){setLegalTab('impressum');}} style={tabSt('impressum')}>{ll==='de'?'Impressum':ll==='tr'?'K\u00fcnye':ll==='fr'?'Mentions':'Imprint'}</button>
+            <button onClick={function(){setLegalTab('privacy');}} style={tabSt('privacy')}>{ll==='de'?'Datenschutz':ll==='tr'?'Gizlilik':ll==='fr'?'Conf.':'Privacy'}</button>
+            <button onClick={function(){setLegalTab('terms');}} style={tabSt('terms')}>{ll==='de'?'AGB':ll==='tr'?'Ko\u015fullar':ll==='fr'?'CGU':'Terms'}</button>
+          </div>
+          <div style={cardSt}>
+            {sections.map(function(line,i){return(
+              <div key={i} style={{fontSize:i===0?14:12,fontWeight:i===0?900:500,color:i===0?'var(--text)':'var(--subtle)',marginBottom:i===0?10:6,lineHeight:1.6,borderBottom:i===0?'1px solid var(--border)':'none',paddingBottom:i===0?10:0}}>{line}</div>
+            );})}
+          </div>
+          <div style={{textAlign:'center',marginTop:10,fontSize:10,color:'var(--subtle)',fontWeight:600}}>
+            {'\u00a9'} {new Date().getFullYear()} Wrong Way \u00b7 H\u00fcseyin Tunay
+          </div>
+          <div style={{textAlign:'center',marginTop:10}}>
+            <button onClick={function(){try{localStorage.removeItem('ww_cookie_consent');}catch(e){}setCookieConsent(null);goBack();}} style={{background:'none',border:'1px solid var(--border)',color:'var(--subtle)',cursor:'pointer',fontSize:11,fontWeight:600,fontFamily:'system-ui,-apple-system,sans-serif',padding:'8px 16px',borderRadius:8}}>
+              {ll==='de'?'Cookie-Einstellungen zur\u00fccksetzen':ll==='tr'?'\u00c7erez ayarlar\u0131n\u0131 s\u0131f\u0131rla':'Reset cookie settings'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const doGoogleSignIn=()=>{
     const provider=new firebase.auth.GoogleAuthProvider();
