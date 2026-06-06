@@ -5239,6 +5239,25 @@ function App(){
     });
   };
 
+  // ── Menü: tote Lobbys einmalig bereinigen ──
+  useEffect(()=>{
+    if(screen!=='menu')return;
+    var cleanup=async function(){
+      try{
+        var list=await stoGet('barricade_lobby_list');
+        if(!list||!list.length)return;
+        var now=Date.now();
+        var alive=list.filter(function(l){return now-l.ts<45000;});
+        if(alive.length<list.length){
+          await stoSet('barricade_lobby_list',alive);
+          var dead=list.filter(function(l){return now-l.ts>=45000;});
+          for(var i=0;i<dead.length;i++){await stoDel('barricade_lobby_'+dead[i].id);}
+        }
+      }catch(e){}
+    };
+    cleanup();
+  },[screen]);
+
   // ── Lobby polling ──
   useEffect(()=>{
     if(screen!=='waiting'&&screen!=='online')return;
