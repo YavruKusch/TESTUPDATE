@@ -4344,65 +4344,8 @@ function App(){
     return function(){clearTimeout(timer);};
   },[adminCfg.announce]);
 
-  // AFK-Zug-Timer: 60s pro Zug, nur Online ohne Timer, kein Ranked
-  useEffect(function(){
-    if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
-    setAfkTimeLeft(0);
-    if(screen!=='game'||gameMode!=='online'||winner||turn!==onlineRole||isRanked)return;
-    if(gameTimeMode&&gameTimeMode!=='none')return;
-    var secs=60;
-    setAfkTimeLeft(secs);
-    turnTimerRef.current=setInterval(function(){
-      secs--;
-      setAfkTimeLeft(secs);
-      if(secs<=0){
-        clearInterval(turnTimerRef.current);
-        turnTimerRef.current=null;
-        if(S.current&&S.current.turn===onlineRole&&!S.current.winner){
-          var opp=onlineRole==='A'?'B':'A';
-          if(afkTriggerRef.current) afkTriggerRef.current(opp);
-        }
-      }
-    },1000);
-    return function(){
-      if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
-      setAfkTimeLeft(0);
-    };
-  },[turn,winner,screen,onlineRole,gameMode,gameTimeMode,isRanked]);
+  // AFK-Zug-Timer und Inaktivitäts-Kick: weiter unten nach allen Deklarationen (Safari TDZ)
 
-  // Inaktivitäts-Kick: 2min kein Touch → Warnung → Menü
-  useEffect(function(){
-    function resetInactivity(){
-      clearTimeout(inactivityTimerRef.current);
-      clearTimeout(inactivityWarnRef.current);
-      clearInterval(inactiveCountRef.current);
-      setInactiveWarning(false);
-      setInactiveSecs(15);
-      inactivityWarnRef.current=setTimeout(function(){
-        setInactiveWarning(true);
-        var s=15;
-        setInactiveSecs(s);
-        inactiveCountRef.current=setInterval(function(){
-          s--;
-          setInactiveSecs(s);
-          if(s<=0)clearInterval(inactiveCountRef.current);
-        },1000);
-      },105000);
-      inactivityTimerRef.current=setTimeout(function(){
-        setInactiveWarning(false);
-        setScreen('menu');
-      },120000);
-    }
-    var evts=['touchstart','mousedown','click','keydown'];
-    evts.forEach(function(e){document.addEventListener(e,resetInactivity,{passive:true,capture:true});});
-    resetInactivity();
-    return function(){
-      evts.forEach(function(e){document.removeEventListener(e,resetInactivity,{capture:true});});
-      clearTimeout(inactivityTimerRef.current);
-      clearTimeout(inactivityWarnRef.current);
-      clearInterval(inactiveCountRef.current);
-    };
-  },[]);
 
   // URL ?join=CODE → automatisch zum Freund-Beitritt
   useEffect(()=>{
@@ -4878,6 +4821,67 @@ function App(){
   const inactivityTimerRef=useRef(null);
   const inactivityWarnRef=useRef(null);
   const inactiveCountRef=useRef(null);
+
+  // AFK-Zug-Timer: 60s pro Zug, nur Online ohne Timer, kein Ranked
+  useEffect(function(){
+    if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
+    setAfkTimeLeft(0);
+    if(screen!=='game'||gameMode!=='online'||winner||turn!==onlineRole||isRanked)return;
+    if(gameTimeMode&&gameTimeMode!=='none')return;
+    var secs=60;
+    setAfkTimeLeft(secs);
+    turnTimerRef.current=setInterval(function(){
+      secs--;
+      setAfkTimeLeft(secs);
+      if(secs<=0){
+        clearInterval(turnTimerRef.current);
+        turnTimerRef.current=null;
+        if(S.current&&S.current.turn===onlineRole&&!S.current.winner){
+          var opp=onlineRole==='A'?'B':'A';
+          if(afkTriggerRef.current) afkTriggerRef.current(opp);
+        }
+      }
+    },1000);
+    return function(){
+      if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
+      setAfkTimeLeft(0);
+    };
+  },[turn,winner,screen,onlineRole,gameMode,gameTimeMode,isRanked]);
+
+  // Inaktivitäts-Kick: 2min kein Touch → Warnung → Menü
+  useEffect(function(){
+    function resetInactivity(){
+      clearTimeout(inactivityTimerRef.current);
+      clearTimeout(inactivityWarnRef.current);
+      clearInterval(inactiveCountRef.current);
+      setInactiveWarning(false);
+      setInactiveSecs(15);
+      inactivityWarnRef.current=setTimeout(function(){
+        setInactiveWarning(true);
+        var s=15;
+        setInactiveSecs(s);
+        inactiveCountRef.current=setInterval(function(){
+          s--;
+          setInactiveSecs(s);
+          if(s<=0)clearInterval(inactiveCountRef.current);
+        },1000);
+      },105000);
+      inactivityTimerRef.current=setTimeout(function(){
+        setInactiveWarning(false);
+        setScreen('menu');
+      },120000);
+    }
+    var evts=['touchstart','mousedown','click','keydown'];
+    evts.forEach(function(e){document.addEventListener(e,resetInactivity,{passive:true,capture:true});});
+    resetInactivity();
+    return function(){
+      evts.forEach(function(e){document.removeEventListener(e,resetInactivity,{capture:true});});
+      clearTimeout(inactivityTimerRef.current);
+      clearTimeout(inactivityWarnRef.current);
+      clearInterval(inactiveCountRef.current);
+    };
+  },[]);
+
   useEffect(()=>{
     if(!hammerMode||isRanked||hammerDrops!==2||winner||screen!=='game')return;
     if(hammerWave2Ref.current)return;
