@@ -5977,11 +5977,17 @@ function App(){
           boxShadow:'0 2px 10px rgba(245,158,11,0.4)',zIndex:100}}><ShieldSmIcon size={20} color="#fff"/></button>
       )}
       {adminCfg.announce&&(adminCfg.announceUntil===0||Date.now()<adminCfg.announceUntil)?(
-        <div style={{position:'relative',zIndex:1,width:280,marginBottom:14,padding:'10px 14px',
-          background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'white',borderRadius:12,
-          fontSize:12,fontWeight:700,textAlign:'center',boxShadow:'0 2px 10px rgba(99,102,241,0.3)',
-          display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
-          <MegaphoneIcon size={14} color="#fff"/> {adminCfg.announce}
+        <div style={{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 14px)',left:'50%',
+          transform:'translateX(-50%)',zIndex:200,
+          maxWidth:'calc(100vw - 32px)',width:'max-content',
+          padding:'9px 16px',
+          background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'white',borderRadius:20,
+          fontSize:12,fontWeight:700,textAlign:'center',
+          boxShadow:'0 4px 16px rgba(99,102,241,0.35)',
+          display:'flex',alignItems:'center',gap:6,
+          animation:'fadeSlideUp 0.3s cubic-bezier(0.25,1,0.5,1) both',
+          pointerEvents:'none'}}>
+          <MegaphoneIcon size={13} color="#fff"/> {adminCfg.announce}
         </div>
       ):null}
       {pendingInvite&&(
