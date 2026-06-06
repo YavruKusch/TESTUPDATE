@@ -8247,19 +8247,46 @@ function App(){
             </div>
           </div>
           {/* VS in der Mitte */}
-          <div style={{position:'relative',zIndex:3,display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
-            <div style={{fontSize:62,fontWeight:900,fontStyle:'italic',letterSpacing:-3,lineHeight:1,
-              background:'linear-gradient(180deg,#fff 0%,#cbd5e1 100%)',WebkitBackgroundClip:'text',
-              WebkitTextFillColor:'transparent',backgroundClip:'text',
-              filter:'drop-shadow(0 4px 16px rgba(255,255,255,0.35))',
+          <div style={{position:'relative',zIndex:3,display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
+            <div style={{fontSize:72,fontWeight:900,fontStyle:'italic',letterSpacing:-2,lineHeight:1,
+              color:'#ffffff',
+              textShadow:'0 0 40px rgba(255,255,255,0.6), 0 4px 24px rgba(0,0,0,0.8), 0 2px 0 rgba(0,0,0,0.5)',
               animation:'intro-vs 0.75s cubic-bezier(0.34,1.56,0.64,1) 0.4s both'}}>VS</div>
-            {/* Modus-Label */}
-            <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:5,
+            {/* Modus-Labels */}
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6,
               animation:'intro-label 0.5s ease-out 0.95s both'}}>
-              <div style={{fontSize:14,fontWeight:900,letterSpacing:2,color:'#fff',textTransform:'uppercase',
-                padding:'7px 18px',borderRadius:20,background:'rgba(255,255,255,0.12)',
-                border:'1.5px solid rgba(255,255,255,0.25)',backdropFilter:'blur(4px)'}}>{introMapLbl}</div>
-              {introTimeLbl&&<div style={{fontSize:11,fontWeight:700,letterSpacing:1,color:'rgba(255,255,255,0.7)',textTransform:'uppercase'}}>{introTimeLbl}</div>}
+              {/* Haupt-Modus */}
+              <div style={{
+                fontSize:18,fontWeight:900,letterSpacing:3,color:'#fff',textTransform:'uppercase',
+                padding:'8px 22px',borderRadius:24,
+                background:isRanked?'linear-gradient(135deg,#f59e0b,#d97706)':selectedMap==='duel'?'linear-gradient(135deg,#8b5cf6,#6d28d9)':'linear-gradient(135deg,#3b82f6,#2563eb)',
+                boxShadow:isRanked?'0 4px 20px rgba(245,158,11,0.55)':selectedMap==='duel'?'0 4px 20px rgba(139,92,246,0.55)':'0 4px 20px rgba(59,130,246,0.55)',
+                border:'2px solid rgba(255,255,255,0.25)'}}>
+                {isRanked?'RANKED ':''}{introMapLbl.toUpperCase()}
+              </div>
+              {/* Sub-Modi Badges */}
+              <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'center'}}>
+                {introTimeLbl?(
+                  <div style={{fontSize:11,fontWeight:800,letterSpacing:1,color:'rgba(255,255,255,0.95)',
+                    textTransform:'uppercase',padding:'4px 12px',borderRadius:12,
+                    background:'rgba(255,255,255,0.15)',border:'1px solid rgba(255,255,255,0.3)'}}>{introTimeLbl}</div>
+                ):null}
+                {hammerMode&&!isRanked?(
+                  <div style={{fontSize:11,fontWeight:800,letterSpacing:1,color:'#1a1220',
+                    textTransform:'uppercase',padding:'4px 12px',borderRadius:12,
+                    background:'#fbbf24',boxShadow:'0 2px 8px rgba(251,191,36,0.5)'}}>HAMMER</div>
+                ):null}
+                {chaosMode&&!isRanked?(
+                  <div style={{fontSize:11,fontWeight:800,letterSpacing:1,color:'#fff',
+                    textTransform:'uppercase',padding:'4px 12px',borderRadius:12,
+                    background:'linear-gradient(135deg,#8b5cf6,#ec4899)',boxShadow:'0 2px 8px rgba(139,92,246,0.5)'}}>CHAOS</div>
+                ):null}
+                {dropMode&&!isRanked?(
+                  <div style={{fontSize:11,fontWeight:800,letterSpacing:1,color:'#fff',
+                    textTransform:'uppercase',padding:'4px 12px',borderRadius:12,
+                    background:'linear-gradient(135deg,#ec4899,#f43f5e)',boxShadow:'0 2px 8px rgba(236,72,153,0.5)'}}>DROP</div>
+                ):null}
+              </div>
             </div>
           </div>
           {/* Flash */}
