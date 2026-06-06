@@ -846,6 +846,7 @@ const I18N={
 const I18N_EXT={
 en:{
   viewProfile:'View profile',viewProfileDesc:'Opponent stats',opponent:'Opponent',
+  copyLink:'Copy link',
   email:'Email',emailPh:'you@example.com',forgotPw:'Forgot password?',
   pwResetSent:'Reset email sent \u2014 check your inbox.',pwResetErr:'Could not send reset email.',
   auth_emailTaken:'Email already registered',auth_emailInvalid:'Invalid email address',
@@ -890,6 +891,7 @@ en:{
 },
 de:{
   viewProfile:'Profil ansehen',viewProfileDesc:'Stats des Gegners',opponent:'Gegner',
+  copyLink:'Link kopieren',
   email:'E-Mail',emailPh:'du@beispiel.de',forgotPw:'Passwort vergessen?',
   pwResetSent:'E-Mail zum Zur\u00fccksetzen gesendet \u2014 schau in dein Postfach.',pwResetErr:'E-Mail konnte nicht gesendet werden.',
   auth_emailTaken:'E-Mail bereits registriert',auth_emailInvalid:'Ung\u00fcltige E-Mail-Adresse',
@@ -933,6 +935,7 @@ de:{
 },
 tr:{
   viewProfile:'Profili g\u00f6r',viewProfileDesc:'Rakip istatistikleri',opponent:'Rakip',
+  copyLink:'Ba\u011flant\u0131y\u0131 kopyala',
   email:'E-posta',emailPh:'siz@ornek.com',forgotPw:'\u015eifremi unuttum?',
   pwResetSent:'S\u0131f\u0131rlama e-postas\u0131 g\u00f6nderildi \u2014 gelen kutunuzu kontrol edin.',pwResetErr:'S\u0131f\u0131rlama e-postas\u0131 g\u00f6nderilemedi.',
   auth_emailTaken:'E-posta zaten kay\u0131tl\u0131',auth_emailInvalid:'Ge\u00e7ersiz e-posta adresi',
@@ -976,6 +979,7 @@ tr:{
 },
 fr:{
   viewProfile:'Voir le profil',viewProfileDesc:"Stats de l'adversaire",opponent:'Adversaire',
+  copyLink:'Copier le lien',
   email:'E-mail',emailPh:'vous@exemple.fr',forgotPw:'Mot de passe oubli\u00e9\u00a0?',
   pwResetSent:'E-mail de r\u00e9initialisation envoy\u00e9 \u2014 v\u00e9rifiez votre bo\u00eete.',pwResetErr:"Impossible d'envoyer l'e-mail de r\u00e9initialisation.",
   auth_emailTaken:'E-mail d\u00e9j\u00e0 enregistr\u00e9',auth_emailInvalid:'Adresse e-mail invalide',
@@ -7784,15 +7788,30 @@ function App(){
               {t('scanQR')}
             </div>
 
-            {/* WhatsApp Share */}
-            <button onClick={()=>{window.open('https://wa.me/?text='+waMsg,'_blank');}}
-              style={{width:'100%',padding:'12px 14px',background:'#25D366',color:'white',
-                border:'none',borderRadius:12,fontWeight:800,cursor:'pointer',fontSize:13,
-                textAlign:'center',display:'block',
-                boxShadow:'0 4px 12px rgba(37,211,102,0.32)',
-                fontFamily:'system-ui,-apple-system,sans-serif',marginBottom:20}}>
-              <span style={{display:'inline-flex',alignItems:'center',gap:8,justifyContent:'center'}}><PhoneIcon size={15} color="#fff"/>{t('shareWhatsApp')}</span>
-            </button>
+            {/* Share Buttons */}
+            <div style={{display:'flex',gap:8,width:'100%',marginBottom:20}}>
+              <button onClick={()=>{window.open('https://wa.me/?text='+waMsg,'_blank');}}
+                style={{flex:1,padding:'12px 10px',background:'#25D366',color:'white',
+                  border:'none',borderRadius:12,fontWeight:800,cursor:'pointer',fontSize:13,
+                  textAlign:'center',boxShadow:'0 4px 12px rgba(37,211,102,0.32)',
+                  fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                <span style={{display:'inline-flex',alignItems:'center',gap:6,justifyContent:'center'}}>
+                  <PhoneIcon size={14} color="#fff"/>{t('shareWhatsApp')}
+                </span>
+              </button>
+              <button onClick={()=>{
+                try{navigator.clipboard.writeText(shareUrl).then(function(){
+                  var b=document.getElementById('copy-link-btn');
+                  if(b){b.textContent=t('copied');setTimeout(function(){b.textContent=t('copyLink');},2000);}
+                });}catch(e){}
+              }} id="copy-link-btn"
+                style={{flex:1,padding:'12px 10px',background:'var(--card)',color:'var(--text)',
+                  border:'1.5px solid var(--border)',borderRadius:12,fontWeight:800,cursor:'pointer',fontSize:13,
+                  textAlign:'center',boxShadow:'var(--shadow-soft)',
+                  fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                {t('copyLink')}
+              </button>
+            </div>
           </>
         )}
         <div style={{fontSize:12,color:'var(--subtle)',marginBottom:22,textAlign:'center'}}>
