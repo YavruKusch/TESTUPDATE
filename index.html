@@ -3491,7 +3491,7 @@ function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack}){
 }
 function LeaderboardScreen({t,darkMode,goBack,account}){
   const[mode,setMode]=React.useState('classic');
-  const[entries,setEntries]=React.useState([]);
+  const[raw,setRaw]=React.useState({});
   const[loading,setLoading]=React.useState(true);
   const dk=darkMode;
   const bg=dk?'#0a1020':'#f8f9fa';
@@ -3501,21 +3501,25 @@ function LeaderboardScreen({t,darkMode,goBack,account}){
   const border=dk?'#252d44':'#e2e8f0';
   const gold='#f59e0b',silver='#94a3b8',bronze='#b45309';
 
+  // Einmal laden (gesamter Node), danach clientseitig nach Modus filtern/sortieren.
+  // Vorher wurde bei JEDEM Tab-Wechsel (Classic/Duel) der komplette Node neu heruntergeladen.
   const load=async()=>{
     setLoading(true);
     try{
       if(!window.db){setLoading(false);return;}
       const snap=await window.db.ref('ww_leaderboard').once('value');
-      const data=snap.val()||{};
-      const list=Object.entries(data)
-        .map(([key,v])=>({key,name:v.name||'?',color:v.color||'#8b5cf6',classic:v.classic,duel:v.duel}))
-        .filter(e=>e[mode]&&e[mode].rating);
-      list.sort((a,b)=>(b[mode]&&b[mode].rating||0)-(a[mode]&&a[mode].rating||0));
-      setEntries(list);
+      setRaw(snap.val()||{});
     }catch(e){console.warn('Leaderboard load error',e);}
     setLoading(false);
   };
-  React.useEffect(()=>{load();},[mode]);
+  React.useEffect(()=>{load();},[]);
+  const entries=React.useMemo(()=>{
+    return Object.entries(raw)
+      .map(([key,v])=>({key,name:v.name||'?',color:v.color||'#8b5cf6',classic:v.classic,duel:v.duel}))
+      .filter(e=>e[mode]&&e[mode].rating)
+      .sort((a,b)=>(((b[mode]&&b[mode].rating)||0)-((a[mode]&&a[mode].rating)||0)))
+      .slice(0,100);
+  },[raw,mode]);
 
   const MEDAL=['🥇','🥈','🥉'];
   const myKey=account?account.key:null;
@@ -4011,26 +4015,38 @@ function App(){
   const[friendReqCount,setFriendReqCount]=useState(0);
   const[globalStats,setGlobalStats]=useState({online:0,inGame:0});
   const[spectateId,setSpectateId]=useState(null);
-  // Globaler Realtime-Listener: wieviele Spieler online / in Runde
+  // Spielerzähler (online / in Runde): NUR im Menü, periodischer Einzel-Abruf statt Dauer-Listener.
+  // Ein .on('value') auf dem GESAMTEN ww_presence-Node lieferte bei JEDEM Heartbeat den
+  // kompletten Node an JEDEN Client zurück → massive Download-Kosten. Daher 45s-Poll, nur im Menü.
   useEffect(()=>{
-    if(!window.db)return;
+    if(!window.db||screen!=='menu')return;
+    let cancelled=false;
     const ref=window.db.ref('ww_presence');
-    const cb=ref.on('value',snap=>{
-      const all=snap.val()||{};const now=Date.now();
-      let on=0,ig=0;
-      Object.values(all).forEach(p=>{
-        if(p&&p.online&&(now-p.lastSeen<50000)){on++;if(p.inGame)ig++;}
-      });
-      setGlobalStats({online:on,inGame:ig});
-    });
-    return()=>ref.off('value',cb);
-  },[]);
+    const load=async()=>{
+      try{
+        const snap=await ref.once('value');
+        if(cancelled)return;
+        const all=snap.val()||{};const now=Date.now();
+        let on=0,ig=0;
+        Object.values(all).forEach(p=>{
+          if(p&&p.online&&(now-p.lastSeen<50000)){on++;if(p.inGame)ig++;}
+        });
+        setGlobalStats({online:on,inGame:ig});
+      }catch(e){}
+    };
+    load();
+    const iv=setInterval(load,45000);
+    return()=>{cancelled=true;clearInterval(iv);};
+  },[screen]);
   // Presence-Heartbeat: solange eingeloggt → online setzen alle 25s
   useEffect(()=>{
     var authU=firebase.auth().currentUser;
     const key=account?account.key:(authU?authU.uid:GUEST_ID);
     const name=getDisplayName(account);
     setPresence(key,true,name);
+    // Verbindung weg (App zu / Crash) → eigenen Presence-Eintrag automatisch entfernen.
+    // Hält ww_presence klein (nur aktuell verbundene Clients) statt unbegrenzt zu wachsen.
+    try{window.db.ref(PRESENCE_KEY(key)).onDisconnect().remove();}catch(e){}
     const iv=setInterval(()=>{
       var u=firebase.auth().currentUser;
       const k=account?account.key:(u?u.uid:GUEST_ID);
@@ -5300,7 +5316,7 @@ function App(){
         }
       }
     };
-    const iv=setInterval(poll,1500);poll();
+    const iv=setInterval(poll,2000);poll();
     return()=>clearInterval(iv);
   },[screen,lobbyId,onlineRole]);
 
@@ -5396,6 +5412,12 @@ function App(){
     const hostAccountKey=account?account.key:null;
     const ok=await stoSet(`barricade_lobby_${id}`,{id,code,isPrivate,hostId:SESSION,hostName,hostAccountKey,guestId:null,ts:Date.now(),...cfg});
     if(!ok){setFlash(t('firebaseError')+(window.lastFbError||'?')+t('checkRules'));return;}
+    // Ghost-Lobby-Schutz: verliert der Host die Verbindung (App zu / Crash / kein Netz),
+    // löscht Firebase Lobby- UND Code-Node automatisch. Verhindert ewig offene Zombie-Lobbys.
+    try{
+      window.db.ref(`barricade_lobby_${id}`).onDisconnect().remove();
+      if(isPrivate)window.db.ref(`barricade_code_${code}`).onDisconnect().remove();
+    }catch(e){}
     if(isPrivate)await stoSet(`barricade_code_${code}`,{id});
     else{const list=await stoGet('barricade_lobby_list')||[];await stoSet('barricade_lobby_list',[...list.filter(l=>l.hostId!==SESSION),{id,hostId:SESSION,ts:Date.now(),...cfg}]);}
     setLobbyId(id);setOnlineRole('A');
@@ -5425,6 +5447,8 @@ function App(){
         const res=await window.db.ref(`barricade_lobby_${id}`).transaction(cur=>{
           if(cur===null){out={reason:'gone'};return cur;} // existiert nicht
           let obj;try{obj=JSON.parse(cur);}catch(e){out={reason:'gone'};return cur;}
+          // Zombie-Schutz: uralte Lobby (Host lange weg) ignorieren statt beizutreten.
+          if(obj.ts&&(Date.now()-obj.ts>120000)){out={reason:'gone'};return cur;}
           if(obj.guestId){out={reason:'full'};return;} // besetzt → abbrechen
           obj.guestId=SESSION;
           obj.guestName=getDisplayName(account);
@@ -5778,18 +5802,41 @@ function App(){
       );
     }
     if(adminCfg.maintenance&&!isAdmin()){
+      const tryUnlock=async()=>{
+        try{
+          const enc=new TextEncoder().encode(adminUnlockPw);
+          const buf=await crypto.subtle.digest('SHA-256',enc);
+          const hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+          if(hash===ADMIN_HASH){_adminUnlocked=true;setShowAdminUnlock(false);setAdminUnlockPw('');setShowAdmin(true);}
+          else setAdminUnlockErr(true);
+        }catch(e){setAdminUnlockErr(true);}
+      };
       return(
         <div style={{...sPage,background:'transparent',position:'relative',zIndex:1}}>
           <MenuBG dark={darkMode}/>
           <div style={{position:'relative',zIndex:1,textAlign:'center',maxWidth:300,padding:24}}>
-          <div style={{width:56,height:56,borderRadius:18,background:'linear-gradient(135deg,#64748b,#475569)',
+          <div onClick={()=>{const n=adminTaps+1;setAdminTaps(n);if(n>=10){setAdminTaps(0);setShowAdminUnlock(true);setAdminUnlockPw('');setAdminUnlockErr(false);}}}
+            style={{width:56,height:56,borderRadius:18,background:'linear-gradient(135deg,#64748b,#475569)',
             display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',
-            boxShadow:'0 6px 20px rgba(0,0,0,0.2)'}}><ShieldSmIcon size={28} color="#fff"/></div>
+            boxShadow:'0 6px 20px rgba(0,0,0,0.2)',cursor:'default',userSelect:'none'}}><ShieldSmIcon size={28} color="#fff"/></div>
             <div style={{fontSize:20,fontWeight:900,letterSpacing:-0.5,color:'var(--text)',marginBottom:8}}>{t('maintenanceTitle')}</div>
             <div style={{fontSize:13,color:'var(--subtle)',fontWeight:500,lineHeight:1.6}}>
               {adminCfg.announce?adminCfg.announce:'Das Spiel ist gerade nicht verfügbar. Bitte versuche es später nochmal.'}
             </div>
           </div>
+          {showAdminUnlock&&(
+            <div onClick={()=>{setShowAdminUnlock(false);setAdminUnlockPw('');setAdminUnlockErr(false);}}
+              style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.6)',zIndex:9000,display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
+              <div onClick={e=>e.stopPropagation()} style={{background:'var(--card)',borderRadius:18,padding:'20px 18px',width:'100%',maxWidth:300,boxShadow:'0 20px 60px rgba(0,0,0,0.4)'}}>
+                <div style={{fontSize:15,fontWeight:800,color:'var(--text)',marginBottom:12,textAlign:'center'}}>Admin</div>
+                <input value={adminUnlockPw} onChange={e=>{setAdminUnlockPw(e.target.value);setAdminUnlockErr(false);}} type="password" placeholder="Passwort" autoFocus
+                  onKeyDown={e=>{if(e.key==='Enter')tryUnlock();}}
+                  style={{width:'100%',padding:'12px',borderRadius:10,border:adminUnlockErr?'1.5px solid #ef4444':'1.5px solid var(--border)',fontSize:15,outline:'none',background:'var(--bg)',color:'var(--text)',fontFamily:'system-ui,-apple-system,sans-serif',boxSizing:'border-box'}}/>
+                {adminUnlockErr&&<div style={{color:'#ef4444',fontSize:12,fontWeight:600,marginTop:6,textAlign:'center'}}>Falsches Passwort</div>}
+                <button onClick={tryUnlock} style={{width:'100%',marginTop:10,padding:'11px',borderRadius:10,background:'#3b82f6',color:'#fff',border:'none',fontWeight:800,fontSize:14,fontFamily:'system-ui,-apple-system,sans-serif',cursor:'pointer'}}>OK</button>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
@@ -6035,6 +6082,35 @@ function App(){
               onClick={()=>initGame('pvp',undefined,null,false,undefined,false,selectedMap)}/>}
           </MenuSection>
         )}
+
+        {/* COMMUNITY */}
+        <div style={{display:'flex',gap:10,justifyContent:'center',marginTop:6,paddingBottom:4}}>
+          <button onClick={()=>window.open('https://discord.gg/XtFzzjpmf','_blank')} style={{
+            display:'flex',alignItems:'center',gap:7,padding:'9px 16px',borderRadius:20,
+            background:'var(--card)',border:'1.5px solid var(--border)',cursor:'pointer',
+            boxShadow:'var(--shadow-soft)',fontFamily:'system-ui,-apple-system,sans-serif'}}>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="#5865F2">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+            </svg>
+            <span style={{fontSize:12,fontWeight:800,color:'var(--text)',letterSpacing:0.2}}>Discord</span>
+          </button>
+          <button onClick={()=>window.open('https://www.instagram.com/wrongway.app?igsh=MW84anJuNmd1ZTgxYQ%3D%3D&utm_source=qr','_blank')} style={{
+            display:'flex',alignItems:'center',gap:7,padding:'9px 16px',borderRadius:20,
+            background:'var(--card)',border:'1.5px solid var(--border)',cursor:'pointer',
+            boxShadow:'var(--shadow-soft)',fontFamily:'system-ui,-apple-system,sans-serif'}}>
+            <svg viewBox="0 0 24 24" width="17" height="17">
+              <defs><linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#f09433"/>
+                <stop offset="25%" stopColor="#e6683c"/>
+                <stop offset="50%" stopColor="#dc2743"/>
+                <stop offset="75%" stopColor="#cc2366"/>
+                <stop offset="100%" stopColor="#bc1888"/>
+              </linearGradient></defs>
+              <path fill="url(#igGrad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <span style={{fontSize:12,fontWeight:800,color:'var(--text)',letterSpacing:0.2}}>Instagram</span>
+          </button>
+        </div>
       </div>
       {showOptions&&(
         <div onClick={()=>{setShowOptions(false);setShowLang(false);setOptionsTab('main');}} style={{position:'fixed',inset:0,
