@@ -3932,6 +3932,7 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
 function App(){
   const[screen,setScreen]=useState('menu');
   const[cookieConsent,setCookieConsent]=useState(getInitialCookieConsent);
+  const[legalTab,setLegalTab]=useState('impressum');
   const[navDir,setNavDir]=useState('fwd'); // Richtung für Seitenwechsel-Animation
   const[gameMode,setGameMode]=useState(null);
   const[onlineRole,setOnlineRole]=useState(null);
@@ -6985,8 +6986,6 @@ function App(){
     var imp=LEGAL.impressum[legalLang];
     var priv=LEGAL.privacy[legalLang];
     var terms=LEGAL.terms[legalLang];
-
-    var[legalTab,setLegalTab]=React.useState('impressum');
 
     var card={background:'var(--card)',border:'1.5px solid var(--border)',borderRadius:14,padding:'16px',marginBottom:10};
     var h3={fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:6,marginTop:10};
