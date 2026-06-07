@@ -3928,6 +3928,7 @@ function App(){
   const[afkTimeLeft,setAfkTimeLeft]=useState(0);
   const[inactiveWarning,setInactiveWarning]=useState(false);
   const[inactiveSecs,setInactiveSecs]=useState(15);
+  const[inactiveKicked,setInactiveKicked]=useState(false);
   const[optionsTab,setOptionsTab]=useState('main');
   const[showLang,setShowLang]=useState(false);
   const[hapticOn,setHapticOn]=useState(()=>{try{return localStorage.getItem('ww_haptic')!=='0';}catch{return true;}});
@@ -4821,6 +4822,7 @@ function App(){
   const inactivityTimerRef=useRef(null);
   const inactivityWarnRef=useRef(null);
   const inactiveCountRef=useRef(null);
+  const inactiveKickedRef=useRef(false);
 
   // AFK-Zug-Timer: 60s pro Zug, nur Online ohne Timer, kein Ranked
   useEffect(function(){
@@ -4848,9 +4850,10 @@ function App(){
     };
   },[turn,winner,screen,onlineRole,gameMode,gameTimeMode,isRanked]);
 
-  // Inaktivitäts-Kick: 2min kein Touch → Warnung → Menü
+  // Inaktivitäts-Kick: 2min kein Touch → Warnung → Firebase trennen
   useEffect(function(){
     function resetInactivity(){
+      if(inactiveKickedRef.current)return; // Nach Kick nicht mehr zurücksetzen
       clearTimeout(inactivityTimerRef.current);
       clearTimeout(inactivityWarnRef.current);
       clearInterval(inactiveCountRef.current);
@@ -4867,8 +4870,11 @@ function App(){
         },1000);
       },105000);
       inactivityTimerRef.current=setTimeout(function(){
+        inactiveKickedRef.current=true;
         setInactiveWarning(false);
-        setScreen('menu');
+        setInactiveKicked(true);
+        // Firebase trennen → stoppt Datentransfer, spart Kosten
+        try{if(window.firebase&&window.firebase.database)window.firebase.database().goOffline();}catch(e){}
       },120000);
     }
     var evts=['touchstart','mousedown','click','keydown'];
@@ -6458,6 +6464,35 @@ function App(){
               )}
 
             </div>
+          </div>
+        </div>
+      )}
+      {inactiveKicked&&(
+        <div style={{position:'fixed',inset:0,
+          background:'rgba(0,0,0,0.88)',zIndex:99999,display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+          <div style={{
+            background:'var(--card)',borderRadius:20,padding:'32px 24px',
+            border:'1.5px solid var(--border)',boxShadow:'var(--shadow-card)',
+            maxWidth:320,width:'100%',textAlign:'center'}}>
+            <div style={{fontSize:40,marginBottom:12}}>{'(-_-) zZ'}</div>
+            <div style={{fontSize:18,fontWeight:900,color:'var(--text)',marginBottom:8,
+              fontFamily:'system-ui,-apple-system,sans-serif'}}>
+              {lang==='de'?'Wegen Inaktivität getrennt':lang==='tr'?'Hareketsizlik nedeniyle bağlantı kesildi':lang==='fr'?'Déconnecté pour inactivité':'Disconnected due to inactivity'}
+            </div>
+            <div style={{fontSize:13,color:'var(--subtle)',marginBottom:22,lineHeight:1.5,fontFamily:'system-ui,-apple-system,sans-serif'}}>
+              {lang==='de'?'Du warst zu lange inaktiv. Tippe zum Neuverbinden.':lang==='tr'?'Çok uzun süre hareketsiz kaldın. Yeniden bağlanmak için dokun.':lang==='fr'?'Inactif trop longtemps. Touchez pour vous reconnecter.':'You were inactive too long. Tap to reconnect.'}
+            </div>
+            <button onClick={function(){
+              try{if(window.firebase&&window.firebase.database)window.firebase.database().goOnline();}catch(e){}
+              window.location.reload();
+            }} style={{
+              width:'100%',padding:'13px',borderRadius:12,
+              background:'linear-gradient(135deg,#3b82f6,#6366f1)',
+              color:'white',border:'none',cursor:'pointer',
+              fontWeight:800,fontSize:14,fontFamily:'system-ui,-apple-system,sans-serif',
+              boxShadow:'0 4px 14px rgba(99,102,241,0.35)'}}>
+              {lang==='de'?'Wieder verbinden':lang==='tr'?'Yeniden bağlan':lang==='fr'?'Se reconnecter':'Reconnect'}
+            </button>
           </div>
         </div>
       )}
