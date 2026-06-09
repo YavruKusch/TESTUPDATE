@@ -669,6 +669,38 @@ const SESSION=Math.random().toString(36).slice(2,10);
 const GUEST_ID=(()=>{try{let n=localStorage.getItem('ww_guest_id');if(!n){n='User'+Math.floor(1000+Math.random()*9000);localStorage.setItem('ww_guest_id',n);}return n;}catch(e){return 'User'+Math.floor(1000+Math.random()*9000);}})();
 function getDisplayName(account){return account?account.name:GUEST_ID;}
 
+// ── WebSocket-Anbindung an den Spiel-Server (server-autoritativ, nur Classic) ──
+// Standardmaessig AUS. Mit ?ws=1 in der URL aktiv (zum Testen auf Staging).
+var WW_URL='wss://wrongway-server-production.up.railway.app';
+var WS_ENABLED=(function(){try{return new URLSearchParams(window.location.search).get('ws')==='1';}catch(e){return false;}})();
+var WSNET={
+  sock:null, token:null, roomId:null, role:null, onState:null,
+  connect:function(roomId,role,onState){ this.roomId=roomId; this.role=role; this.onState=onState; this.token=null; this._open(); },
+  _open:function(){
+    var self=this;
+    if(!self.roomId)return;
+    if(self.sock&&(self.sock.readyState===0||self.sock.readyState===1))return;
+    try{ self.sock=new WebSocket(WW_URL); }catch(e){ return; }
+    self.sock.onopen=function(){
+      if(self.token){ self._send({type:'reconnect',token:self.token}); }
+      else if(self.role==='A'){ self._send({type:'create_room',roomId:self.roomId}); }
+      else { self._send({type:'join_room',code:self.roomId}); }
+    };
+    self.sock.onmessage=function(ev){
+      var d; try{ d=JSON.parse(ev.data); }catch(e){ return; }
+      if(d.type==='error'&&d.grund==='raum nicht gefunden'&&self.role==='B'&&self.roomId){ setTimeout(function(){ self._send({type:'join_room',code:self.roomId}); },1000); return; }
+      if(d.type==='room_created'||d.type==='room_joined'||d.type==='match_start'||d.type==='resync'){ if(d.token)self.token=d.token; }
+      if(self.onState)self.onState(d);
+    };
+    self.sock.onclose=function(){ if(self.roomId){ setTimeout(function(){ self._open(); },1500); } };
+  },
+  _send:function(o){ if(this.sock&&this.sock.readyState===1)this.sock.send(JSON.stringify(o)); },
+  move:function(to){ this._send({type:'move',to:to}); },
+  wall:function(key){ this._send({type:'wall',key:key}); },
+  close:function(){ this.roomId=null; this.role=null; this.onState=null; this.token=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
+};
+try{ document.addEventListener('visibilitychange',function(){ if(!document.hidden&&WSNET.roomId&&(!WSNET.sock||WSNET.sock.readyState!==1)){ WSNET._open(); } }); }catch(e){}
+
 // ── 2v2 (Beta) ─────────────────────────────────────────────
 const COLS2=11,ROWS2=15,WW2=8,BARR2=25,MIN_PATHS_2V2=2;
 const CELL2=Math.max(26,Math.min(38,Math.floor((window.innerWidth-16)/COLS2)));
@@ -4048,6 +4080,7 @@ function App(){
   // kompletten Node an JEDEN Client zurück → massive Download-Kosten. Daher 45s-Poll, nur im Menü.
   useEffect(()=>{
     if(!window.db||screen!=='menu')return;
+    if(adminCfg.maintenance&&!isAdmin())return; // Wartungsmodus: keine Presence-Abfragen (Traffic sparen)
     let cancelled=false;
     const ref=window.db.ref('ww_presence');
     const load=async()=>{
@@ -4065,9 +4098,10 @@ function App(){
     load();
     const iv=setInterval(load,45000);
     return()=>{cancelled=true;clearInterval(iv);};
-  },[screen]);
+  },[screen,adminCfg.maintenance]);
   // Presence-Heartbeat: solange eingeloggt → online setzen alle 25s
   useEffect(()=>{
+    if(adminCfg.maintenance&&!isAdmin())return; // Wartungsmodus: nicht als online melden
     var authU=firebase.auth().currentUser;
     const key=account?account.key:(authU?authU.uid:GUEST_ID);
     const name=getDisplayName(account);
@@ -4086,7 +4120,7 @@ function App(){
       const k=account?account.key:(u?u.uid:GUEST_ID);
       setPresence(k,false,getDisplayName(account));
     };
-  },[account]);
+  },[account,adminCfg.maintenance]);
   // HOST: sobald friend-Lobby existiert, auf Guest warten
   useEffect(()=>{
     if(!friendLobbyState||!window.db)return;
@@ -4317,6 +4351,7 @@ function App(){
   // URL ?join=CODE → automatisch zum Freund-Beitritt
   useEffect(()=>{
     if(!window.db)return;
+    if(adminCfg.maintenance&&!isAdmin())return; // Wartungsmodus: keinen Broadcast-Listener anhängen
     var bcRef=window.db.ref('ww_broadcasts');
     var bcCb=bcRef.on('value',function(snap){
       var val=snap.val();
@@ -4328,7 +4363,7 @@ function App(){
       setBroadcasts(list);
     });
     return function(){bcRef.off('value',bcCb);};
-  },[]);
+  },[adminCfg.maintenance]);
 
   // Announce-Banner: 60s sichtbar, 8s unsichtbar, wiederholen
   useEffect(function(){
@@ -4702,6 +4737,22 @@ function App(){
   const color=PC[turn];
 
   // ── Init game ──
+  // Wendet einen Server-Zustand auf das React-Spiel an (Adapter Server -> Spiel)
+  const applyServerState=(d)=>{
+    if(d.type==='match_start'||d.type==='resync'||d.type==='state'){
+      if(d.pos){ setPA({...d.pos[0]}); setPB({...d.pos[1]}); }
+      if(d.walls){ setWalls(new Set(d.walls)); }
+      if(d.barr){ setBarrLeft({A:d.barr[0],B:d.barr[1]}); }
+      if(typeof d.amZug==='number'){ setTurn(d.amZug===0?'A':'B'); }
+      if(d.winner!==undefined&&d.winner!==null&&!S.current.winner){
+        const wRole=d.winner===0?'A':'B';
+        triggerWin(wRole,false,S.current.moveHist);
+      }
+    }else if(d.type==='opponent_disconnected'){
+      if(d.countdown)setFlash('Gegner getrennt - gewinnt in '+d.countdown+'s');
+    }
+  };
+
   const initGame=(mode,role='A',lid=null,isRematch=false,tmOverride,ranked=false,mapOverride,sizeOverride,forcedTurn)=>{
     setIsRanked(ranked);
     setGameMode(mode);setOnlineRole(role);setLobbyId(lid);
@@ -4728,6 +4779,10 @@ function App(){
       starter=Math.random()<0.5?'A':'B';
     }
     setBarrLeft({A:gameBarr,B:gameBarr});setTurn(starter);setWinner(null);setGaveUp(null);setMoveHist([]);
+    // Server-autoritative Anbindung nur fuer reines Classic-Online (kein Duell/Ranked/Hammer/Chaos/Timer)
+    if(WS_ENABLED&&mode==='online'&&mapToUse!=='duel'&&!ranked&&!effHammer&&!chaosMode&&!isTimerMode(tm)){
+      WSNET.connect(lid,role,applyServerState);
+    }else if(WSNET.roomId){ WSNET.close(); }
     if(!isRematch)setSeriesScore({A:0,B:0});
     setEloChange(null);
     winnerFiredRef.current=false;
@@ -4762,6 +4817,7 @@ function App(){
 
   // ── Sync online ──
   const doSync=(gs)=>{
+    if(WSNET.roomId)return; // WS-Modus: der Server ist die Wahrheit, kein Firebase-Schreiben
     const{gameMode:gm,lobbyId:lid,rematchA:rA,rematchB:rB,rematchDeclined:rD,gameNum:gN}=S.current;
     if(gm!=='online'||!lid)return;
     var mvs=gs.moves||[];
@@ -5160,6 +5216,7 @@ function App(){
   // ── Online realtime listener ──
   useEffect(()=>{
     if(gameMode!=='online'||!lobbyId||(screen!=='game'&&screen!=='end'))return;
+    if(WSNET.roomId)return; // WS-Modus: kein Firebase-Listener
     const ref=window.db.ref(`barricade_game_${lobbyId}`);
     const cb=ref.on('value',snap=>{
       const v=snap.val();if(!v)return;
@@ -5332,6 +5389,9 @@ function App(){
     });
     return()=>ref.off('value',cb);
   },[gameMode,lobbyId,screen,onlineRole]);
+
+  // WS-Verbindung schliessen, wenn man das Spiel verlaesst
+  useEffect(()=>{ if(WSNET.roomId&&screen!=='game'&&screen!=='end'){ WSNET.close(); } },[screen]);
 
   // ── Zuschauer-Anzahl (Live) ──
   useEffect(()=>{
@@ -5761,6 +5821,7 @@ function App(){
     // Sicherheits-Check für Online+Blitz: sicherstellen dass es noch der eigene Zug ist
     if(gameMode==='online'&&S.current.turn!==onlineRole)return;
     if(!getValidMoves(cur,other,walls).some(m=>m.r===r&&m.c===c))return;
+    if(WSNET.roomId){ playSound('move'); WSNET.move({r:r,c:c}); return; } // server-autoritativ: nur Absicht
     playSound('move');
     const np={r,c};const isA=turn==='A';
     if(isA)setPA(np);else setPB(np);
@@ -5861,6 +5922,7 @@ function App(){
         const rel=getRel(x,y-OFFSET);
         if(rel){
           const key=snapWall(rel.x,rel.y,dragging.orient);
+          if(WSNET.roomId){ playSound('wall'); WSNET.wall(key); setDragging(null);setPreviewKey(null);setSnapPos(null); return; } // server-autoritativ
           const{walls:w,pA:a,pB:b,barrLeft:bl,turn:curT,moveHist:mh}=S.current;
           if(bl[curT]>0){
             _hamCtx=S.current.hammerMode?buildHamCtx(S.current.hammers,S.current.hammerHeld,a,b):null;
