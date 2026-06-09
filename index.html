@@ -4764,7 +4764,12 @@ function App(){
   const doSync=(gs)=>{
     const{gameMode:gm,lobbyId:lid,rematchA:rA,rematchB:rB,rematchDeclined:rD,gameNum:gN}=S.current;
     if(gm!=='online'||!lid)return;
-    stoSet(`barricade_game_${lid}`,{
+    var mvs=gs.moves||[];
+    var newGN=gs.gameNum===undefined?(gN||1):gs.gameNum;
+    // Volle Moves-Liste nur bei Spielende oder neuer Runde senden (für Replay-Integrität).
+    // Bei normalen Zügen: nur letzten Zug + Anzahl → spart wachsende Download-Last.
+    var sendFull=gs.winner||newGN!==(gN||1)||mvs.length===0;
+    var payload={
       ...gs,
       walls:[...gs.walls],
       map:gs.map===undefined?(S.current.selectedMap||'classic'):gs.map,
@@ -4772,14 +4777,22 @@ function App(){
       rematchA:gs.rematchA===undefined?rA:gs.rematchA,
       rematchB:gs.rematchB===undefined?rB:gs.rematchB,
       rematchDeclined:gs.rematchDeclined===undefined?rD:gs.rematchDeclined,
-      gameNum:gs.gameNum===undefined?(gN||1):gs.gameNum,
+      gameNum:newGN,
       chaosItem:gs.chaosItem===undefined?chaosItem:gs.chaosItem,
       goldenWalls:gs.goldenWalls!==undefined?gs.goldenWalls:[...goldenWalls],
       hammers:gs.hammers===undefined?hammers:gs.hammers,
       hammerHeld:gs.hammerHeld===undefined?hammerHeld:gs.hammerHeld,
       hammerUsed:gs.hammerUsed===undefined?hammerUsed:gs.hammerUsed,
+      mc:mvs.length,
       lastUpdated:Date.now()
-    });
+    };
+    if(sendFull){
+      payload.moves=mvs;
+    }else{
+      payload.lm=mvs[mvs.length-1];
+      delete payload.moves;
+    }
+    stoSet(`barricade_game_${lid}`,payload);
   };
 
   // ── Classic-Timer-Tick ──
@@ -5155,7 +5168,7 @@ function App(){
       // Clock-Skew-sicher (kein Date.now()-Vergleich mehr).
       const newGN=gs.gameNum||1;
       const oldGN=S.current.gameNum||0;
-      const newMoveCount=(gs.moves||[]).length;
+      const newMoveCount=gs.mc!==undefined?gs.mc:(gs.moves||[]).length;
       const oldMoveCount=S.current.moveHist.length;
       if(newGN<oldGN)return;
       if(newGN===oldGN&&newMoveCount<oldMoveCount)return;
@@ -5256,8 +5269,20 @@ function App(){
       }
 
       // Normales Game-Update
-      const newMoves=gs.moves||[];
+      // Moves rekonstruieren: volle Liste (gs.moves) ODER inkrementell (gs.lm anhängen)
       const oldLen=S.current.moveHist.length;
+      var newMoves;
+      if(gs.moves!==undefined){
+        newMoves=gs.moves;
+      }else if(gs.lm&&newMoveCount===oldLen+1){
+        newMoves=S.current.moveHist.concat([gs.lm]);
+      }else if(gs.lm&&newMoveCount>oldLen){
+        // Fallback (sollte bei alternierenden Zügen nicht auftreten): letzten Zug anhängen
+        newMoves=S.current.moveHist.concat([gs.lm]);
+      }else{
+        // Kein neuer Zug (z.B. Chaos-Item-Update) → moveHist unverändert
+        newMoves=S.current.moveHist;
+      }
       // Map synchron halten (wichtig für Freunde-/Online-Duell, falls Gast andere Map gewählt hatte)
       if(gs.map){CUR_MAP=gs.map;if(gs.map!==S.current.selectedMap)setSelectedMap(gs.map);
         const ds=gs.duelSize||'standard';
