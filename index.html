@@ -5833,7 +5833,15 @@ function App(){
     // Sicherheits-Check für Online+Blitz: sicherstellen dass es noch der eigene Zug ist
     if(gameMode==='online'&&S.current.turn!==onlineRole)return;
     if(!getValidMoves(cur,other,walls).some(m=>m.r===r&&m.c===c))return;
-    if(WSNET.roomId){ playSound('move'); WSNET.move({r:r,c:c}); return; } // server-autoritativ: nur Absicht
+    if(WSNET.roomId){
+      // Optimistisch: eigenen Zug sofort lokal zeigen, Server bestaetigt parallel
+      playSound('move');
+      const np={r:r,c:c};const isA=turn==='A';
+      if(isA)setPA(np);else setPB(np);
+      setTurn(turn==='A'?'B':'A');
+      WSNET.move({r:r,c:c});
+      return;
+    }
     playSound('move');
     const np={r,c};const isA=turn==='A';
     if(isA)setPA(np);else setPB(np);
@@ -5934,7 +5942,22 @@ function App(){
         const rel=getRel(x,y-OFFSET);
         if(rel){
           const key=snapWall(rel.x,rel.y,dragging.orient);
-          if(WSNET.roomId){ playSound('wall'); WSNET.wall(key); setDragging(null);setPreviewKey(null);setSnapPos(null); return; } // server-autoritativ
+          if(WSNET.roomId){
+            // Optimistisch: Wand lokal pruefen+setzen, Server bestaetigt parallel
+            const sc=S.current;
+            if(sc.barrLeft[sc.turn]>0){
+              const next=tryWall(key,sc.walls,sc.pA,sc.pB,goalRowOf('A',sc.selectedMap),goalRowOf('B',sc.selectedMap));
+              if(next){
+                playSound('wall');
+                setWalls(next);
+                setBarrLeft({...sc.barrLeft,[sc.turn]:sc.barrLeft[sc.turn]-1});
+                setTurn(sc.turn==='A'?'B':'A');
+                WSNET.wall(key);
+              }else setFlash(t('invalidPos'));
+            }
+            setDragging(null);setPreviewKey(null);setSnapPos(null);
+            return;
+          }
           const{walls:w,pA:a,pB:b,barrLeft:bl,turn:curT,moveHist:mh}=S.current;
           if(bl[curT]>0){
             _hamCtx=S.current.hammerMode?buildHamCtx(S.current.hammers,S.current.hammerHeld,a,b):null;
