@@ -4762,6 +4762,7 @@ function App(){
   };
 
   const initGame=(mode,role='A',lid=null,isRematch=false,tmOverride,ranked=false,mapOverride,sizeOverride,forcedTurn)=>{
+    setFlash('init mode='+mode+(WS_ENABLED?' [ws=1]':' [ws=0]'));
     setIsRanked(ranked);
     setGameMode(mode);setOnlineRole(role);setLobbyId(lid);
     // Ranked = faires Standard-Regelwerk: keine Modifikatoren (Casual-Einstellungen bleiben erhalten)
