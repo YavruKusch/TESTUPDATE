@@ -4740,6 +4740,7 @@ function App(){
   // Wendet einen Server-Zustand auf das React-Spiel an (Adapter Server -> Spiel)
   const applyServerState=(d)=>{
     if(d.type==='match_start'||d.type==='resync'||d.type==='state'){
+      if(d.type==='match_start')setFlash('WS-Match gestartet (neuer Server)');
       if(d.pos){ setPA({...d.pos[0]}); setPB({...d.pos[1]}); }
       if(d.walls){ setWalls(new Set(d.walls)); }
       if(d.barr){ setBarrLeft({A:d.barr[0],B:d.barr[1]}); }
@@ -4750,6 +4751,8 @@ function App(){
       }
     }else if(d.type==='opponent_disconnected'){
       if(d.countdown)setFlash('Gegner getrennt - gewinnt in '+d.countdown+'s');
+    }else if(d.type==='room_created'||d.type==='room_joined'){
+      setFlash('WS-Server verbunden - warte auf Gegner');
     }
   };
 
