@@ -672,7 +672,8 @@ function getDisplayName(account){return account?account.name:GUEST_ID;}
 // ── WebSocket-Anbindung an den Spiel-Server (server-autoritativ, nur Classic) ──
 // Standardmaessig AUS. Mit ?ws=1 in der URL aktiv (zum Testen auf Staging).
 var WW_URL='wss://wrongway-server-production.up.railway.app';
-var WS_ENABLED=(function(){try{return new URLSearchParams(window.location.search).get('ws')==='1';}catch(e){return false;}})();
+var WS_ENABLED=(function(){try{return new URLSearchParams(window.location.search).get('ws')!=='0';}catch(e){return true;}})();
+var WS_DEBUG=(function(){try{return new URLSearchParams(window.location.search).get('wsdebug')==='1';}catch(e){return false;}})();
 var WSNET={
   sock:null, token:null, roomId:null, role:null, onState:null,
   connect:function(roomId,role,onState){ this.roomId=roomId; this.role=role; this.onState=onState; this.token=null; this._dbg('verbinde '+roomId+' ('+role+')'); this._open(); },
@@ -705,7 +706,7 @@ var WSNET={
   giveUp:function(){ this._send({type:'give_up'}); },
   rematch:function(){ this._send({type:'rematch'}); },
   rematchCancel:function(){ this._send({type:'rematch_cancel'}); },
-  _dbg:function(msg){ try{ var el=document.getElementById('wsdbg'); if(!el){ el=document.createElement('div'); el.id='wsdbg'; el.style.cssText='position:fixed;top:4px;left:4px;z-index:999999;background:#000;color:#0f0;font:bold 12px monospace;padding:3px 8px;border-radius:5px;'; if(document.body)document.body.appendChild(el); } if(el)el.textContent='WS: '+msg; }catch(e){} },
+  _dbg:function(msg){ if(!WS_DEBUG)return; try{ var el=document.getElementById('wsdbg'); if(!el){ el=document.createElement('div'); el.id='wsdbg'; el.style.cssText='position:fixed;top:4px;left:4px;z-index:999999;background:#000;color:#0f0;font:bold 12px monospace;padding:3px 8px;border-radius:5px;'; if(document.body)document.body.appendChild(el); } if(el)el.textContent='WS: '+msg; }catch(e){} },
   close:function(){ this.roomId=null; this.role=null; this.onState=null; this.token=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
 };
 if(WS_ENABLED){ try{ WSNET._dbg('bereit (ws=1)'); }catch(e){} }
@@ -4086,28 +4087,24 @@ function App(){
   const[globalStats,setGlobalStats]=useState({online:0,inGame:0});
   const[spectateId,setSpectateId]=useState(null);
   const[adminCfg,setAdminCfg]=useState(DEFAULT_ADMIN_CFG); // frueh deklariert: wird unten in useEffect-Deps genutzt (sonst Safari TDZ)
-  // Spielerzähler (online / in Runde): NUR im Menü, periodischer Einzel-Abruf statt Dauer-Listener.
-  // Ein .on('value') auf dem GESAMTEN ww_presence-Node lieferte bei JEDEM Heartbeat den
-  // kompletten Node an JEDEN Client zurück → massive Download-Kosten. Daher 45s-Poll, nur im Menü.
+  // Spielerzähler: liest nur einen winzigen Zaehler-Knoten (ww_stats), NICHT mehr den ganzen
+  // Presence-Knoten. Jeder Client zaehlt sich selbst hoch/runter (siehe Heartbeat-Effekt).
+  // Das verhindert die O(N^2)-Download-Kosten, die auch ohne Spielen anfielen.
   useEffect(()=>{
     if(!window.db||screen!=='menu')return;
-    if(adminCfg.maintenance&&!isAdmin())return; // Wartungsmodus: keine Presence-Abfragen (Traffic sparen)
+    if(adminCfg.maintenance&&!isAdmin())return; // Wartungsmodus: keine Abfragen (Traffic sparen)
     let cancelled=false;
-    const ref=window.db.ref('ww_presence');
+    const ref=window.db.ref('ww_stats');
     const load=async()=>{
       try{
         const snap=await ref.once('value');
         if(cancelled)return;
-        const all=snap.val()||{};const now=Date.now();
-        let on=0,ig=0;
-        Object.values(all).forEach(p=>{
-          if(p&&p.online&&(now-p.lastSeen<50000)){on++;if(p.inGame)ig++;}
-        });
-        setGlobalStats({online:on,inGame:ig});
+        const v=snap.val()||{};
+        setGlobalStats({online:Math.max(0,v.online||0),inGame:Math.max(0,v.inGame||0)});
       }catch(e){}
     };
     load();
-    const iv=setInterval(load,45000);
+    const iv=setInterval(load,30000);
     return()=>{cancelled=true;clearInterval(iv);};
   },[screen,adminCfg.maintenance]);
   // Presence-Heartbeat: solange eingeloggt → online setzen alle 25s
@@ -4120,6 +4117,21 @@ function App(){
     // Verbindung weg (App zu / Crash) → eigenen Presence-Eintrag automatisch entfernen.
     // Hält ww_presence klein (nur aktuell verbundene Clients) statt unbegrenzt zu wachsen.
     try{window.db.ref(PRESENCE_KEY(key)).onDisconnect().remove();}catch(e){}
+    // Billiger Online-Zaehler: nur +1/-1 fuer SICH SELBST. Alle lesen spaeter nur diese eine Zahl
+    // (statt den ganzen Presence-Knoten) → verhindert O(N^2)-Kosten.
+    var SVonline=(firebase.database&&firebase.database.ServerValue)?firebase.database.ServerValue:null;
+    var canCountOnline=!!(SVonline&&SVonline.increment);
+    var onlineRef=canCountOnline?window.db.ref('ww_stats/online'):null;
+    var connRef=canCountOnline?window.db.ref('.info/connected'):null;
+    var connCb=null;
+    if(canCountOnline){
+      connCb=connRef.on('value',function(s){
+        if(s.val()===true){
+          try{onlineRef.onDisconnect().set(SVonline.increment(-1));}catch(e){}
+          try{onlineRef.set(SVonline.increment(1));}catch(e){}
+        }
+      });
+    }
     const iv=setInterval(()=>{
       var u=firebase.auth().currentUser;
       const k=account?account.key:(u?u.uid:GUEST_ID);
@@ -4130,9 +4142,27 @@ function App(){
       var u=firebase.auth().currentUser;
       const k=account?account.key:(u?u.uid:GUEST_ID);
       setPresence(k,false,getDisplayName(account));
+      if(canCountOnline){
+        try{connRef.off('value',connCb);}catch(e){}
+        try{onlineRef.onDisconnect().cancel();}catch(e){}
+        try{onlineRef.set(SVonline.increment(-1));}catch(e){}
+      }
     };
   },[account,adminCfg.maintenance]);
-  // HOST: sobald friend-Lobby existiert, auf Guest warten
+  // "In Runde"-Zaehler: jeder Client zaehlt sich selbst, wenn er in einem Online-Match ist
+  useEffect(()=>{
+    if(adminCfg.maintenance&&!isAdmin())return;
+    if(!window.db||gameMode!=='online'||(screen!=='game'&&screen!=='end'))return;
+    var SVig=(firebase.database&&firebase.database.ServerValue)?firebase.database.ServerValue:null;
+    if(!SVig||!SVig.increment)return;
+    var igRef=window.db.ref('ww_stats/inGame');
+    try{igRef.onDisconnect().set(SVig.increment(-1));}catch(e){}
+    try{igRef.set(SVig.increment(1));}catch(e){}
+    return()=>{
+      try{igRef.onDisconnect().cancel();}catch(e){}
+      try{igRef.set(SVig.increment(-1));}catch(e){}
+    };
+  },[gameMode,screen,adminCfg.maintenance]);
   useEffect(()=>{
     if(!friendLobbyState||!window.db)return;
     let cancelled=false;
@@ -4575,6 +4605,7 @@ function App(){
   const winSound=w=>{ if(!isOwnLoss(w)) playSound('win'); };
   const winnerFiredRef=useRef(false);
   const afkTriggerRef=useRef(null); // Ref für triggerWin - vermeidet TDZ in Safari
+  const wsTurnEndsRef=useRef(0); // WS: lokale Deadline fuer Zug-Countdown (vom Server, turnMs)
 
   const triggerWin=(p,skipAnim,finalMoveHist)=>{
     if(winnerFiredRef.current||S.current.winner)return;
@@ -4750,11 +4781,12 @@ function App(){
   // Wendet einen Server-Zustand auf das React-Spiel an (Adapter Server -> Spiel)
   const applyServerState=(d)=>{
     if(d.type==='match_start'||d.type==='resync'||d.type==='state'){
-      if(d.type==='match_start')setFlash('WS-Match gestartet (neuer Server)');
+      if(typeof d.deineNummer==='number')setOnlineRole(d.deineNummer===0?'A':'B');
       if(d.pos){ setPA({...d.pos[0]}); setPB({...d.pos[1]}); }
       if(d.walls){ setWalls(new Set(d.walls)); }
       if(d.barr){ setBarrLeft({A:d.barr[0],B:d.barr[1]}); }
       if(typeof d.amZug==='number'){ setTurn(d.amZug===0?'A':'B'); }
+      if(typeof d.turnMs==='number'){ wsTurnEndsRef.current=d.turnMs>0?(Date.now()+d.turnMs):0; }
       if(d.gaveUp!==undefined&&d.gaveUp!==null)setGaveUp(d.gaveUp===0?'A':'B');
       var mh=S.current.moveHist;
       if(d.lm){
@@ -4770,12 +4802,6 @@ function App(){
       }
     }else if(d.type==='opponent_disconnected'){
       if(d.countdown)setFlash('Gegner getrennt - gewinnt in '+d.countdown+'s');
-    }else if(d.type==='room_created'||d.type==='room_joined'){
-      setFlash('WS-Server verbunden - warte auf Gegner');
-    }else if(d.type==='ws_open'){
-      setFlash('WS: Socket offen');
-    }else if(d.type==='ws_closed'){
-      setFlash('WS: Socket getrennt');
     }else if(d.type==='rematch_state'){
       setRematchA(!!(d.req&&d.req[0]));
       setRematchB(!!(d.req&&d.req[1]));
@@ -4785,6 +4811,7 @@ function App(){
       setWalls(new Set(d.walls||[]));
       if(d.barr)setBarrLeft({A:d.barr[0],B:d.barr[1]});
       if(typeof d.amZug==='number')setTurn(d.amZug===0?'A':'B');
+      if(typeof d.turnMs==='number'){ wsTurnEndsRef.current=d.turnMs>0?(Date.now()+d.turnMs):0; }
       setWinner(null);setCelebrating(false);setGaveUp(null);
       setRematchA(false);setRematchB(false);setRematchDeclined(null);
       setMoveHist([]);
@@ -4937,11 +4964,24 @@ function App(){
   const inactiveCountRef=useRef(null);
   const inactiveKickedRef=useRef(false);
 
-  // AFK-Zug-Timer: 60s pro Zug, nur Online ohne Timer, kein Ranked
+  // AFK-Zug-Timer: 60s pro Zug. WS-Modus: Countdown fuer beide vom Server, Timeout handhabt der Server.
   useEffect(function(){
     if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
     setAfkTimeLeft(0);
-    if(screen!=='game'||gameMode!=='online'||winner||turn!==onlineRole||isRanked)return;
+    if(screen!=='game'||gameMode!=='online'||winner)return;
+    if(WSNET.roomId){
+      // Server beendet den Zug bei Ablauf. Hier nur Countdown anzeigen (fuer beide Spieler).
+      turnTimerRef.current=setInterval(function(){
+        var ends=wsTurnEndsRef.current;
+        if(!ends||S.current.winner){ setAfkTimeLeft(0); return; }
+        setAfkTimeLeft(Math.max(0,Math.ceil((ends-Date.now())/1000)));
+      },500);
+      return function(){
+        if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
+        setAfkTimeLeft(0);
+      };
+    }
+    if(turn!==onlineRole||isRanked)return;
     if(gameTimeMode&&gameTimeMode!=='none')return;
     var secs=60;
     setAfkTimeLeft(secs);
@@ -4953,7 +4993,6 @@ function App(){
         turnTimerRef.current=null;
         if(S.current&&S.current.turn===onlineRole&&!S.current.winner){
           var opp=onlineRole==='A'?'B':'A';
-          if(WSNET.roomId)WSNET.giveUp(); // WS: Server benachrichtigen, Gegner gewinnt
           if(afkTriggerRef.current) afkTriggerRef.current(opp);
         }
       }
@@ -8727,10 +8766,10 @@ function App(){
         </div>
         {!winner&&(
           <div style={{display:'flex',alignItems:'center',gap:8}}>
-            {afkTimeLeft>0&&afkTimeLeft<=20&&gameMode==='online'&&turn===onlineRole&&(
+            {afkTimeLeft>0&&afkTimeLeft<=20&&gameMode==='online'&&(WSNET.roomId||turn===onlineRole)&&(
               <div style={{
                 padding:'5px 10px',borderRadius:12,
-                background:afkTimeLeft<=10?'#ef4444':'#f59e0b',
+                background:(WSNET.roomId&&turn!==onlineRole)?'#3b82f6':(afkTimeLeft<=10?'#ef4444':'#f59e0b'),
                 color:'white',fontSize:12,fontWeight:900,
                 fontFamily:'system-ui,-apple-system,sans-serif',
                 boxShadow:afkTimeLeft<=10?'0 2px 10px rgba(239,68,68,0.5)':'0 2px 10px rgba(245,158,11,0.4)',
