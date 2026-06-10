@@ -4075,6 +4075,7 @@ function App(){
   const[friendReqCount,setFriendReqCount]=useState(0);
   const[globalStats,setGlobalStats]=useState({online:0,inGame:0});
   const[spectateId,setSpectateId]=useState(null);
+  const[adminCfg,setAdminCfg]=useState(DEFAULT_ADMIN_CFG); // frueh deklariert: wird unten in useEffect-Deps genutzt (sonst Safari TDZ)
   // Spielerzähler (online / in Runde): NUR im Menü, periodischer Einzel-Abruf statt Dauer-Listener.
   // Ein .on('value') auf dem GESAMTEN ww_presence-Node lieferte bei JEDEM Heartbeat den
   // kompletten Node an JEDEN Client zurück → massive Download-Kosten. Daher 45s-Poll, nur im Menü.
@@ -4274,7 +4275,6 @@ function App(){
     }
     if(!joinCancelledRef.current){setNavDir('back');setScreen('friends');}
   };
-  const[adminCfg,setAdminCfg]=useState(DEFAULT_ADMIN_CFG);
   const[adminCfgReady,setAdminCfgReady]=useState(false);
   const[showAdmin,setShowAdmin]=useState(false);
   const[showTutorial,setShowTutorial]=useState(false);
@@ -4780,7 +4780,7 @@ function App(){
     }
     setBarrLeft({A:gameBarr,B:gameBarr});setTurn(starter);setWinner(null);setGaveUp(null);setMoveHist([]);
     // Server-autoritative Anbindung nur fuer reines Classic-Online (kein Duell/Ranked/Hammer/Chaos/Timer)
-    if(WS_ENABLED&&mode==='online'&&mapToUse!=='duel'&&!ranked&&!effHammer&&!chaosMode&&!isTimerMode(tm)){
+    if(WS_ENABLED&&mode==='online'&&mapToUse!=='duel'&&!ranked&&!effHammer&&!chaosMode&&!(tm&&(tm.indexOf('classic-')===0||tm.indexOf('blitz-')===0))){
       WSNET.connect(lid,role,applyServerState);
     }else if(WSNET.roomId){ WSNET.close(); }
     if(!isRematch)setSeriesScore({A:0,B:0});
@@ -5389,9 +5389,6 @@ function App(){
     });
     return()=>ref.off('value',cb);
   },[gameMode,lobbyId,screen,onlineRole]);
-
-  // WS-Verbindung schliessen, wenn man das Spiel verlaesst
-  useEffect(()=>{ if(WSNET.roomId&&screen!=='game'&&screen!=='end'){ WSNET.close(); } },[screen]);
 
   // ── Zuschauer-Anzahl (Live) ──
   useEffect(()=>{
