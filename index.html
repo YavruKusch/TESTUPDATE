@@ -702,6 +702,7 @@ var WSNET={
   _send:function(o){ if(this.sock&&this.sock.readyState===1)this.sock.send(JSON.stringify(o)); },
   move:function(to){ this._send({type:'move',to:to}); },
   wall:function(key){ this._send({type:'wall',key:key}); },
+  giveUp:function(){ this._send({type:'give_up'}); },
   _dbg:function(msg){ try{ var el=document.getElementById('wsdbg'); if(!el){ el=document.createElement('div'); el.id='wsdbg'; el.style.cssText='position:fixed;top:4px;left:4px;z-index:999999;background:#000;color:#0f0;font:bold 12px monospace;padding:3px 8px;border-radius:5px;'; if(document.body)document.body.appendChild(el); } if(el)el.textContent='WS: '+msg; }catch(e){} },
   close:function(){ this.roomId=null; this.role=null; this.onState=null; this.token=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
 };
@@ -4752,6 +4753,7 @@ function App(){
       if(d.walls){ setWalls(new Set(d.walls)); }
       if(d.barr){ setBarrLeft({A:d.barr[0],B:d.barr[1]}); }
       if(typeof d.amZug==='number'){ setTurn(d.amZug===0?'A':'B'); }
+      if(d.gaveUp!==undefined&&d.gaveUp!==null)setGaveUp(d.gaveUp===0?'A':'B');
       if(d.winner!==undefined&&d.winner!==null&&!S.current.winner){
         const wRole=d.winner===0?'A':'B';
         triggerWin(wRole,false,S.current.moveHist);
@@ -5908,8 +5910,12 @@ function App(){
     const winP=loser==='A'?'B':'A';
     setGaveUp(loser);
     if(gameMode==='online'){
-      const s=S.current;
-      doSync({pA:s.pA,pB:s.pB,walls:s.walls,barrLeft:s.barrLeft,turn:s.turn,winner:winP,moves:s.moveHist,chaosItem:s.chaosItem,gaveUp:loser});
+      if(WSNET.roomId){
+        WSNET.giveUp();
+      }else{
+        const s=S.current;
+        doSync({pA:s.pA,pB:s.pB,walls:s.walls,barrLeft:s.barrLeft,turn:s.turn,winner:winP,moves:s.moveHist,chaosItem:s.chaosItem,gaveUp:loser});
+      }
     }
     triggerWin(winP);
   };
