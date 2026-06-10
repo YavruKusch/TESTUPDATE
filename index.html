@@ -703,6 +703,8 @@ var WSNET={
   move:function(to){ this._send({type:'move',to:to}); },
   wall:function(key){ this._send({type:'wall',key:key}); },
   giveUp:function(){ this._send({type:'give_up'}); },
+  rematch:function(){ this._send({type:'rematch'}); },
+  rematchCancel:function(){ this._send({type:'rematch_cancel'}); },
   _dbg:function(msg){ try{ var el=document.getElementById('wsdbg'); if(!el){ el=document.createElement('div'); el.id='wsdbg'; el.style.cssText='position:fixed;top:4px;left:4px;z-index:999999;background:#000;color:#0f0;font:bold 12px monospace;padding:3px 8px;border-radius:5px;'; if(document.body)document.body.appendChild(el); } if(el)el.textContent='WS: '+msg; }catch(e){} },
   close:function(){ this.roomId=null; this.role=null; this.onState=null; this.token=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
 };
@@ -4754,9 +4756,17 @@ function App(){
       if(d.barr){ setBarrLeft({A:d.barr[0],B:d.barr[1]}); }
       if(typeof d.amZug==='number'){ setTurn(d.amZug===0?'A':'B'); }
       if(d.gaveUp!==undefined&&d.gaveUp!==null)setGaveUp(d.gaveUp===0?'A':'B');
+      var mh=S.current.moveHist;
+      if(d.lm){
+        const lp=d.lm.p===0?'A':'B';
+        const ent=d.lm.type==='wall'?{type:'wall',p:lp,k:d.lm.k}:{type:'move',p:lp,r:d.lm.r,c:d.lm.c};
+        mh=(S.current.moveHist||[]).concat([ent]);
+        setMoveHist(mh);
+        if(lp!==S.current.onlineRole)playSound(d.lm.type==='wall'?'wall':'move');
+      }
       if(d.winner!==undefined&&d.winner!==null&&!S.current.winner){
         const wRole=d.winner===0?'A':'B';
-        triggerWin(wRole,false,S.current.moveHist);
+        triggerWin(wRole,false,mh);
       }
     }else if(d.type==='opponent_disconnected'){
       if(d.countdown)setFlash('Gegner getrennt - gewinnt in '+d.countdown+'s');
@@ -4766,6 +4776,23 @@ function App(){
       setFlash('WS: Socket offen');
     }else if(d.type==='ws_closed'){
       setFlash('WS: Socket getrennt');
+    }else if(d.type==='rematch_state'){
+      setRematchA(!!(d.req&&d.req[0]));
+      setRematchB(!!(d.req&&d.req[1]));
+    }else if(d.type==='rematch_start'){
+      // Vollreset wie neue Runde
+      if(d.pos){ setPA({...d.pos[0]}); setPB({...d.pos[1]}); }
+      setWalls(new Set(d.walls||[]));
+      if(d.barr)setBarrLeft({A:d.barr[0],B:d.barr[1]});
+      if(typeof d.amZug==='number')setTurn(d.amZug===0?'A':'B');
+      setWinner(null);setCelebrating(false);setGaveUp(null);
+      setRematchA(false);setRematchB(false);setRematchDeclined(null);
+      setMoveHist([]);
+      setGameNum((S.current.gameNum||1)+1);
+      winnerFiredRef.current=false;
+      setGiveUpArmed(false);setFlash('');
+      setEloChange(null);
+      setScreen('game');
     }
   };
 
@@ -4926,6 +4953,7 @@ function App(){
         turnTimerRef.current=null;
         if(S.current&&S.current.turn===onlineRole&&!S.current.winner){
           var opp=onlineRole==='A'?'B':'A';
+          if(WSNET.roomId)WSNET.giveUp(); // WS: Server benachrichtigen, Gegner gewinnt
           if(afkTriggerRef.current) afkTriggerRef.current(opp);
         }
       }
@@ -5503,6 +5531,11 @@ function App(){
   const requestRematch=()=>{
     const s=S.current;
     if(s.rematchDeclined)return;
+    if(WSNET.roomId){
+      if(s.onlineRole==='A')setRematchA(true);else setRematchB(true);
+      WSNET.rematch();
+      return;
+    }
     const isA=s.onlineRole==='A';
     doSync({
       pA:s.pA,pB:s.pB,walls:s.walls,barrLeft:s.barrLeft,
@@ -5516,6 +5549,11 @@ function App(){
   const declineRematch=()=>{
     const s=S.current;
     if(s.gameMode!=='online'||!s.lobbyId)return;
+    if(WSNET.roomId){
+      setRematchA(false);setRematchB(false);
+      WSNET.rematchCancel();
+      return;
+    }
     doSync({
       pA:s.pA,pB:s.pB,walls:s.walls,barrLeft:s.barrLeft,
       turn:s.turn,winner:s.winner,moves:s.moveHist,
