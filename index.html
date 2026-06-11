@@ -674,26 +674,60 @@ function getDisplayName(account){return account?account.name:GUEST_ID;}
 var WW_URL='wss://wrongway-server-production.up.railway.app';
 var WS_ENABLED=(function(){try{return new URLSearchParams(window.location.search).get('ws')!=='0';}catch(e){return true;}})();
 var WS_DEBUG=(function(){try{return new URLSearchParams(window.location.search).get('wsdebug')==='1';}catch(e){return false;}})();
+// ── DB-Download-Messung (?dbstats=1): zaehlt empfangene Firebase-Bytes je Pfad, Overlay unten links.
+// Damit finden wir die echten Download-Kostentreiber statt zu raten. Ohne URL-Param: komplett inaktiv.
+var DB_STATS_ON=(function(){try{return new URLSearchParams(window.location.search).get('dbstats')==='1';}catch(e){return false;}})();
+var DLSTAT={total:0,start:Date.now(),paths:{}};
+function dlTrack(key,val){
+  if(!DB_STATS_ON)return;
+  try{
+    var n=(val===null||val===undefined)?4:JSON.stringify(val).length;
+    DLSTAT.total+=n;
+    var p=String(key)
+      .replace(/^barricade_lobby_(?!list).+$/,'barricade_lobby_*')
+      .replace(/^barricade_game_.+$/,'barricade_game_*')
+      .replace(/^barricade_chat_.+$/,'barricade_chat_*')
+      .replace(/^barricade_hb_.+$/,'barricade_hb_*')
+      .replace(/^barricade_code_.+$/,'barricade_code_*')
+      .replace(/^(ww_profiles|ww_presence|ww_invites|ww_freq|ww_usernames|ww_friends|ww_leaderboard|ww_spec|ww_spec_emote)\/.+$/,'$1/*');
+    if(!DLSTAT.paths[p])DLSTAT.paths[p]={b:0,c:0};
+    DLSTAT.paths[p].b+=n;DLSTAT.paths[p].c++;
+    var el=document.getElementById('dbstats');
+    if(!el){el=document.createElement('div');el.id='dbstats';el.style.cssText='position:fixed;bottom:6px;left:6px;z-index:999999;background:rgba(0,0,0,0.85);color:#fbbf24;font:10px monospace;padding:5px 9px;border-radius:6px;max-width:86vw;pointer-events:none;white-space:pre;line-height:1.5;';if(document.body)document.body.appendChild(el);}
+    var mins=Math.max(1,(Date.now()-DLSTAT.start)/60000);
+    var rows=Object.keys(DLSTAT.paths).map(function(k){return [k,DLSTAT.paths[k]];})
+      .sort(function(a,b){return b[1].b-a[1].b;}).slice(0,8)
+      .map(function(e){return (e[1].b/1024).toFixed(1)+'KB x'+e[1].c+'  '+e[0];});
+    if(el)el.textContent='DB: '+(DLSTAT.total/1024).toFixed(1)+'KB ('+(DLSTAT.total/1024/mins).toFixed(1)+'KB/min)\n'+rows.join('\n');
+  }catch(e){}
+}
 var WSNET={
-  sock:null, token:null, roomId:null, role:null, onState:null,
-  connect:function(roomId,role,onState){ this.roomId=roomId; this.role=role; this.onState=onState; this.token=null; this._dbg('verbinde '+roomId+' ('+role+')'); this._open(); },
+  sock:null, token:null, roomId:null, role:null, onState:null, lastRecv:0, pongSeen:false, _hb:null,
+  connect:function(roomId,role,onState){
+    // Alte Verbindung KOMPLETT schliessen, sonst bleibt der Socket im alten (beendeten) Raum gebunden
+    if(this.sock){ try{ this.sock.onopen=null; this.sock.onmessage=null; this.sock.onclose=null; this.sock.close(); }catch(e){} this.sock=null; }
+    this.roomId=roomId; this.role=role; this.onState=onState; this.token=null; this.lastRecv=Date.now(); this._dbg('verbinde '+roomId+' ('+role+')'); this._open(); this._startHb();
+  },
   _open:function(){
     var self=this;
     if(!self.roomId)return;
     if(self.sock&&(self.sock.readyState===0||self.sock.readyState===1))return;
     try{ self.sock=new WebSocket(WW_URL); }catch(e){ return; }
     self.sock.onopen=function(){
-      self._dbg('socket offen');
+      self._dbg('socket offen'); self.lastRecv=Date.now();
       if(self.onState)self.onState({type:'ws_open'});
       if(self.token){ self._send({type:'reconnect',token:self.token}); }
       else if(self.role==='A'){ self._send({type:'create_room',roomId:self.roomId}); }
       else { self._send({type:'join_room',code:self.roomId}); }
     };
     self.sock.onmessage=function(ev){
+      self.lastRecv=Date.now();
       var d; try{ d=JSON.parse(ev.data); }catch(e){ return; }
+      if(d.type==='pong'){ self.pongSeen=true; return; }
       if(d.type==='error'&&d.grund==='raum nicht gefunden'&&self.role==='B'&&self.roomId){ setTimeout(function(){ self._send({type:'join_room',code:self.roomId}); },1000); return; }
       if(d.type==='room_created'||d.type==='room_joined')self._dbg('raum ok, warte Gegner');
       if(d.type==='match_start')self._dbg('MATCH laeuft!');
+      if(d.type==='state'&&d.winner!==undefined&&d.winner!==null)self._dbg('Runde vorbei');
       if(d.type==='error')self._dbg('FEHLER: '+(d.grund||'?'));
       if(d.type==='room_created'||d.type==='room_joined'||d.type==='match_start'||d.type==='resync'){ if(d.token)self.token=d.token; }
       if(self.onState)self.onState(d);
@@ -701,13 +735,29 @@ var WSNET={
     self.sock.onclose=function(){ self._dbg('getrennt'); if(self.onState)self.onState({type:'ws_closed'}); if(self.roomId){ setTimeout(function(){ self._open(); },1500); } };
   },
   _send:function(o){ if(this.sock&&this.sock.readyState===1)this.sock.send(JSON.stringify(o)); },
+  _startHb:function(){
+    var self=this;
+    if(self._hb)return;
+    self._hb=setInterval(function(){
+      if(!self.roomId)return;
+      if(self.sock&&self.sock.readyState===1){
+        try{ self.sock.send(JSON.stringify({type:'ping'})); }catch(e){}
+        // Server antwortet (pong/State); kommt lange GAR NICHTS, ist die Verbindung still tot -> Reconnect erzwingen.
+        // Nur wenn der Server pong unterstuetzt (sonst alter Server -> keine Fehlausloesung).
+        if(self.pongSeen&&(Date.now()-self.lastRecv>14000)){ self.lastRecv=Date.now(); try{ self.sock.close(); }catch(e){} }
+      }else{ self._open(); }
+    },6000);
+  },
+  _stopHb:function(){ if(this._hb){ clearInterval(this._hb); this._hb=null; } },
   move:function(to){ this._send({type:'move',to:to}); },
   wall:function(key){ this._send({type:'wall',key:key}); },
   giveUp:function(){ this._send({type:'give_up'}); },
+  timeout:function(){ this._send({type:'timeout'}); },
+  requestSync:function(){ this._send({type:'sync'}); },
   rematch:function(){ this._send({type:'rematch'}); },
   rematchCancel:function(){ this._send({type:'rematch_cancel'}); },
   _dbg:function(msg){ if(!WS_DEBUG)return; try{ var el=document.getElementById('wsdbg'); if(!el){ el=document.createElement('div'); el.id='wsdbg'; el.style.cssText='position:fixed;top:4px;left:4px;z-index:999999;background:#000;color:#0f0;font:bold 12px monospace;padding:3px 8px;border-radius:5px;'; if(document.body)document.body.appendChild(el); } if(el)el.textContent='WS: '+msg; }catch(e){} },
-  close:function(){ this.roomId=null; this.role=null; this.onState=null; this.token=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
+  close:function(){ this._stopHb(); this.roomId=null; this.role=null; this.onState=null; this.token=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
 };
 if(WS_ENABLED){ try{ WSNET._dbg('bereit (ws=1)'); }catch(e){} }
 try{ document.addEventListener('visibilitychange',function(){ if(!document.hidden&&WSNET.roomId&&(!WSNET.sock||WSNET.sock.readyState!==1)){ WSNET._open(); } }); }catch(e){}
@@ -739,7 +789,7 @@ let _adminUnlocked=false;
 function isAdmin(){return _adminUnlocked;}
 // Globale Admin-Config (in Firebase unter ADMIN_CFG_KEY, von allen Clients live gelesen)
 const ADMIN_CFG_KEY='barricade_admin_config';
-const DEFAULT_ADMIN_CFG={features:{online:false,friend:false,bots:true,local:true,twovtwo:false,chaos:false,drop:false,hammer:false,blitz:false,classicTime3:true,classicTime5:true,classicTime8:true,blitzTime5:true,blitzTime8:true,blitzTime10:true,duelBlitz:false,duelStandard:true,ranked:false,rankedClassic:false,rankedDuel:false,rankedChaosEvent:false,showPresence:true,showInGame:true},announce:'',announceUntil:0,maintenance:false};
+const DEFAULT_ADMIN_CFG={features:{online:false,friend:false,bots:true,local:true,twovtwo:false,chaos:false,drop:false,hammer:false,blitz:false,classicTime3:true,classicTime5:true,classicTime8:true,blitzTime5:true,blitzTime8:true,blitzTime10:true,duelBlitz:false,duelStandard:true,ranked:false,rankedClassic:false,rankedDuel:false,rankedChaosEvent:false,showPresence:true,showInGame:true,race:true,duel:true},announce:'',announceUntil:0,maintenance:false};
 function mergeAdminCfg(cfg){return {features:{...DEFAULT_ADMIN_CFG.features,...(cfg&&cfg.features?cfg.features:{})},announce:cfg&&cfg.announce?cfg.announce:'',announceUntil:cfg&&cfg.announceUntil?cfg.announceUntil:0,maintenance:!!(cfg&&cfg.maintenance)};}
 // Erklärtexte für Modi-Hilfe (umkreistes ?)
 const MODE_HELP={
@@ -2082,6 +2132,7 @@ async function stoGet(k){
   try{
     const snap=await window.db.ref(k).once('value');
     const v=snap.val();
+    dlTrack(k,v);
     return v?JSON.parse(v):null;
   }catch(e){console.error('FB GET fail',k,e);window.lastFbError=e.message;return null;}
 }
@@ -2107,6 +2158,7 @@ async function stoGetChildren(k){
   try{
     const snap=await window.db.ref(k).once('value');
     const v=snap.val();if(!v)return{};
+    dlTrack(k,v);
     if(typeof v==='string'){try{return JSON.parse(v);}catch(e){return{};}}
     const out={};
     for(const ck of Object.keys(v)){try{out[ck]=typeof v[ck]==='string'?JSON.parse(v[ck]):v[ck];}catch(e){}}
@@ -2369,6 +2421,7 @@ async function getPresenceMany(keys){
     try{
       const snap=await window.db.ref(PRESENCE_KEY(k)).once('value');
       const p=snap.val();
+      dlTrack('ww_presence/x',p);
       const isOnline=p&&p.online&&(Date.now()-p.lastSeen<90000);
       res[k]={
         status:isOnline?(p.inGame?'in_game':'online'):'offline',
@@ -3041,6 +3094,29 @@ function RankedScreen({account,t,darkMode,goBack,onStart,features}){
     </div>
   );
 }
+function AdminWhoAmI(){
+  // Zeigt die eigene Firebase-UID an (fuer die Firebase-Regel) + ob eingeloggt
+  var u=null;
+  try{u=firebase.auth().currentUser;}catch(e){}
+  var uid=u?u.uid:'';
+  var email=u&&u.email?u.email:'';
+  var anon=u?!!u.isAnonymous:true;
+  var copy=function(){ try{navigator.clipboard.writeText(uid);}catch(e){} };
+  return(
+    <div style={{marginBottom:16,padding:'12px',borderRadius:12,background:'var(--bg)',border:'1.5px solid var(--border)'}}>
+      <div style={{fontSize:10,fontWeight:800,color:'var(--subtle)',letterSpacing:1.2,marginBottom:8,textTransform:'uppercase'}}>DEIN ACCOUNT (FUER FIREBASE-REGEL)</div>
+      {anon?(
+        <div style={{fontSize:12,color:'#ef4444',fontWeight:600,lineHeight:1.4}}>Nicht eingeloggt (Gast). Logge dich mit E-Mail/Google ein, dann erscheint hier deine UID.</div>
+      ):(
+        <div>
+          {email?<div style={{fontSize:12,color:'var(--subtle)',marginBottom:4}}>{email}</div>:null}
+          <div style={{fontSize:12,color:'var(--text)',fontFamily:'monospace',wordBreak:'break-all',marginBottom:8}}>{uid}</div>
+          <button onClick={copy} style={{fontSize:12,fontWeight:700,padding:'6px 12px',borderRadius:8,border:'1.5px solid var(--border)',background:'var(--card)',color:'var(--text)',cursor:'pointer'}}>UID kopieren</button>
+        </div>
+      )}
+    </div>
+  );
+}
 function AdminSection({label,children}){
   return(
     <div style={{marginBottom:16}}>
@@ -3570,8 +3646,14 @@ function LeaderboardScreen({t,darkMode,goBack,account}){
     setLoading(true);
     try{
       if(!window.db){setLoading(false);return;}
-      const snap=await window.db.ref('ww_leaderboard').once('value');
-      setRaw(snap.val()||{});
+      // Nur Top 100 je Modus laden statt des KOMPLETTEN Knotens (massive Download-Kosten
+      // bei vielen registrierten Spielern). Benoetigt .indexOn in den Firebase-Regeln!
+      const [s1,s2]=await Promise.all([
+        window.db.ref('ww_leaderboard').orderByChild('classic/rating').limitToLast(100).once('value'),
+        window.db.ref('ww_leaderboard').orderByChild('duel/rating').limitToLast(100).once('value')
+      ]);
+      setRaw(Object.assign({},s1.val()||{},s2.val()||{}));
+      dlTrack('ww_leaderboard',s1.val());dlTrack('ww_leaderboard',s2.val());
     }catch(e){console.warn('Leaderboard load error',e);}
     setLoading(false);
   };
@@ -4092,15 +4174,19 @@ function App(){
   // Das verhindert die O(N^2)-Download-Kosten, die auch ohne Spielen anfielen.
   useEffect(()=>{
     if(!window.db||screen!=='menu')return;
-    if(adminCfg.maintenance&&!isAdmin())return; // Wartungsmodus: keine Abfragen (Traffic sparen)
+    if(adminCfg.maintenance&&!isAdmin())return;
     let cancelled=false;
-    const ref=window.db.ref('ww_stats');
     const load=async()=>{
       try{
-        const snap=await ref.once('value');
+        const [snapPv,snapIg]=await Promise.all([
+          window.db.ref('ww_pv2').once('value'),
+          window.db.ref('ww_ig').once('value')
+        ]);
         if(cancelled)return;
-        const v=snap.val()||{};
-        setGlobalStats({online:Math.max(0,v.online||0),inGame:Math.max(0,v.inGame||0)});
+        const pv=snapPv.val()||{};
+        const ig=snapIg.val()||{};
+        dlTrack('ww_pv2',pv);dlTrack('ww_ig',ig);
+        setGlobalStats({online:Object.keys(pv).length,inGame:Object.keys(ig).length});
       }catch(e){}
     };
     load();
@@ -4114,24 +4200,13 @@ function App(){
     const key=account?account.key:(authU?authU.uid:GUEST_ID);
     const name=getDisplayName(account);
     setPresence(key,true,name);
-    // Verbindung weg (App zu / Crash) → eigenen Presence-Eintrag automatisch entfernen.
-    // Hält ww_presence klein (nur aktuell verbundene Clients) statt unbegrenzt zu wachsen.
     try{window.db.ref(PRESENCE_KEY(key)).onDisconnect().remove();}catch(e){}
-    // Billiger Online-Zaehler: nur +1/-1 fuer SICH SELBST. Alle lesen spaeter nur diese eine Zahl
-    // (statt den ganzen Presence-Knoten) → verhindert O(N^2)-Kosten.
-    var SVonline=(firebase.database&&firebase.database.ServerValue)?firebase.database.ServerValue:null;
-    var canCountOnline=!!(SVonline&&SVonline.increment);
-    var onlineRef=canCountOnline?window.db.ref('ww_stats/online'):null;
-    var connRef=canCountOnline?window.db.ref('.info/connected'):null;
-    var connCb=null;
-    if(canCountOnline){
-      connCb=connRef.on('value',function(s){
-        if(s.val()===true){
-          try{onlineRef.onDisconnect().set(SVonline.increment(-1));}catch(e){}
-          try{onlineRef.set(SVonline.increment(1));}catch(e){}
-        }
-      });
-    }
+    // Zuverlässiger Online-Zähler: jede Browser-Session schreibt einen eigenen Eintrag
+    // ww_pv2/SESSION = true, mit onDisconnect().remove().
+    // Kein increment/decrement → kein Drift bei Reconnects oder Crashes.
+    var pvRef=window.db.ref('ww_pv2/'+SESSION);
+    try{pvRef.onDisconnect().remove();}catch(e){}
+    try{pvRef.set(true);}catch(e){}
     const iv=setInterval(()=>{
       var u=firebase.auth().currentUser;
       const k=account?account.key:(u?u.uid:GUEST_ID);
@@ -4142,25 +4217,20 @@ function App(){
       var u=firebase.auth().currentUser;
       const k=account?account.key:(u?u.uid:GUEST_ID);
       setPresence(k,false,getDisplayName(account));
-      if(canCountOnline){
-        try{connRef.off('value',connCb);}catch(e){}
-        try{onlineRef.onDisconnect().cancel();}catch(e){}
-        try{onlineRef.set(SVonline.increment(-1));}catch(e){}
-      }
+      try{pvRef.onDisconnect().cancel();}catch(e){}
+      try{pvRef.remove();}catch(e){}
     };
   },[account,adminCfg.maintenance]);
-  // "In Runde"-Zaehler: jeder Client zaehlt sich selbst, wenn er in einem Online-Match ist
+  // "In Runde"-Zaehler: Session-Presence-Ansatz, kein Drift
   useEffect(()=>{
     if(adminCfg.maintenance&&!isAdmin())return;
     if(!window.db||gameMode!=='online'||(screen!=='game'&&screen!=='end'))return;
-    var SVig=(firebase.database&&firebase.database.ServerValue)?firebase.database.ServerValue:null;
-    if(!SVig||!SVig.increment)return;
-    var igRef=window.db.ref('ww_stats/inGame');
-    try{igRef.onDisconnect().set(SVig.increment(-1));}catch(e){}
-    try{igRef.set(SVig.increment(1));}catch(e){}
+    var igRef=window.db.ref('ww_ig/'+SESSION);
+    try{igRef.onDisconnect().remove();}catch(e){}
+    try{igRef.set(true);}catch(e){}
     return()=>{
       try{igRef.onDisconnect().cancel();}catch(e){}
-      try{igRef.set(SVig.increment(-1));}catch(e){}
+      try{igRef.remove();}catch(e){}
     };
   },[gameMode,screen,adminCfg.maintenance]);
   useEffect(()=>{
@@ -4170,6 +4240,7 @@ function App(){
     const cb=ref.on('value',snap=>{
       if(cancelled)return;
       const lob=snap.val();
+      dlTrack('barricade_lobby_x',lob);
       if(!lob)return;
       const players=Object.keys(lob.players||{});
       if(players.length>=2){
@@ -4203,7 +4274,7 @@ function App(){
       if(inv&&!cancelled&&Date.now()-inv.ts<60000)setPendingInvite(inv);
       else if(!cancelled)setPendingInvite(null);
     };
-    poll();const iv=setInterval(poll,1500);
+    poll();const iv=setInterval(poll,5000); // 1,5s -> 5s: Einladung ist 60s gueltig, spart Dauerlast
     return()=>{cancelled=true;clearInterval(iv);};
   },[account,screen]);
   // Freundschaftsanfragen pollen (Badge im Menü)
@@ -4215,6 +4286,7 @@ function App(){
       try{
         const snap=await window.db.ref(FR_KEY(account.key)).once('value');
         const v=snap.val()||{};
+        dlTrack('ww_freq/x',v);
         if(!cancelled)setFriendReqCount(Object.keys(v).length);
       }catch(e){}
     };
@@ -4371,12 +4443,14 @@ function App(){
       // Einmalig laden für schnellen Start
       ref.once('value',snap=>{
         const v=snap.val();
+        dlTrack('barricade_admin_config',v);
         if(v){try{setAdminCfg(mergeAdminCfg(JSON.parse(v)));}catch(e){}}
         else setAdminCfg(DEFAULT_ADMIN_CFG);
         setAdminCfgReady(true);
         // Danach live updates
         cb=ref.on('value',snap2=>{
           const v2=snap2.val();
+          dlTrack('barricade_admin_config',v2);
           if(v2){try{setAdminCfg(mergeAdminCfg(JSON.parse(v2)));}catch(e){}}
         });
       });
@@ -4395,6 +4469,7 @@ function App(){
     var bcRef=window.db.ref('ww_broadcasts');
     var bcCb=bcRef.on('value',function(snap){
       var val=snap.val();
+      dlTrack('ww_broadcasts',val);
       if(!val){setBroadcasts([]);return;}
       var now=Date.now();
       var list=Object.entries(val).map(function(e){return Object.assign({id:e[0]},e[1]);})
@@ -4527,7 +4602,13 @@ function App(){
       if(prev==='standard'&&!f.duelStandard)return 'blitz';
       return prev;
     });
-  },[adminCfgReady]);
+    // selectedMap auto-switch wenn Spielfeld deaktiviert
+    setSelectedMap(prev=>{
+      if(prev==='duel'&&!f.duel)return 'classic';
+      if(prev==='classic'&&!f.race)return 'duel';
+      return prev;
+    });
+  },[adminCfgReady,adminCfg.features.race,adminCfg.features.duel]);
   const[timeLeft,setTimeLeft]=useState({A:0,B:0}); // Restzeit in Sekunden je Spieler (Classic-Modus)
   const[turnTimeLeft,setTurnTimeLeft]=useState(60); // Restzeit für aktuellen Zug (Classic-Modus)
   const[copyFlash,setCopyFlash]=useState(false);
@@ -4606,6 +4687,7 @@ function App(){
   const winnerFiredRef=useRef(false);
   const afkTriggerRef=useRef(null); // Ref für triggerWin - vermeidet TDZ in Safari
   const wsTurnEndsRef=useRef(0); // WS: lokale Deadline fuer Zug-Countdown (vom Server, turnMs)
+  const pendingWsRef=useRef(null); // WS: zuletzt optimistisch gesendeter Zug/Wand, falls er verloren geht -> erneut senden
 
   const triggerWin=(p,skipAnim,finalMoveHist)=>{
     if(winnerFiredRef.current||S.current.winner)return;
@@ -4800,6 +4882,20 @@ function App(){
         const wRole=d.winner===0?'A':'B';
         triggerWin(wRole,false,mh);
       }
+      // Verlorenen eigenen Zug automatisch erneut senden (Anti-Verlust auf wackeliger Verbindung)
+      if(d.winner===undefined||d.winner===null){
+        var myRoleP=(typeof d.deineNummer==='number')?(d.deineNummer===0?'A':'B'):S.current.onlineRole;
+        var myNumP=myRoleP==='A'?0:1;
+        var srvTurnP=(typeof d.amZug==='number')?(d.amZug===0?'A':'B'):S.current.turn;
+        var pend=pendingWsRef.current;
+        if(pend){
+          if(d.lm&&d.lm.p===myNumP){ pendingWsRef.current=null; } // eigener Zug bestaetigt
+          else if(srvTurnP===myRoleP){ // Server: ich bin noch dran -> Zug kam nicht an -> erneut senden
+            if(pend.tries<3){ pend.tries++; if(pend.kind==='move')WSNET.move(pend.to); else WSNET.wall(pend.key); }
+            else pendingWsRef.current=null;
+          } else { pendingWsRef.current=null; } // Gegner ist dran -> Zug wurde angewendet
+        }
+      } else { pendingWsRef.current=null; }
     }else if(d.type==='opponent_disconnected'){
       if(d.countdown)setFlash('Gegner getrennt - gewinnt in '+d.countdown+'s');
     }else if(d.type==='opponent_back'){
@@ -4819,6 +4915,7 @@ function App(){
       setMoveHist([]);
       setGameNum((S.current.gameNum||1)+1);
       winnerFiredRef.current=false;
+      pendingWsRef.current=null;
       setGiveUpArmed(false);setFlash('');
       setEloChange(null);
       setScreen('game');
@@ -4852,8 +4949,8 @@ function App(){
       starter=Math.random()<0.5?'A':'B';
     }
     setBarrLeft({A:gameBarr,B:gameBarr});setTurn(starter);setWinner(null);setGaveUp(null);setMoveHist([]);
-    // Server-autoritative Anbindung nur fuer reines Classic-Online (kein Duell/Ranked/Hammer/Chaos/Timer)
-    if(WS_ENABLED&&mode==='online'&&mapToUse!=='duel'&&!ranked&&!effHammer&&!chaosMode&&!(tm&&(tm.indexOf('classic-')===0||tm.indexOf('blitz-')===0))){
+    // Server-autoritative Anbindung fuer Classic-Online inkl. Classic-Zeit (3/5/8); kein Duell/Ranked/Hammer/Chaos/Blitz
+    if(WS_ENABLED&&mode==='online'&&mapToUse!=='duel'&&!ranked&&!effHammer&&!chaosMode&&(!tm||tm.indexOf('blitz-')!==0)){
       // Spielernamen aus dem Lobby-Spielstand holen (Sieg-Zaehler nach Namen, nicht Farbe)
       if(lid){ try{ stoGet('barricade_game_'+lid).then(function(g){ if(g&&(g.nameA||g.nameB))setPlayerNames({A:g.nameA||'',B:g.nameB||''}); }); }catch(e){} }
       WSNET.connect(lid,role,applyServerState);
@@ -5143,6 +5240,8 @@ function App(){
       // Classic: Zug-Zeit abgelaufen → Gegner gewinnt (außerhalb des State-Setters)
       if(turnExpired&&!S.current.winner){
         const other=turn==='A'?'B':'A';
+        // WS: Verlierer (aktiver Spieler) meldet Zeitablauf an Server
+        if(WSNET.roomId&&S.current.turn===S.current.onlineRole)WSNET.timeout();
         triggerWin(other);
       }
       // Gesamt-Zeit nur für Classic runterzählen
@@ -5160,12 +5259,31 @@ function App(){
         });
         if(totalExpired&&!S.current.winner){
           const other=turn==='A'?'B':'A';
+          // WS: Verlierer (aktiver Spieler) meldet Zeitablauf an Server
+          if(WSNET.roomId&&S.current.turn===S.current.onlineRole)WSNET.timeout();
           triggerWin(other);
         }
       }
     },1000);
     return()=>clearInterval(iv);
   },[screen,winner,turn,gameTimeMode,gameMode]);
+
+  // ── WS Anti-Deadlock ──
+  // Solange wir auf den Gegner warten, regelmaessig den echten Stand vom Server anfordern.
+  // Faengt verlorene State-Nachrichten ab (z.B. wenn die Verbindung still abbricht ohne onclose),
+  // sodass kein Spiel haengen bleibt weil beide denken der andere sei dran.
+  useEffect(()=>{
+    if(!WSNET.roomId||gameMode!=='online'||screen!=='game')return;
+    const iv=setInterval(()=>{
+      const s=S.current;
+      if(!s||s.gameMode!=='online'||s.winner)return;
+      if(s.turn!==s.onlineRole){ // wir warten auf den Gegner -> Stand pruefen
+        try{ WSNET.requestSync(); }catch(e){}
+        try{ if(!WSNET.sock||WSNET.sock.readyState!==1)WSNET._open(); }catch(e){}
+      }
+    },4000);
+    return()=>clearInterval(iv);
+  },[gameMode,screen]);
 
   // ── AI ──
   useEffect(()=>{
@@ -5308,6 +5426,7 @@ function App(){
     const ref=window.db.ref(`barricade_game_${lobbyId}`);
     const cb=ref.on('value',snap=>{
       const v=snap.val();if(!v)return;
+      dlTrack('barricade_game_'+lobbyId,v);
       let gs;try{gs=JSON.parse(v);}catch{return;}
       // Robuste Filterung: Updates aus alter Runde oder mit weniger moves ignorieren.
       // Clock-Skew-sicher (kein Date.now()-Vergleich mehr).
@@ -5501,6 +5620,7 @@ function App(){
   },[gameMode,lobbyId,screen]);
   useEffect(()=>{
     if(gameMode!=='online'||!lobbyId||screen!=='game'||winner)return;
+    if(WSNET.roomId)return; // WS-Match: Server ueberwacht Verbindungen selbst, kein Firebase-Heartbeat
     const myRef=window.db.ref(`barricade_hb_${lobbyId}/${onlineRole}`);
     const send=()=>myRef.set(Date.now());
     send();
@@ -5515,6 +5635,7 @@ function App(){
 
   useEffect(()=>{
     if(gameMode!=='online'||!lobbyId||screen!=='game'||winner)return;
+    if(WSNET.roomId)return; // WS-Match: kein Firebase-Gegner-Heartbeat
     const oppRole=onlineRole==='A'?'B':'A';
     oppLastSeenRef.current=Date.now();
     const ref=window.db.ref(`barricade_hb_${lobbyId}/${oppRole}`);
@@ -5531,6 +5652,7 @@ function App(){
 
   useEffect(()=>{
     if(gameMode!=='online'||screen!=='game'||winner){setOppCountdown(null);return;}
+    if(WSNET.roomId){setOppCountdown(null);return;} // WS-Match: NUR der Server entscheidet Disconnect-Forfeits
     let lastTick=Date.now();
     const iv=setInterval(()=>{
       const nowT=Date.now();
@@ -5630,6 +5752,9 @@ function App(){
     if(screen!=='waiting'&&screen!=='online')return;
     let gameStarted=false;
     const poll=async()=>{
+      // Volle Lobby-Liste nur lesen wenn sie auch angezeigt wird (Online-Screen).
+      // Im Wartescreen wurde sie vorher alle 2s sinnlos mitgeladen (Download-Kosten).
+      if(screen==='online'){
       const list=await stoGet('barricade_lobby_list');
       const now=Date.now();
       const all=list||[];
@@ -5643,6 +5768,7 @@ function App(){
         const keep=all.filter(l=>now-l.ts<45000);
         await stoSet('barricade_lobby_list',keep);
         for(const l of dead){await stoDel(`barricade_lobby_${l.id}`);}
+      }
       }
       if(gameStarted)return;
       if(screen==='waiting'&&lobbyId&&onlineRole==='A'){
@@ -5674,6 +5800,7 @@ function App(){
   // ── Host-Heartbeat: hält die Lobby in der Liste am Leben solange der Host wartet ──
   useEffect(()=>{
     if(screen!=='waiting'||onlineRole!=='A'||!lobbyId)return;
+    let hbCount=0;
     const hb=async()=>{
       // Transaction: nur ts aktualisieren — guestId NIEMALS ueberschreiben,
       // sonst geht ein gerade beigetretener Gast wieder verloren (Connection haengt).
@@ -5688,8 +5815,10 @@ function App(){
         if(res&&res.snapshot&&res.snapshot.val()){try{lobby=JSON.parse(res.snapshot.val());}catch(e){}}
       }catch(e){}
       if(!lobby)return;
-      // Nur öffentliche Lobbys stehen in der Liste
-      if(!lobby.isPrivate){
+      // Nur öffentliche Lobbys stehen in der Liste; volle Liste nur jedes 3. Mal (alle 9s)
+      // lesen+schreiben statt alle 3s — Anzeigefenster ist 20s, bleibt sicher. Spart Downloads.
+      hbCount++;
+      if(!lobby.isPrivate&&hbCount%3===1){
         const list=await stoGet('barricade_lobby_list')||[];
         const updated=list.map(l=>l.id===lobbyId?{...l,ts:Date.now()}:l);
         await stoSet('barricade_lobby_list',updated);
@@ -5719,6 +5848,7 @@ function App(){
     const ref=window.db.ref('barricade_chat_'+lobbyId);
     const cb=ref.on('value',snap=>{
       const v=snap.val();
+      dlTrack('barricade_chat_'+lobbyId,v);
       let list=[];
       if(v){try{list=JSON.parse(v)||[];}catch(e){list=[];}}
       setChatMsgs(list);
@@ -5922,6 +6052,7 @@ function App(){
       const np={r:r,c:c};const isA=turn==='A';
       if(isA)setPA(np);else setPB(np);
       setTurn(turn==='A'?'B':'A');
+      pendingWsRef.current={kind:'move',to:{r:r,c:c},tries:0};
       WSNET.move({r:r,c:c});
       return;
     }
@@ -6039,6 +6170,7 @@ function App(){
                 setWalls(next);
                 setBarrLeft({...sc.barrLeft,[sc.turn]:sc.barrLeft[sc.turn]-1});
                 setTurn(sc.turn==='A'?'B':'A');
+                pendingWsRef.current={kind:'wall',key:key,tries:0};
                 WSNET.wall(key);
               }else setFlash(t('invalidPos'));
             }
@@ -6206,26 +6338,8 @@ function App(){
             </div>
           </div>
           <div style={{position:'relative',zIndex:1,textAlign:'center'}}>
-            <button onClick={()=>{setShowAdminUnlock(true);setAdminUnlockPw('');setAdminUnlockErr(false);}}
-              style={{background:'none',border:'none',cursor:'pointer',padding:'8px 16px',
-                fontSize:12,fontWeight:700,color:'var(--subtle)',fontFamily:'system-ui,-apple-system,sans-serif',
-                letterSpacing:0.5,opacity:0.7}}>
-              Admin
-            </button>
+            <div style={{height:28}}/>
           </div>
-          {showAdminUnlock&&(
-            <div onClick={()=>{setShowAdminUnlock(false);setAdminUnlockPw('');setAdminUnlockErr(false);}}
-              style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.6)',zIndex:9000,display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
-              <div onClick={e=>e.stopPropagation()} style={{background:'var(--card)',borderRadius:18,padding:'20px 18px',width:'100%',maxWidth:300,boxShadow:'0 20px 60px rgba(0,0,0,0.4)'}}>
-                <div style={{fontSize:15,fontWeight:800,color:'var(--text)',marginBottom:12,textAlign:'center'}}>Admin</div>
-                <input value={adminUnlockPw} onChange={e=>{setAdminUnlockPw(e.target.value);setAdminUnlockErr(false);}} type="password" placeholder="Passwort" autoFocus
-                  onKeyDown={e=>{if(e.key==='Enter')tryUnlock();}}
-                  style={{width:'100%',padding:'12px',borderRadius:10,border:adminUnlockErr?'1.5px solid #ef4444':'1.5px solid var(--border)',fontSize:15,outline:'none',background:'var(--bg)',color:'var(--text)',fontFamily:'system-ui,-apple-system,sans-serif',boxSizing:'border-box'}}/>
-                {adminUnlockErr&&<div style={{color:'#ef4444',fontSize:12,fontWeight:600,marginTop:6,textAlign:'center'}}>Falsches Passwort</div>}
-                <button onClick={tryUnlock} style={{width:'100%',marginTop:10,padding:'11px',borderRadius:10,background:'#3b82f6',color:'#fff',border:'none',fontWeight:800,fontSize:14,fontFamily:'system-ui,-apple-system,sans-serif',cursor:'pointer'}}>OK</button>
-              </div>
-            </div>
-          )}
         </div>
       );
     }
@@ -6848,6 +6962,8 @@ function App(){
             </div>
             <div style={{fontSize:11,color:'var(--subtle)',marginBottom:18,fontWeight:500}}>Änderungen gelten sofort für alle Spieler.</div>
 
+            <AdminWhoAmI/>
+
             <AdminSection label="SPIELMODI">
               {[['online','Online-Lobby',<GlobeIcon size={13} color="var(--subtle)"/>],['friend','Mit Freund',<PeopleIcon size={13} color="var(--subtle)"/>],['bots','Gegen Bots',<BotIcon size={13} color="var(--subtle)"/>],['local','Lokal',<PhoneIcon size={13} color="var(--subtle)"/>],['twovtwo','2 vs 2',<SwordsIcon size={13} color="var(--subtle)"/>]].map(function(f){
                 return <AdminToggle key={f[0]} label={<span style={{display:'inline-flex',alignItems:'center',gap:6}}><span style={{display:'flex'}}>{f[2]}</span>{f[1]}</span>} on={adminCfg.features[f[0]]} onClick={()=>toggleFeature(f[0])}/>;
@@ -6861,16 +6977,22 @@ function App(){
             </AdminSection>
 
             <AdminSection label="DUELL-MODI">
-              <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:6}}>Welche Duell-Feldgrößen Spieler wählen können:</div>
-              <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}>⚡ Blitz-Duell (7×7)</span>} on={adminCfg.features.duelBlitz} onClick={()=>toggleFeature('duelBlitz')}/>
-              <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}>🛡 Standard-Duell (9×9)</span>} on={adminCfg.features.duelStandard} onClick={()=>toggleFeature('duelStandard')}/>
+              <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><SwordsIcon size={13} color="var(--subtle)"/>Duell-Spielfeld aktiv</span>} on={adminCfg.features.duel} onClick={()=>toggleFeature('duel')} accent/>
+              <div style={{paddingLeft:12,borderLeft:'2px solid var(--border)',marginLeft:4,display:'flex',flexDirection:'column',gap:7,opacity:adminCfg.features.duel?1:0.4}}>
+                <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:2}}>Welche Feldgrößen wählbar:</div>
+                <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><span style={{fontSize:11}}>+</span> Blitz-Duell (7x7)</span>} on={adminCfg.features.duelBlitz} onClick={()=>{if(adminCfg.features.duel)toggleFeature('duelBlitz');}}/>
+                <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><span style={{fontSize:11}}>+</span> Standard-Duell (9x9)</span>} on={adminCfg.features.duelStandard} onClick={()=>{if(adminCfg.features.duel)toggleFeature('duelStandard');}}/>
+              </div>
             </AdminSection>
 
-            <AdminSection label="ZEITMODI — RACE">
-              <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:6}}>Welche Classic-Optionen Spieler wählen können:</div>
-              <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><ModeGlyph kind="clock" size={11} color="var(--subtle)"/>3 Minuten</span>} on={adminCfg.features.classicTime3} onClick={()=>toggleFeature('classicTime3')}/>
-              <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><ModeGlyph kind="clock" size={11} color="var(--subtle)"/>5 Minuten</span>} on={adminCfg.features.classicTime5} onClick={()=>toggleFeature('classicTime5')}/>
-              <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><ModeGlyph kind="clock" size={11} color="var(--subtle)"/>8 Minuten</span>} on={adminCfg.features.classicTime8} onClick={()=>toggleFeature('classicTime8')}/>
+            <AdminSection label="RACE-MODI">
+              <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><ModeGlyph kind="clock" size={11} color="var(--subtle)"/>Race-Spielfeld aktiv</span>} on={adminCfg.features.race} onClick={()=>toggleFeature('race')} accent/>
+              <div style={{paddingLeft:12,borderLeft:'2px solid var(--border)',marginLeft:4,display:'flex',flexDirection:'column',gap:7,opacity:adminCfg.features.race?1:0.4}}>
+                <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:2}}>Welche Zeitmodi wählbar:</div>
+                <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><ModeGlyph kind="clock" size={11} color="var(--subtle)"/>3 Minuten</span>} on={adminCfg.features.classicTime3} onClick={()=>{if(adminCfg.features.race)toggleFeature('classicTime3');}}/>
+                <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><ModeGlyph kind="clock" size={11} color="var(--subtle)"/>5 Minuten</span>} on={adminCfg.features.classicTime5} onClick={()=>{if(adminCfg.features.race)toggleFeature('classicTime5');}}/>
+                <AdminToggle label={<span style={{display:'inline-flex',alignItems:'center',gap:5}}><ModeGlyph kind="clock" size={11} color="var(--subtle)"/>8 Minuten</span>} on={adminCfg.features.classicTime8} onClick={()=>{if(adminCfg.features.race)toggleFeature('classicTime8');}}/>
+              </div>
             </AdminSection>
 
             <AdminSection label="ZEITMODI — BLITZ">
@@ -7316,7 +7438,7 @@ function App(){
             <div style={{width:3,height:11,borderRadius:2,background:'var(--subtle)',opacity:0.5}}/> SPIELFELD
           </div>
           <div style={{display:'flex',gap:8,marginBottom:4}}>
-            <button onClick={()=>setSelectedMap('duel')} className="mi-btn" style={{
+            {feat('duel')&&<button onClick={()=>setSelectedMap('duel')} className="mi-btn" style={{
               flex:1,padding:'14px 10px',borderRadius:14,cursor:'pointer',textAlign:'center',
               background:selectedMap==='duel'
                 ?'linear-gradient(135deg,#7c3aed,#8b5cf6)'
@@ -7347,8 +7469,8 @@ function App(){
               </div>
               <div style={{fontSize:12,fontWeight:900,letterSpacing:-0.2}}>{t('duel')}</div>
               <div style={{fontSize:9,fontWeight:700,opacity:0.65,marginTop:2}}>1v1 Arena</div>
-            </button>
-            <button onClick={()=>setSelectedMap('classic')} className="mi-btn" style={{
+            </button>}
+            {feat('race')&&<button onClick={()=>setSelectedMap('classic')} className="mi-btn" style={{
               flex:1,padding:'14px 10px',borderRadius:14,cursor:'pointer',textAlign:'center',
               background:selectedMap==='classic'
                 ?'linear-gradient(135deg,#2563eb,#8b5cf6)'
@@ -7377,7 +7499,7 @@ function App(){
               </div>
               <div style={{fontSize:12,fontWeight:900,letterSpacing:-0.2}}>{t('classic')}</div>
               <div style={{fontSize:9,fontWeight:700,opacity:0.65,marginTop:2}}>{t('classicDesc')||'Race to top'}</div>
-            </button>
+            </button>}
           </div>
           {selectedMap==='duel'&&(
             <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:8,paddingLeft:2,lineHeight:1.5}}>
@@ -8597,6 +8719,7 @@ function App(){
               title={t('menu')} desc="Zurück zum Hauptmenü"
               onClick={()=>{
                 if(gameMode==='online'&&myRematch)declineRematch();
+                try{WSNET.close();}catch(e){}
                 setScreen('menu');setGameMode(null);setLobbyId(null);
               }}/>
           </div>
