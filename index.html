@@ -702,11 +702,11 @@ function dlTrack(key,val){
   }catch(e){}
 }
 var WSNET={
-  sock:null, token:null, roomId:null, role:null, onState:null, lastRecv:0, pongSeen:false, _hb:null,
-  connect:function(roomId,role,onState){
+  sock:null, token:null, roomId:null, role:null, onState:null, settings:null, lastRecv:0, pongSeen:false, _hb:null,
+  connect:function(roomId,role,onState,settings){
     // Alte Verbindung KOMPLETT schliessen, sonst bleibt der Socket im alten (beendeten) Raum gebunden
     if(this.sock){ try{ this.sock.onopen=null; this.sock.onmessage=null; this.sock.onclose=null; this.sock.close(); }catch(e){} this.sock=null; }
-    this.roomId=roomId; this.role=role; this.onState=onState; this.token=null; this.lastRecv=Date.now(); this._dbg('verbinde '+roomId+' ('+role+')'); this._open(); this._startHb();
+    this.roomId=roomId; this.role=role; this.onState=onState; this.settings=settings||null; this.token=null; this.lastRecv=Date.now(); this._dbg('verbinde '+roomId+' ('+role+')'); this._open(); this._startHb();
   },
   _open:function(){
     var self=this;
@@ -717,7 +717,7 @@ var WSNET={
       self._dbg('socket offen'); self.lastRecv=Date.now();
       if(self.onState)self.onState({type:'ws_open'});
       if(self.token){ self._send({type:'reconnect',token:self.token}); }
-      else if(self.role==='A'){ self._send({type:'create_room',roomId:self.roomId}); }
+      else if(self.role==='A'){ self._send({type:'create_room',roomId:self.roomId,settings:self.settings||{}}); }
       else { self._send({type:'join_room',code:self.roomId}); }
     };
     self.sock.onmessage=function(ev){
@@ -757,7 +757,7 @@ var WSNET={
   rematch:function(){ this._send({type:'rematch'}); },
   rematchCancel:function(){ this._send({type:'rematch_cancel'}); },
   _dbg:function(msg){ if(!WS_DEBUG)return; try{ var el=document.getElementById('wsdbg'); if(!el){ el=document.createElement('div'); el.id='wsdbg'; el.style.cssText='position:fixed;top:4px;left:4px;z-index:999999;background:#000;color:#0f0;font:bold 12px monospace;padding:3px 8px;border-radius:5px;'; if(document.body)document.body.appendChild(el); } if(el)el.textContent='WS: '+msg; }catch(e){} },
-  close:function(){ this._stopHb(); this.roomId=null; this.role=null; this.onState=null; this.token=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
+  close:function(){ this._stopHb(); this.roomId=null; this.role=null; this.onState=null; this.token=null; this.settings=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
 };
 if(WS_ENABLED){ try{ WSNET._dbg('bereit (ws=1)'); }catch(e){} }
 try{ document.addEventListener('visibilitychange',function(){ if(!document.hidden&&WSNET.roomId){ if(!WSNET.sock||WSNET.sock.readyState!==1){ WSNET._open(); } else { try{ WSNET.requestSync(); }catch(e){} } } }); }catch(e){}
@@ -4874,6 +4874,8 @@ function App(){
   // Wendet einen Server-Zustand auf das React-Spiel an (Adapter Server -> Spiel)
   const applyServerState=(d)=>{
     if(d.type==='match_start'||d.type==='resync'||d.type==='state'){
+      // Schutz bei gemischten Versionen: Server-Brett muss zum Client-Brett passen
+      if((d.type==='match_start'||d.type==='resync')&&d.cols&&d.rows&&(d.cols!==COLS||d.rows!==ROWS)){WSNET._dbg('GEO-MISMATCH! Server '+d.cols+'x'+d.rows+' vs Client '+COLS+'x'+ROWS);}
       if(typeof d.deineNummer==='number')setOnlineRole(d.deineNummer===0?'A':'B');
       if(d.pos){ setPA({...d.pos[0]}); setPB({...d.pos[1]}); }
       if(d.walls){ setWalls(new Set(d.walls)); }
@@ -4960,11 +4962,12 @@ function App(){
       starter=Math.random()<0.5?'A':'B';
     }
     setBarrLeft({A:gameBarr,B:gameBarr});setTurn(starter);setWinner(null);setGaveUp(null);setMoveHist([]);
-    // Server-autoritative Anbindung fuer Classic-Online inkl. Classic-Zeit (3/5/8); kein Duell/Ranked/Hammer/Chaos/Blitz
-    if(WS_ENABLED&&mode==='online'&&mapToUse!=='duel'&&!ranked&&!effHammer&&!chaosMode&&(!tm||tm.indexOf('blitz-')!==0)){
+    // Server-autoritative Anbindung fuer Race UND Duell (inkl. Classic-Zeit 3/5/8).
+    // Ausgeschlossen: Ranked, Hammer, Chaos, Zufalls-Waende (Drop), Blitz-Zugzeit — laufen weiter ueber Firebase.
+    if(WS_ENABLED&&mode==='online'&&!ranked&&!effHammer&&!chaosMode&&!effDrop&&(!tm||tm.indexOf('blitz-')!==0)){
       // Spielernamen aus dem Lobby-Spielstand holen (Sieg-Zaehler nach Namen, nicht Farbe)
       if(lid){ try{ stoGet('barricade_game_'+lid).then(function(g){ if(g&&(g.nameA||g.nameB))setPlayerNames({A:g.nameA||'',B:g.nameB||''}); }); }catch(e){} }
-      WSNET.connect(lid,role,applyServerState);
+      WSNET.connect(lid,role,applyServerState,{map:mapToUse,size:sizeToUse,barr:gameBarr});
     }else if(WSNET.roomId){ WSNET.close(); }
     if(!isRematch)setSeriesScore({A:0,B:0});
     setEloChange(null);
