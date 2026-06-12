@@ -801,6 +801,7 @@ var WSNET={
   wall:function(key){ this._send({type:'wall',key:key}); },
   giveUp:function(){ this._send({type:'give_up'}); },
   timeout:function(){ this._send({type:'timeout'}); },
+  skipTurn:function(){ this._send({type:'skip'}); },
   requestSync:function(){ this._send({type:'sync'}); },
   rematch:function(){ this._send({type:'rematch'}); },
   rematchCancel:function(){ this._send({type:'rematch_cancel'}); },
@@ -4408,7 +4409,7 @@ function App(){
     const code=randId(4);
     if(WS_ENABLED){
       // Privater WS-Raum; Einladung weiter ueber Firebase (ww_invites)
-      const fbm=(chaosMode||hammerMode||dropMode||(gameTimeMode&&gameTimeMode.indexOf('blitz-')===0))?1:0;
+      const fbm=(chaosMode||hammerMode||dropMode)?1:0;
       WSNET.openLobby(code,{map:selectedMap,size:duelSize,barr:gameBarr,tm:gameTimeMode,ch:chaosMode?1:0,dp:dropMode,hm:hammerMode?1:0,hd:hammerDrops,fb:fbm,priv:1},{name:account.name,akey:account.key},wsLobbyTrampRef.current);
     }else{
       const lobby={host:SESSION,players:{},status:'waiting',map:selectedMap,duelSize:duelSize,tm:gameTimeMode,ch:chaosMode,br:gameBarr,dp:dropMode,hm:hammerMode,hd:hammerDrops,lastUpdated:Date.now()};
@@ -4803,6 +4804,7 @@ function App(){
   const winnerFiredRef=useRef(false);
   const afkTriggerRef=useRef(null); // Ref für triggerWin - vermeidet TDZ in Safari
   const wsTurnEndsRef=useRef(0); // WS: lokale Deadline fuer Zug-Countdown (vom Server, turnMs)
+  const wsSkipForRef=useRef(0); // WS-Blitz: fuer welche Deadline schon ein skip gesendet wurde (Doppelsende-Schutz)
   const pendingWsRef=useRef(null); // WS: zuletzt optimistisch gesendeter Zug/Wand, falls er verloren geht -> erneut senden
 
   const triggerWin=(p,skipAnim,finalMoveHist)=>{
@@ -5098,15 +5100,15 @@ function App(){
       starter=Math.random()<0.5?'A':'B';
     }
     setBarrLeft({A:gameBarr,B:gameBarr});setTurn(starter);setWinner(null);setGaveUp(null);setMoveHist([]);
-    // Server-autoritative Anbindung fuer Race UND Duell (inkl. Classic-Zeit 3/5/8).
-    // Ausgeschlossen: Ranked, Hammer, Chaos, Zufalls-Waende (Drop), Blitz-Zugzeit — laufen weiter ueber Firebase.
+    // Server-autoritative Anbindung fuer Race UND Duell (inkl. Classic-Zeit 3/5/8 und Blitz-Zugzeit 5/8/10s).
+    // Ausgeschlossen: Ranked, Hammer, Chaos, Zufalls-Waende (Drop) — laufen weiter ueber Firebase.
     if(wsGo){
       // Raum existiert schon seit der Lobby -> nur den Handler aufs laufende Spiel umhaengen.
       WSNET.onState=applyServerState;
-    }else if(WS_ENABLED&&mode==='online'&&!ranked&&!effHammer&&!chaosMode&&!effDrop&&(!tm||tm.indexOf('blitz-')!==0)){
+    }else if(WS_ENABLED&&mode==='online'&&!ranked&&!effHammer&&!chaosMode&&!effDrop){
       // Spielernamen aus dem Lobby-Spielstand holen (Sieg-Zaehler nach Namen, nicht Farbe)
       if(lid){ try{ stoGet('barricade_game_'+lid).then(function(g){ if(g&&(g.nameA||g.nameB))setPlayerNames({A:g.nameA||'',B:g.nameB||''}); }); }catch(e){} }
-      WSNET.connect(lid,role,applyServerState,{map:mapToUse,size:sizeToUse,barr:gameBarr});
+      WSNET.connect(lid,role,applyServerState,{map:mapToUse,size:sizeToUse,barr:gameBarr,tm:tm});
     }else if(WSNET.roomId){ WSNET.close(); }
     if(!isRematch)setSeriesScore({A:0,B:0});
     setEloChange(null);
@@ -5293,6 +5295,7 @@ function App(){
     if(turnTimerRef.current){clearInterval(turnTimerRef.current);turnTimerRef.current=null;}
     setAfkTimeLeft(0);
     if(screen!=='game'||gameMode!=='online'||winner)return;
+    if(WSNET.roomId&&gameTimeMode&&gameTimeMode.indexOf('blitz-')===0)return; // WS-Blitz: eigener Zug-Timer-Badge, kein AFK-Countdown daneben
     if(WSNET.roomId){
       // Server beendet den Zug bei Ablauf. Hier nur Countdown anzeigen (fuer beide Spieler).
       turnTimerRef.current=setInterval(function(){
@@ -5434,6 +5437,23 @@ function App(){
     if(winner)return;
     if(!isTimerMode(gameTimeMode))return;
     const isBlitz=gameTimeMode.indexOf('blitz-')===0;
+    if(isBlitz&&WSNET.roomId&&gameMode==='online'){
+      // WS-Blitz: der SERVER skippt autoritativ bei Ablauf (kein Verlust, Zug wechselt).
+      // Hier nur Countdown aus der Server-Deadline anzeigen + Sicherheitsnetz: bei 0
+      // einmalig skip senden (falls die Server-Uhr haengt; Server validiert eh).
+      const ivW=setInterval(()=>{
+        if(S.current.winner||S.current.screen!=='game')return;
+        var ends=wsTurnEndsRef.current;
+        if(!ends){setTurnTimeLeft(getTurnTime(gameTimeMode));return;}
+        var rest=Math.max(0,Math.ceil((ends-Date.now())/1000));
+        setTurnTimeLeft(rest);
+        if(rest<=0&&S.current.turn===S.current.onlineRole&&wsSkipForRef.current!==ends){
+          wsSkipForRef.current=ends; // pro Deadline nur ein skip
+          try{WSNET.skipTurn();}catch(e){}
+        }
+      },300);
+      return()=>clearInterval(ivW);
+    }
     const iv=setInterval(()=>{
       if(S.current.winner||S.current.screen!=='game')return;
       let turnExpired=false;
@@ -6170,7 +6190,7 @@ function App(){
     if(WS_ENABLED){
       // WS-Modus: Raum auf dem Server, Code = Raum-ID (privat kurz, oeffentlich lang)
       const id=isPrivate?randId(4):randId(6);
-      const fbm=(chaosMode||hammerMode||dropMode||(gameTimeMode&&gameTimeMode.indexOf('blitz-')===0))?1:0;
+      const fbm=(chaosMode||hammerMode||dropMode)?1:0;
       WSNET.openLobby(id,{map:selectedMap,size:duelSize,barr:gameBarr,tm:gameTimeMode,ch:chaosMode?1:0,dp:dropMode,hm:hammerMode?1:0,hd:hammerDrops,fb:fbm,priv:isPrivate?1:0},{name:getDisplayName(account),akey:account?account.key:null},wsLobbyTrampRef.current);
       setLobbyId(id);setOnlineRole('A');
       setPrivateCode(isPrivate?id:null);
