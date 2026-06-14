@@ -569,10 +569,10 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='wwsg'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wwsg)'/%3E%3C/svg%3E");}
   .ww-stone-sheen{position:absolute;left:22%;top:14%;width:48%;height:36%;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,255,255,0.4),transparent);filter:blur(1.5px);}
   .ww-wall-gloss{position:absolute;left:7%;right:7%;top:1.5px;height:28%;border-radius:4px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,0.34),transparent);}
-  .ww-board-tex{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;mix-blend-mode:soft-light;opacity:0.45;background-size:260px 260px;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='wwbn'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wwbn)' opacity='0.55'/%3E%3C/svg%3E");}
-  .ww-board-veins{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;opacity:0.4;background-size:cover;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23808a9c' stroke-opacity='0.16'%3E%3Cpath d='M40 0 C 70 110 20 210 80 400' stroke-width='1'/%3E%3Cpath d='M380 10 C 300 140 360 250 270 400' stroke-width='1.2'/%3E%3Cpath d='M150 0 C 180 90 120 180 160 400' stroke-width='0.8'/%3E%3Cpath d='M0 120 C 130 150 250 90 400 140' stroke-width='0.9'/%3E%3C/g%3E%3C/svg%3E");}
+  .ww-board-tex{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;background-size:150px 150px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='wwbn'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wwbn)' opacity='0.5'/%3E%3C/svg%3E");}
+  .ww-board-veins{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;background-size:cover;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23808a9c' stroke-opacity='0.14'%3E%3Cpath d='M40 0 C 70 110 20 210 80 400' stroke-width='1'/%3E%3Cpath d='M380 10 C 300 140 360 250 270 400' stroke-width='1.2'/%3E%3Cpath d='M150 0 C 180 90 120 180 160 400' stroke-width='0.8'/%3E%3Cpath d='M0 120 C 130 150 250 90 400 140' stroke-width='0.9'/%3E%3C/g%3E%3C/svg%3E");}
 </style>
 </head>
 <body>
@@ -9415,8 +9415,11 @@ function App(){
       <div ref={gridRef} style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,touchAction:'auto',...sGrid,
         background:darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
         transform:boardFlip?'scaleY(-1)':'none'}}>
-        <div className="ww-board-tex"/>
-        <div className="ww-board-veins"/>
+        <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
+        <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
+        <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(180deg,rgba(225,70,60,0.15),transparent)'}}/>
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(0deg,rgba(70,135,235,0.15),transparent)'}}/>
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
           backgroundImage:`radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.09)':'rgba(20,28,45,0.12)'} 1.3px, transparent 1.9px)`,
           backgroundSize:`${CELL}px ${CELL}px`}}/>
@@ -9426,20 +9429,12 @@ function App(){
           const duel=selectedMap==='duel';
           const isGoal=r===0,isStart=r===ROWS-1;
           let bg='transparent';
-          if(isGoal)bg='var(--goal)';
-          if(isStart)bg=duel?'var(--goal)':'var(--start)';
           return(
             <div key={r+'-'+c} data-r={r} data-c={c} onClick={()=>handleCellClick(r,c)}
               style={{position:'absolute',left:c*CELL,top:r*CELL,width:CELL,height:CELL,
                 background:bg,border:'1px solid var(--cell-line)',
                 display:'flex',alignItems:'center',justifyContent:'center',
                 cursor:vDot&&!dragging?'pointer':'default',boxSizing:'border-box'}}>
-              {isGoal&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,
-                background:'linear-gradient(90deg,#16a34a,#22c55e)',
-                pointerEvents:'none'}}/>}
-              {isStart&&duel&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,
-                background:'linear-gradient(90deg,#16a34a,#22c55e)',pointerEvents:'none'}}/>}
-              {isStart&&!duel&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:2,background:'var(--border)',pointerEvents:'none'}}/>}
               {vDot&&!isA&&!isB&&<div style={{width:10,height:10,borderRadius:'50%',background:color,opacity:0.32,pointerEvents:'none'}}/>}
             </div>
           );
