@@ -4031,7 +4031,7 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
   const SC=Math.min(Math.floor((Math.min(window.innerWidth,440)-48)/COLS),Math.floor((window.innerHeight*0.55)/ROWS));
   const SW=Math.max(4,Math.round(SC*0.2));
   const myKey=account?account.key:SESSION;
-  const myName=account?account.name:'👁';
+  const myName=account?account.name:GUEST_ID;
   React.useEffect(()=>{
     if(!lobbyId||!window.db)return;
     // Spielstand live verfolgen
@@ -4059,7 +4059,7 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
       const v=snap.val();
       if(!v||!v.type||!v.ts||v.ts<initTs-300||v.from===myKey)return;
       const id=v.ts+Math.random();
-      setOtherEmotes(prev=>[...prev.slice(-3),{type:v.type,id,name:v.name||'👁'}]);
+      setOtherEmotes(prev=>[...prev.slice(-3),{type:v.type,id,name:v.name||'?'}]);
       setTimeout(()=>setOtherEmotes(prev=>prev.filter(e=>e.id!==id)),3000);
     });
     return()=>{
@@ -4086,29 +4086,32 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
   const walls=gs?new Set(gs.walls||[]):new Set();
   const pA=gs?gs.pA:{r:ROWS-1,c:2};
   const pB=gs?gs.pB:{r:ROWS-1,c:6};
-  const cells=[];
-  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)
-    cells.push(<div key={r+'-'+c} style={{position:'absolute',left:c*SC,top:r*SC,width:SC,height:SC,
-      background:(r+c)%2===0?(dk?'#1e293b':'#f8fafc'):(dk?'#1a2740':'#f1f5f9'),
-      boxSizing:'border-box',border:'0.5px solid '+(dk?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.05)')}}/>);
+  const wallOverlay='linear-gradient(180deg,rgba(255,255,255,0.2) 0%,rgba(255,255,255,0) 30%,rgba(0,0,0,0) 62%,rgba(0,0,0,0.3) 73%,rgba(0,0,0,0.1) 100%), ';
   const wallEls=[...walls].map(key=>{
     const a=key.split('-');const ty=a[0],r=+a[1],c=+a[2];const isH=ty==='H';
+    const wc=dk?'#e2e8f0':'#1e293b';
     return <div key={key} style={{position:'absolute',
       left:isH?c*SC:(c+1)*SC-SW/2,top:isH?(r+1)*SC-SW/2:r*SC,
       width:isH?2*SC:SW,height:isH?SW:2*SC,
-      background:dk?'#e2e8f0':'#1e293b',borderRadius:SW/2,zIndex:4,
-      boxShadow:'0 1px 4px rgba(0,0,0,0.18)'}}/>;
+      background:wallOverlay+wc,borderRadius:4,zIndex:10,overflow:'hidden',
+      boxShadow:'inset 0 1.5px 1px rgba(255,255,255,0.28),inset 0 -2px 3px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.1),0 4px 8px rgba(0,0,0,0.5),0 2px 3px rgba(0,0,0,0.35)'}}>
+      <div className="ww-wall-gloss"/>
+    </div>;
   });
-  const Piece=({pos,col,border:bd})=>(
-    <div style={{position:'absolute',
-      left:pos.c*SC+SC/2-SC*0.36,top:pos.r*SC+SC/2-SC*0.36,
-      width:SC*0.72,height:SC*0.72,borderRadius:'50%',
-      background:col,border:'2px solid '+bd,zIndex:6,
-      boxShadow:'0 2px 8px '+col+'55',
-      transition:'left 0.25s cubic-bezier(0.34,1.56,0.64,1),top 0.25s cubic-bezier(0.34,1.56,0.64,1)'}}/>
-  );
+  const SpecStone=({pos,p})=>{
+    const sz=Math.round(SC*0.72),off=(SC-sz)/2;
+    return <div style={{position:'absolute',left:pos.c*SC+off,top:pos.r*SC+off,width:sz,height:sz,zIndex:20,
+      transition:'left 0.25s cubic-bezier(0.34,1.56,0.64,1),top 0.25s cubic-bezier(0.34,1.56,0.64,1)'}}>
+      <div className="ww-stone" style={{width:sz,height:sz,position:'relative'}}>
+        <div style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',borderRadius:'50%',
+          background:`radial-gradient(circle at 38% 32%, ${PC[p]}, ${PD[p]} 100%)`,
+          boxShadow:`inset 0 2px 3px rgba(255,255,255,0.28),inset 0 -4px 7px rgba(0,0,0,0.4),inset 0 0 0 1px rgba(0,0,0,0.12),0 4px 7px rgba(0,0,0,0.4)`}}/>
+        <div className="ww-stone-tex"/>
+        <div className="ww-stone-sheen"/>
+      </div>
+    </div>;
+  };
   const SPEC_EMOTES=['laugh','cry','angry','confused'];
-  const EMOTE_EMOJI={laugh:'😂',cry:'😢',angry:'😡',confused:'🤔'};
   return(
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',minHeight:'100vh',
       paddingTop:'calc(env(safe-area-inset-top) + 20px)',paddingBottom:24,
@@ -4121,14 +4124,27 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
       <div style={{position:'relative',zIndex:1,width:'100%',maxWidth:440,padding:'0 16px'}}>
         {/* Header */}
         <div style={{textAlign:'center',marginBottom:10,paddingTop:48}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:9,marginBottom:8}}>
+            <div style={{width:32,height:32,borderRadius:10,
+              background:'linear-gradient(145deg,#7c3aed,#6366f1 48%,#3b82f6)',
+              display:'flex',alignItems:'center',justifyContent:'center',
+              boxShadow:'0 5px 16px rgba(99,102,241,0.5),inset 0 1px 0 rgba(255,255,255,0.4),inset 0 -3px 6px rgba(49,46,129,0.6)'}}>
+              <BrickWallIcon size={18} light/>
+            </div>
+            <div style={{fontSize:18,fontWeight:900,color:txt,letterSpacing:-0.5}}>{t('title')}</div>
+          </div>
+          <div style={{display:'flex',justifyContent:'center'}}>
           <div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'4px 12px',
             borderRadius:20,background:'rgba(239,68,68,0.12)',marginBottom:6}}>
             <div style={{width:7,height:7,borderRadius:'50%',background:'#ef4444',animation:'pulse 1.2s ease-in-out infinite'}}/>
             <span style={{fontSize:11,fontWeight:800,color:'#ef4444',letterSpacing:1}}>LIVE</span>
-            {specCount>0&&<span style={{fontSize:11,fontWeight:800,color:'#ef4444',opacity:0.7}}>· 👁 {specCount}</span>}
+            {specCount>0&&<span style={{display:'inline-flex',alignItems:'center',gap:3,fontSize:11,fontWeight:800,color:'#ef4444',opacity:0.8}}><span style={{opacity:0.6}}>{'\u00b7'}</span><EyeIcon size={11} color="#ef4444"/>{specCount}</span>}
+          </div>
           </div>
           {gone?(
-            <div style={{fontSize:14,color:muted,fontWeight:600,marginTop:8}}>🏁 {t('gameOver')}</div>
+            <div style={{fontSize:14,color:muted,fontWeight:600,marginTop:8,display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-1.5 3.5L16 11H5"/></svg>{t('gameOver')}
+            </div>
           ):gs&&gs.winner?(
             <div style={{fontSize:16,fontWeight:900,color:gs.winner==='A'?'#ef4444':'#3b82f6',marginTop:4,display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
               <div style={{width:12,height:12,borderRadius:'50%',background:gs.winner==='A'?'#ef4444':'#3b82f6'}}/>
@@ -4141,72 +4157,116 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
             </div>
           ):null}
         </div>
-        {/* Brett */}
-        <div style={{display:'flex',justifyContent:'center',position:'relative'}}>
-          <div style={{position:'relative',width:COLS*SC,height:ROWS*SC,
-            borderRadius:10,overflow:'hidden',border:'1.5px solid '+border,
-            boxShadow:'0 4px 20px rgba(0,0,0,0.12)'}}>
-            <div style={{position:'absolute',top:0,left:0,right:0,height:3,
-              background:'linear-gradient(90deg,#16a34a,#22c55e)',zIndex:5}}/>
-            {gs&&gs.map==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,
-              background:'linear-gradient(90deg,#16a34a,#22c55e)',zIndex:5}}/>}
-            {cells}{wallEls}
-            {gs&&<Piece pos={pA} col="#ef4444" border="#7f1d1d"/>}
-            {gs&&<Piece pos={pB} col="#3b82f6" border="#1e3a5f"/>}
+        {/* Spielerkarten */}
+        <div className="ww-players" style={{width:COLS*SC+26,margin:'0 auto 9px'}}>
+          {['A','B'].map((p,idx)=>{
+            const active=gs&&gs.turn===p&&!gs.winner;
+            const nm=p==='A'?(gs&&gs.nameA||t('red')):(gs&&gs.nameB||t('blue'));
+            const wl=gs&&gs.barrLeft?(gs.barrLeft[p]||0):0;
+            return(
+              <React.Fragment key={p}>
+              <div className={"ww-pcard p"+p+(active?" live":" dim")}>
+                <div className="ww-sheen2"/>
+                <div className="ww-figslot">
+                  <div className="ww-stone" style={{width:38,height:38,position:'relative'}}>
+                    <div style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',borderRadius:'50%',
+                      background:`radial-gradient(circle at 38% 32%, ${PC[p]}, ${PD[p]} 100%)`,
+                      boxShadow:`inset 0 2px 3px rgba(255,255,255,0.28),inset 0 -4px 7px rgba(0,0,0,0.4),inset 0 0 0 1px rgba(0,0,0,0.12),0 3px 6px rgba(0,0,0,0.4)`}}/>
+                    <div className="ww-stone-tex"/>
+                    <div className="ww-stone-sheen"/>
+                  </div>
+                </div>
+                <div className="ww-pinfo">
+                  <div className="ww-pname">{nm}</div>
+                  <div className="ww-pwalls">
+                    <svg width="12" height="12" viewBox="0 0 24 24" style={{opacity:0.85}}><g fill="currentColor"><rect x="2" y="5" width="9" height="5" rx="1"/><rect x="13" y="5" width="9" height="5" rx="1"/><rect x="7" y="12" width="10" height="5" rx="1"/></g></svg>
+                    {wl}
+                  </div>
+                </div>
+                {active&&(
+                  <div className="ww-pclock" style={{padding:'6px 9px'}}>
+                    <div style={{fontSize:9,fontWeight:900,letterSpacing:0.6,textTransform:'uppercase',lineHeight:1.15,color:'#fff'}}>{t('statusTurn')}</div>
+                  </div>
+                )}
+              </div>
+              {idx===0&&<div className="ww-vs"><div className="ww-vt">VS</div><div className="ww-vd"><i/><i/><i/></div></div>}
+              </React.Fragment>
+            );
+          })}
+        </div>
+        {/* Ziel oben */}
+        <div className="ww-goalext t" style={{width:COLS*SC+26,margin:'0 auto',color:gs&&gs.map==='duel'?PC['A']:'#16a34a'}}>
+          <span className="ln"/><span className="ar">{'\u25b2'}</span>
+          {gs&&gs.map==='duel'&&<span className="nm2">{(gs.nameA||t('red')).toUpperCase()}</span>}
+          <span className="ln"/>
+        </div>
+        {/* Brett (v8) */}
+        <div style={{position:'relative',width:COLS*SC+26,margin:'0 auto',borderRadius:24,padding:13,
+          background:dk?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
+          boxShadow:'0 26px 56px rgba(0,0,0,0.5),0 9px 20px rgba(0,0,0,0.38),inset 0 2px 0 rgba(255,255,255,0.28),inset 0 -3px 6px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.2)'}}>
+          <div className="ww-edge ww-edge-t" style={{opacity:dk?0.85:0.5}}/>
+          <div className="ww-edge ww-edge-b" style={{opacity:dk?0.85:0.5}}/>
+          <div className="ww-stud ww-stud-l"/><div className="ww-stud ww-stud-r"/>
+          <div style={{position:'relative',width:COLS*SC,height:ROWS*SC,borderRadius:14,overflow:'hidden',
+            background:dk?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
+            boxShadow:dk?'inset 0 0 0 2px #05080f,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)':'inset 0 0 0 2px #b6bfce,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)'}}>
+            <div className="ww-board-tex" style={{mixBlendMode:dk?'screen':'multiply',opacity:dk?0.12:0.4}}/>
+            <div className="ww-board-veins" style={{opacity:dk?0.3:0.45}}/>
+            <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:dk?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(SC*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(180deg,rgba(225,70,60,0.15),transparent)'}}/>
+            <div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(SC*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(0deg,rgba(70,135,235,0.15),transparent)'}}/>
+            <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
+              backgroundImage:`linear-gradient(${dk?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${dk?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${dk?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
+              backgroundSize:`${SC}px ${SC}px,${SC}px ${SC}px,${SC}px ${SC}px`}}/>
+            {wallEls}
+            {gs&&<SpecStone pos={pA} p="A"/>}
+            {gs&&<SpecStone pos={pB} p="B"/>}
           </div>
         </div>
-        {/* Barrikaden-Info mit Spielernamen */}
-        {gs&&gs.barrLeft&&(
-          <div style={{display:'flex',justifyContent:'space-between',marginTop:8,padding:'0 4px'}}>
-            <div style={{fontSize:12,color:'#ef4444',fontWeight:700,display:'flex',alignItems:'center',gap:4}}>
-              <div style={{width:9,height:9,borderRadius:'50%',background:'#ef4444'}}/>
-              <span style={{maxWidth:80,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{gs.nameA||t('red')}</span>
-              <BrickMini size={12}/>{gs.barrLeft.A||0}
-            </div>
-            <div style={{fontSize:12,color:'#3b82f6',fontWeight:700,display:'flex',alignItems:'center',gap:4}}>
-              {gs.barrLeft.B||0}<BrickMini size={12}/>
-              <span style={{maxWidth:80,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{gs.nameB||t('blue')}</span>
-              <div style={{width:9,height:9,borderRadius:'50%',background:'#3b82f6'}}/>
-            </div>
-          </div>
-        )}
+        {/* Ziel unten */}
+        <div className="ww-goalext b" style={{width:COLS*SC+26,margin:'8px auto 0',color:gs&&gs.map==='duel'?PC['B']:'var(--subtle)',opacity:gs&&gs.map==='duel'?1:0.4}}>
+          <span className="ln"/>
+          {gs&&gs.map==='duel'&&<span className="ar">{'\u25bc'}</span>}
+          {gs&&gs.map==='duel'&&<span className="nm2">{(gs.nameB||t('blue')).toUpperCase()}</span>}
+          <span className="ln"/>
+        </div>
         {/* Andere Zuschauer-Emotes */}
         {otherEmotes.length>0&&(
           <div style={{display:'flex',gap:6,marginTop:8,flexWrap:'wrap',justifyContent:'center'}}>
             {otherEmotes.map(e=>(
-              <div key={e.id} style={{display:'inline-flex',alignItems:'center',gap:4,
+              <div key={e.id} style={{display:'inline-flex',alignItems:'center',gap:5,
                 padding:'4px 10px',borderRadius:12,
                 background:'rgba(139,92,246,0.12)',border:'1px solid rgba(139,92,246,0.2)',
                 animation:'fadeSlideUp 0.25s ease-out both',fontSize:11,color:txt,fontWeight:700}}>
-                <span style={{fontSize:9,color:muted}}>👁</span>
-                <span style={{fontSize:18}}>{EMOTE_EMOJI[e.type]||'👋'}</span>
+                <EyeIcon size={9} color={muted}/>
+                <EmoteChar color="#8b5cf6" dark="#6d28d9" type={e.type} size={20}/>
               </div>
             ))}
           </div>
         )}
         {/* Eigenes gesendetes Emote */}
         {myEmote&&(
-          <div style={{textAlign:'center',marginTop:8}}>
-            <span style={{fontSize:24,animation:'trophy-pop 0.3s ease-out both'}}>{EMOTE_EMOJI[myEmote.type]}</span>
+          <div style={{display:'flex',justifyContent:'center',marginTop:8,animation:'trophy-pop 0.3s ease-out both'}}>
+            <EmoteChar color="#8b5cf6" dark="#6d28d9" type={myEmote.type} size={30}/>
           </div>
         )}
         {/* Emote-Picker */}
         <div style={{marginTop:14,padding:'12px',borderRadius:16,
           background:card,border:'1.5px solid '+border,
           boxShadow:'0 4px 16px rgba(0,0,0,0.08)'}}>
-          <div style={{fontSize:10,fontWeight:700,letterSpacing:1,color:muted,textAlign:'center',marginBottom:10,textTransform:'uppercase'}}>
-            {'\uD83D\uDC41'} {t('spectatorReact')}
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:1,color:muted,textAlign:'center',marginBottom:10,textTransform:'uppercase',display:'flex',alignItems:'center',justifyContent:'center',gap:5}}>
+            <EyeIcon size={11} color={muted}/> {t('spectatorReact')}
           </div>
           <div style={{display:'flex',gap:8,justifyContent:'center'}}>
             {SPEC_EMOTES.map(type=>(
               <button key={type} onClick={()=>sendEmote(type)} style={{
                 width:52,height:52,borderRadius:16,border:'1.5px solid '+border,
                 background:myEmote&&myEmote.type===type?'rgba(139,92,246,0.15)':card,
-                cursor:'pointer',fontSize:24,display:'flex',alignItems:'center',justifyContent:'center',
+                cursor:'pointer',padding:0,display:'flex',alignItems:'center',justifyContent:'center',
                 fontFamily:'system-ui,-apple-system,sans-serif',
                 boxShadow:myEmote&&myEmote.type===type?'0 0 0 2px #8b5cf6':'none',
                 transition:'all 0.15s'}}>
-                {EMOTE_EMOJI[type]}
+                <EmoteHead color="#8b5cf6" dark="#6d28d9" type={type} size={36}/>
               </button>
             ))}
           </div>
