@@ -830,7 +830,7 @@ try{ document.addEventListener('visibilitychange',function(){ if(document.hidden
 
 // ── 2v2 (Beta) ─────────────────────────────────────────────
 const COLS2=11,ROWS2=15,WW2=8,BARR2=25,MIN_PATHS_2V2=2;
-const CELL2=Math.max(26,Math.min(38,Math.floor((window.innerWidth-16)/COLS2)));
+const CELL2=Math.max(26,Math.min(38,Math.floor((window.innerWidth-42)/COLS2)));
 // Tokens: A=Rot(links), B=Blau(rechts). Suffix 1=unten→oben(row0), 2=oben→unten(rowMax)
 const INIT_2V2={A1:{r:ROWS2-1,c:2},A2:{r:0,c:2},B1:{r:ROWS2-1,c:COLS2-3},B2:{r:0,c:COLS2-3}};
 const GOAL_2V2={A1:0,A2:ROWS2-1,B1:0,B2:ROWS2-1};
@@ -8830,10 +8830,17 @@ function App(){
             <div style={{flex:1,height:2,borderRadius:2,background:'#16a34a',opacity:0.4}}/>
           )}
         </div>
+        <div style={{position:'relative',width:COLS*CELL+26,margin:'0 auto',borderRadius:24,padding:13,
+          background:darkMode?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
+          boxShadow:'0 26px 56px rgba(0,0,0,0.5),0 9px 20px rgba(0,0,0,0.38),inset 0 2px 0 rgba(255,255,255,0.28),inset 0 -3px 6px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.2)'}}>
+          <div className="ww-edge ww-edge-t" style={{opacity:darkMode?0.85:0.5}}/>
+          <div className="ww-edge ww-edge-b" style={{opacity:darkMode?0.85:0.5}}/>
+          <div className="ww-stud ww-stud-l"/>
+          <div className="ww-stud ww-stud-r"/>
         <div style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,...sGrid,
           background:darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
-          border:darkMode?'1.5px solid rgba(255,255,255,0.08)':'1.5px solid rgba(20,28,45,0.1)',
-          boxShadow:darkMode?'0 20px 50px rgba(0,0,0,0.5),0 8px 18px rgba(0,0,0,0.4),inset 0 2px 1px rgba(255,255,255,0.12),inset 0 -3px 8px rgba(0,0,0,0.4)':'0 18px 44px rgba(20,28,45,0.18),0 6px 16px rgba(20,28,45,0.12),inset 0 2px 1px rgba(255,255,255,0.7),inset 0 -3px 8px rgba(20,28,45,0.08)'}}>
+          border:'none',
+          boxShadow:darkMode?'inset 0 0 0 2px #05080f,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)':'inset 0 0 0 2px #b6bfce,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)'}}>
           <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
           <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
@@ -8867,6 +8874,7 @@ function App(){
               <EmoteChar color={PC[activeEmote.p]} dark={PD[activeEmote.p]} type={activeEmote.emote}/>
             </div>
           )}
+        </div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4,marginBottom:14,width:COLS*CELL}}>
           {rMap==='duel'?(
@@ -11874,10 +11882,17 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
 
       <div style={{fontSize:9,letterSpacing:3,color:'#16a34a',fontWeight:700,textTransform:'uppercase',marginBottom:2}}>{'\u25b2'} {t('tv2Goal')} {'\u25b2'}</div>
 
+      <div style={{position:'relative',width:COLS2*CELL2+26,margin:'0 auto',borderRadius:24,padding:13,
+        background:darkMode?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
+        boxShadow:'0 26px 56px rgba(0,0,0,0.5),0 9px 20px rgba(0,0,0,0.38),inset 0 2px 0 rgba(255,255,255,0.28),inset 0 -3px 6px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.2)'}}>
+        <div className="ww-edge ww-edge-t" style={{opacity:darkMode?0.85:0.5}}/>
+        <div className="ww-edge ww-edge-b" style={{opacity:darkMode?0.85:0.5}}/>
+        <div className="ww-stud ww-stud-l"/>
+        <div className="ww-stud ww-stud-r"/>
       <div ref={gridRef} style={{position:'relative',width:COLS2*CELL2,height:ROWS2*CELL2,touchAction:'auto',...sGrid,
         background:darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
-        border:darkMode?'1.5px solid rgba(255,255,255,0.08)':'1.5px solid rgba(20,28,45,0.1)',
-        boxShadow:darkMode?'0 20px 50px rgba(0,0,0,0.5),0 8px 18px rgba(0,0,0,0.4),inset 0 2px 1px rgba(255,255,255,0.12),inset 0 -3px 8px rgba(0,0,0,0.4)':'0 18px 44px rgba(20,28,45,0.18),0 6px 16px rgba(20,28,45,0.12),inset 0 2px 1px rgba(255,255,255,0.7),inset 0 -3px 8px rgba(20,28,45,0.08)'}}>
+        border:'none',
+        boxShadow:darkMode?'inset 0 0 0 2px #05080f,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)':'inset 0 0 0 2px #b6bfce,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)'}}>
         <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
         <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
@@ -11919,6 +11934,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
             </div>
           );
         })}
+      </div>
       </div>
 
       <div style={{fontSize:9,letterSpacing:3,color:'#16a34a',fontWeight:700,textTransform:'uppercase',marginTop:2}}>{'\u25bc'} {t('tv2Goal')} {'\u25bc'}</div>
