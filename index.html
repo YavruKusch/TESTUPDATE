@@ -579,6 +579,7 @@
   .ww-edge-b{bottom:6px;background:linear-gradient(90deg,transparent,#4793ec 25%,#4793ec 75%,transparent);box-shadow:0 0 11px #4793ec,0 0 22px rgba(59,130,246,0.53);}
   .ww-stud{position:absolute;width:9px;height:9px;top:50%;margin-top:-4.5px;transform:rotate(45deg);border-radius:2px;z-index:4;pointer-events:none;background:linear-gradient(135deg,#aab4c6,#3a4252);box-shadow:0 1px 2px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.5);}
   .ww-stud-l{left:3px;} .ww-stud-r{right:3px;}
+  @keyframes ww-dotb{0%,100%{transform:scale(1);opacity:0.9;}50%{transform:scale(1.16);opacity:1;}}
 </style>
 </head>
 <body>
@@ -9487,7 +9488,7 @@ function App(){
                 background:bg,
                 display:'flex',alignItems:'center',justifyContent:'center',
                 cursor:vDot&&!dragging?'pointer':'default',boxSizing:'border-box'}}>
-              {vDot&&!isA&&!isB&&<div style={{width:10,height:10,borderRadius:'50%',background:color,opacity:0.32,pointerEvents:'none'}}/>}
+              {vDot&&!isA&&!isB&&<div style={{width:Math.round(CELL*0.26),height:Math.round(CELL*0.26),borderRadius:'50%',pointerEvents:'none',background:`radial-gradient(circle at 40% 34%,rgba(255,255,255,0.6),${color} 62%,${PD[turn]})`,boxShadow:`0 0 8px ${color}aa,0 1px 2px rgba(0,0,0,0.32),inset 0 1px 1px rgba(255,255,255,0.4)`,animation:'ww-dotb 1.7s ease-in-out infinite'}}/>}
             </div>
           );
         });})}
@@ -11912,7 +11913,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
                 cursor:vDot&&!dragging?'pointer':'default',boxSizing:'border-box'}}>
               {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#16a34a,#22c55e)',pointerEvents:'none'}}/>}
               {r===ROWS2-1&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#16a34a,#22c55e)',pointerEvents:'none'}}/>}
-              {vDot&&<div style={{width:9,height:9,borderRadius:'50%',background:PC2[turn],opacity:0.34,pointerEvents:'none'}}/>}
+              {vDot&&<div style={{width:Math.round(CELL2*0.26),height:Math.round(CELL2*0.26),borderRadius:'50%',pointerEvents:'none',background:`radial-gradient(circle at 40% 34%,rgba(255,255,255,0.6),${PC2[turn]} 62%,${PD2[turn]})`,boxShadow:`0 0 8px ${PC2[turn]}aa,0 1px 2px rgba(0,0,0,0.32),inset 0 1px 1px rgba(255,255,255,0.4)`,animation:'ww-dotb 1.7s ease-in-out infinite'}}/>}
             </div>
           );
         });})}
