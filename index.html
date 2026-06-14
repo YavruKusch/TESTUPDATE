@@ -624,22 +624,23 @@
   .ww-bottombar.pos-bottom .ww-wallctl{flex:1;}
   .ww-bottombar.pos-right{justify-content:space-between;}
   .ww-bottombar.pos-left{flex-direction:row-reverse;justify-content:space-between;}
-  .ww-iconbtn{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;
+  .ww-iconbtn{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;
     border:1px solid var(--border);background:linear-gradient(180deg,#ffffff,#e9edf3);
     box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.9),inset 0 -2px 5px rgba(0,0,0,0.12);
     transition:transform 0.14s cubic-bezier(0.34,1.56,0.64,1);}
   .ww-iconbtn:active{transform:scale(0.92);}
-  .ww-wallctl{border-radius:17px;padding:8px 12px 10px;
+  .ww-wallctl{border-radius:16px;padding:5px 11px 7px;
     background:linear-gradient(180deg,#f3f6fb,#ffffff);border:1px solid var(--border);
     box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.9),inset 0 -2px 5px rgba(0,0,0,0.08);}
   body.dark .ww-wallctl,html.dark .ww-wallctl{background:linear-gradient(180deg,#1b2438,#141c2d);box-shadow:0 6px 16px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -2px 5px rgba(0,0,0,0.26);}
-  .ww-wallctl .wl{font-size:10px;font-weight:900;letter-spacing:0.8px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:7px;}
-  .ww-wallctl .tools{display:flex;justify-content:center;align-items:center;gap:11px;}
+  .ww-wallctl .wl{font-size:9px;font-weight:900;letter-spacing:0.8px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:4px;}
+  .ww-wallctl .tools{display:flex;justify-content:center;align-items:center;gap:9px;}
   .ww-wtool{border-radius:13px;display:flex;align-items:center;justify-content:center;position:relative;touch-action:none;
     background:linear-gradient(180deg,#eef2f8,#d2d9e4);border:1px solid rgba(0,0,0,0.06);
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.7),0 3px 7px rgba(0,0,0,0.18);transition:transform 0.14s,box-shadow 0.2s,opacity 0.2s;}
   body.dark .ww-wtool,html.dark .ww-wtool{background:linear-gradient(180deg,#27344b,#0e131d);border:1px solid rgba(255,255,255,0.07);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 3px 7px rgba(0,0,0,0.42);}
   .ww-wtool.armed:active{transform:scale(0.94);}
+  @keyframes ww-goalpulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
 </style>
 </head>
 <body>
@@ -4183,11 +4184,6 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
                     {wl}
                   </div>
                 </div>
-                {active&&(
-                  <div className="ww-pclock" style={{padding:'6px 9px'}}>
-                    <div style={{fontSize:9,fontWeight:900,letterSpacing:0.6,textTransform:'uppercase',lineHeight:1.15,color:'#fff'}}>{t('statusTurn')}</div>
-                  </div>
-                )}
               </div>
               {idx===0&&<div className="ww-vs"><div className="ww-vt">VS</div><div className="ww-vd"><i/><i/><i/></div></div>}
               </React.Fragment>
@@ -4213,8 +4209,10 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
             <div className="ww-board-tex" style={{mixBlendMode:dk?'screen':'multiply',opacity:dk?0.12:0.4}}/>
             <div className="ww-board-veins" style={{opacity:dk?0.3:0.45}}/>
             <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:dk?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
-            <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(SC*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(180deg,rgba(225,70,60,0.15),transparent)'}}/>
-            <div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(SC*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(0deg,rgba(70,135,235,0.15),transparent)'}}/>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(SC*0.85),pointerEvents:'none',zIndex:1,background:`linear-gradient(180deg,${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}55,transparent)`,boxShadow:`inset 0 3px 16px ${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}aa`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:gs&&gs.map==='duel'?'#ef4444':'#22c55e',boxShadow:`0 0 12px ${gs&&gs.map==='duel'?'#ef4444':'#22c55e'},0 0 5px ${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
+            {gs&&gs.map==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(SC*0.85),pointerEvents:'none',zIndex:1,background:'linear-gradient(0deg,rgba(59,130,246,0.33),transparent)',boxShadow:'inset 0 -3px 16px rgba(59,130,246,0.67)',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+            {gs&&gs.map==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:'#3b82f6',boxShadow:'0 0 12px #3b82f6,0 0 5px #3b82f6',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
             <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
               backgroundImage:`linear-gradient(${dk?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${dk?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${dk?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
               backgroundSize:`${SC}px ${SC}px,${SC}px ${SC}px,${SC}px ${SC}px`}}/>
@@ -6656,7 +6654,7 @@ function App(){
     const onMove=(x,y)=>{
       setGhostPos({x,y});
       const rect=gridRef.current?gridRef.current.getBoundingClientRect():null;
-      const inZone=rect&&y<=rect.bottom+60&&y>=rect.top-20;
+      const inZone=rect&&y<=rect.bottom+90&&y>=rect.top-20;
       const rel=getRel(x,y-OFFSET);
       if(inZone&&rel){
         const key=snapWall(rel.x,rel.y,dragging.orient);
@@ -8958,8 +8956,10 @@ function App(){
           <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
           <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
-          <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(180deg,rgba(225,70,60,0.15),transparent)'}}/>
-          <div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(0deg,rgba(70,135,235,0.15),transparent)'}}/>
+          <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL*0.85),pointerEvents:'none',zIndex:1,background:`linear-gradient(180deg,${rMap==='duel'?'#ef4444':'#22c55e'}55,transparent)`,boxShadow:`inset 0 3px 16px ${rMap==='duel'?'#ef4444':'#22c55e'}aa`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
+          <div style={{position:'absolute',top:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:rMap==='duel'?'#ef4444':'#22c55e',boxShadow:`0 0 12px ${rMap==='duel'?'#ef4444':'#22c55e'},0 0 5px ${rMap==='duel'?'#ef4444':'#22c55e'}`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
+          {rMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL*0.85),pointerEvents:'none',zIndex:1,background:'linear-gradient(0deg,rgba(59,130,246,0.33),transparent)',boxShadow:'inset 0 -3px 16px rgba(59,130,246,0.67)',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+          {rMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:'#3b82f6',boxShadow:'0 0 12px #3b82f6,0 0 5px #3b82f6',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
             backgroundImage:`linear-gradient(${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
             backgroundSize:`${CELL}px ${CELL}px,${CELL}px ${CELL}px,${CELL}px ${CELL}px`}}/>
@@ -8973,10 +8973,10 @@ function App(){
             var wallColor=owner?PC[owner]:(darkMode?'#e2e8f0':'#1e293b');
             return <Wall key={k} wkey={k} color={wallColor} opacity={1} steel={isSteelWall(k)} steelColor={owner?PC[owner]:null}/>;
           })}
-          {['A','B'].map(function(p){var pos=p==='A'?rs.pA:rs.pB;var sz=30,off=(CELL-sz)/2;return(
+          {['A','B'].map(function(p){var pos=p==='A'?rs.pA:rs.pB;var sz=Math.round(CELL*0.66),off=(CELL-sz)/2;return(
             <div key={p} style={{position:'absolute',left:pos.c*CELL+off,top:pos.r*CELL+off,width:sz,height:sz,
               transition:'left 0.15s ease,top 0.15s ease',zIndex:20,pointerEvents:'none'}}>
-              <Piece color={PC[p]} dark={PD[p]}/>
+              <Piece color={PC[p]} dark={PD[p]} size={sz}/>
             </div>
           );})}
           {/* Emote-Anzeige neben Spieler */}
@@ -9495,18 +9495,12 @@ function App(){
                   {barrLeft[p]}
                 </div>
               </div>
-              {classic?(
+              {classic&&(
                 <div className="ww-pclock">
                   <div className="ww-ptime" style={{color:timeLeft[p]<=30?'#fde047':'#fff'}}>{Math.floor(timeLeft[p]/60)}:{(timeLeft[p]%60).toString().padStart(2,'0')}</div>
                   <div className="ww-pcap">{t('timeLabel')}</div>
                 </div>
-              ):active&&!winner?(
-                <div className="ww-pclock" style={{padding:'6px 9px'}}>
-                  <div style={{fontSize:9,fontWeight:900,letterSpacing:0.6,textTransform:'uppercase',lineHeight:1.15,color:'#fff'}}>
-                    {isOnlineWait&&p===turn?t('statusWait'):aiThinking&&p==='B'?t('statusThink'):t('statusTurn')}
-                  </div>
-                </div>
-              ):null}
+              )}
             </div>
             {idx===0&&(
               <div className="ww-vs">
@@ -9556,6 +9550,7 @@ function App(){
       <div className="ww-stud ww-stud-r"/>
       {(()=>{
         const boardFlip=gameMode==='online'&&onlineRole==='B'&&selectedMap==='duel';
+        const gcGoal=selectedMap==='duel'?'#ef4444':'#22c55e';
         return(
       <div ref={gridRef} style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,touchAction:'auto',...sGrid,
         background:darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
@@ -9565,8 +9560,10 @@ function App(){
         <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
         <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
-        <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(180deg,rgba(225,70,60,0.15),transparent)'}}/>
-        <div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(0deg,rgba(70,135,235,0.15),transparent)'}}/>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL*0.85),pointerEvents:'none',zIndex:1,background:`linear-gradient(180deg,${gcGoal}55,transparent)`,boxShadow:`inset 0 3px 16px ${gcGoal}aa`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:gcGoal,boxShadow:`0 0 12px ${gcGoal},0 0 5px ${gcGoal}`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
+        {selectedMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL*0.85),pointerEvents:'none',zIndex:1,background:'linear-gradient(0deg,rgba(59,130,246,0.33),transparent)',boxShadow:'inset 0 -3px 16px rgba(59,130,246,0.67)',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+        {selectedMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:'#3b82f6',boxShadow:'0 0 12px #3b82f6,0 0 5px #3b82f6',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
           backgroundImage:`linear-gradient(${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
           backgroundSize:`${CELL}px ${CELL}px,${CELL}px ${CELL}px,${CELL}px ${CELL}px`}}/>
@@ -9616,7 +9613,7 @@ function App(){
           </div>
         ))}
         {['A','B'].map(function(p){
-          const pos=p==='A'?pA:pB;const sz=30,off=(CELL-sz)/2;
+          const pos=p==='A'?pA:pB;const sz=Math.round(CELL*0.66),off=(CELL-sz)/2;
           const isActive=turn===p&&!winner;
           return(
             <div key={p} style={{position:'absolute',left:pos.c*CELL+off,top:pos.r*CELL+off,
@@ -9625,7 +9622,7 @@ function App(){
               zIndex:20,pointerEvents:'none',transform:boardFlip?'scaleY(-1)':'none'}}>
               {isActive&&<div style={{position:'absolute',inset:-2,borderRadius:'50%',
                 background:PC[p],animation:'piece-pulse 1.6s ease-in-out infinite'}}/>}
-              <Piece color={PC[p]} dark={PD[p]}/>
+              <Piece color={PC[p]} dark={PD[p]} size={sz}/>
             </div>
           );
         })}
@@ -9717,17 +9714,19 @@ function App(){
       {/* Untere Steuerleiste: Chat + Wand-Steuerung (Drag bleibt) */}
       {!winner&&screen==='game'&&(
         <div className={"ww-bottombar pos-"+wallBarPos} style={{position:'fixed',zIndex:200,
-          left:'calc(14px + env(safe-area-inset-left, 0px))',right:'calc(14px + env(safe-area-inset-right, 0px))',
-          bottom:'calc(16px + env(safe-area-inset-bottom, 0px))',pointerEvents:'none'}}>
+          left:'50%',transform:'translateX(-50%)',
+          width:'min('+(COLS*CELL+26)+'px, calc(100vw - 20px))',
+          bottom:'calc(14px + env(safe-area-inset-bottom, 0px))',pointerEvents:'none',
+          opacity:dragging?0:1,transition:'opacity 0.12s ease'}}>
           <button onClick={()=>!emoteCooldown&&setEmotePicker(p=>!p)} disabled={emoteCooldown}
             className="ww-iconbtn chat"
-            style={{pointerEvents:'auto',opacity:emoteCooldown?0.5:1,
+            style={{pointerEvents:dragging?'none':'auto',opacity:emoteCooldown?0.5:1,
               animation:emotePicker?'none':'bubble-pulse 2.5s ease-in-out infinite'}}>
-            <BubbleIcon size={26} color="#6366f1"/>
+            <BubbleIcon size={24} color="#6366f1"/>
           </button>
-          <div className="ww-wallctl" style={{pointerEvents:'auto'}}>
+          <div className="ww-wallctl" style={{pointerEvents:'none'}}>
             <div className="wl">
-              <svg width="13" height="13" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
               <span>{barrLeft[turn]} {t('wallsLeft')}</span>
             </div>
             <div className="tools">
@@ -9736,9 +9735,9 @@ function App(){
                   className={"ww-wtool"+(canDrag?" armed":"")}
                   onMouseDown={canDrag?e=>startDrag(e,orient):undefined}
                   onTouchStart={canDrag?e=>startDrag(e,orient):undefined}
-                  style={{width:orient==='H'?64:46,height:orient==='V'?52:46,
+                  style={{pointerEvents:dragging?'none':'auto',width:orient==='H'?54:36,height:orient==='V'?40:34,
                     cursor:canDrag?'grab':'not-allowed',opacity:canDrag?1:0.4}}>
-                  <div style={{width:orient==='H'?40:WW,height:orient==='V'?28:WW,
+                  <div style={{width:orient==='H'?34:WW,height:orient==='V'?22:WW,
                     background:canDrag?(darkMode?'#e2e8f0':'#1e293b'):(darkMode?'#475569':'#94a3b8'),
                     borderRadius:3,pointerEvents:'none',boxShadow:'inset 0 1px 0 rgba(255,255,255,0.4),0 2px 4px rgba(0,0,0,0.4)'}}/>
                 </div>
@@ -10240,8 +10239,8 @@ function Confetti({color}){
   </div>;
 }
 
-function Piece({color,dark}){
-  return <div className="ww-stone" style={{width:30,height:30}}>
+function Piece({color,dark,size=30}){
+  return <div className="ww-stone" style={{width:size,height:size}}>
     <div style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',borderRadius:'50%',
       background:`radial-gradient(circle at 38% 32%, ${color}, ${dark} 100%)`,
       boxShadow:`inset 0 2px 3px rgba(255,255,255,0.28),inset 0 -4px 7px rgba(0,0,0,0.4),inset 0 0 0 1px rgba(0,0,0,0.12),0 4px 7px rgba(0,0,0,0.4),0 2px 3px rgba(0,0,0,0.28)`}}/>
@@ -11054,7 +11053,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
   const noMovesNow=myTurnNow&&!reached[turn]&&!!cur&&validMoves2(cur,others,walls,ROWS2,COLS2).length===0;
   const canPlace=myTurnNow&&barr[isOnline?(myTeam||team):team]>0;
   const teamName=tm=>tm==='A'?t('red'):t('blue');
-  const sz=Math.round(CELL2*0.74),off=(CELL2-sz)/2;
+  const sz=Math.round(CELL2*0.66),off=(CELL2-sz)/2;
 
   const triggerWin=tm=>{
     playSound('win');setWinner(tm);
@@ -11421,9 +11420,9 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
     const onMove=(x,y)=>{
       setGhostPos({x,y});
       const rect=gridRef.current?gridRef.current.getBoundingClientRect():null;
-      const inZone=rect&&y<=rect.bottom+20;
+      const inZone=rect&&y<=rect.bottom+90&&y>=rect.top-20;
       const rel=getRel(x,y-OFFSET);
-      if(inZone&&rel&&rel.x>=0&&rel.x<=COLS2*CELL2&&rel.y>=0&&rel.y<=ROWS2*CELL2){
+      if(inZone&&rel&&rel.x>=0&&rel.x<=COLS2*CELL2&&rel.y>=-CELL2&&rel.y<=ROWS2*CELL2+CELL2){
         const key=snapWall2(rel.x,rel.y,dragging.orient,ROWS2,COLS2,CELL2);
         setPreviewKey(key);
         setPreviewValid(quickValidWall2(key,St.current.walls,St.current.tokens,ROWS2,COLS2));
@@ -11434,7 +11433,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
     const onEnd=(x,y)=>{
       if(snapPosRef.current){
         const rel=getRel(x,y-OFFSET);
-        if(rel&&rel.x>=0&&rel.x<=COLS2*CELL2&&rel.y>=0&&rel.y<=ROWS2*CELL2){
+        if(rel&&rel.x>=0&&rel.x<=COLS2*CELL2&&rel.y>=-CELL2&&rel.y<=ROWS2*CELL2+CELL2){
           const key=snapWall2(rel.x,rel.y,dragging.orient,ROWS2,COLS2,CELL2);
           const{walls:w,tokens:tk,barr:bl,turn:tn,isOnline:io}=St.current;
           const tmm=TEAM_2V2(tn);
@@ -11901,7 +11900,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
   // ── GAME ──
   const activeTm=isOnline?(myTurnNow?myTeam:TEAM_2V2(turn)):team;
   return(
-    <div style={{...sCont,background:'transparent',position:'relative',zIndex:1}}>
+    <div style={{...sCont,background:'transparent',position:'relative',zIndex:1,paddingBottom:'calc(104px + env(safe-area-inset-bottom, 0px))'}}>
       <MenuBG dark={darkMode}/>
       <button onClick={()=>{if(isOnline)leaveLobby();else setSub('config');}} style={backChevron}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
 
@@ -11932,16 +11931,12 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
                   {barr[tm]}
                 </div>
               </div>
-              {active&&isOnline&&useWS&&tickSec>0?(
+              {active&&isOnline&&useWS&&tickSec>0&&(
                 <div className="ww-pclock">
                   <div className="ww-ptime" style={{color:tickSec<=5?'#fde047':'#fff'}}>{tickSec}s</div>
                   <div className="ww-pcap">{t('timeLabel')}</div>
                 </div>
-              ):active&&!winner?(
-                <div className="ww-pclock" style={{padding:'6px 9px'}}>
-                  <div style={{fontSize:9,fontWeight:900,letterSpacing:0.6,textTransform:'uppercase',lineHeight:1.15,color:'#fff'}}>{t('statusTurn')}</div>
-                </div>
-              ):null}
+              )}
             </div>
             {idx===0&&(
               <div className="ww-vs"><div className="ww-vt">VS</div><div className="ww-vd"><i/><i/><i/></div></div>
@@ -12009,8 +12004,10 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
                 background:bg,
                 display:'flex',alignItems:'center',justifyContent:'center',
                 cursor:vDot&&!dragging?'pointer':'default',boxSizing:'border-box'}}>
-              {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#16a34a,#22c55e)',pointerEvents:'none'}}/>}
-              {r===ROWS2-1&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#16a34a,#22c55e)',pointerEvents:'none'}}/>}
+              {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL2*0.85),background:'linear-gradient(180deg,rgba(34,197,94,0.33),transparent)',boxShadow:'inset 0 3px 14px rgba(34,197,94,0.6)',pointerEvents:'none',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+              {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'#22c55e',boxShadow:'0 0 12px #22c55e,0 0 5px #22c55e',pointerEvents:'none',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+              {r===ROWS2-1&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL2*0.85),background:'linear-gradient(0deg,rgba(34,197,94,0.33),transparent)',boxShadow:'inset 0 -3px 14px rgba(34,197,94,0.6)',pointerEvents:'none',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+              {r===ROWS2-1&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,background:'#22c55e',boxShadow:'0 0 12px #22c55e,0 0 5px #22c55e',pointerEvents:'none',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
               {vDot&&<div style={{width:Math.round(CELL2*0.26),height:Math.round(CELL2*0.26),borderRadius:'50%',pointerEvents:'none',background:`radial-gradient(circle at 40% 34%,rgba(255,255,255,0.6),${PC2[turn]} 62%,${PD2[turn]})`,boxShadow:`0 0 8px ${PC2[turn]}aa,0 1px 2px rgba(0,0,0,0.32),inset 0 1px 1px rgba(255,255,255,0.4)`,animation:'ww-dotb 1.7s ease-in-out infinite'}}/>}
             </div>
           );
@@ -12026,7 +12023,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
               transition:'left 0.18s cubic-bezier(0.25,0.46,0.45,0.94),top 0.18s cubic-bezier(0.25,0.46,0.45,0.94)',
               zIndex:20,pointerEvents:'none'}}>
               {active&&<div style={{position:'absolute',inset:-2,borderRadius:'50%',background:PC2[id],animation:'piece-pulse 1.6s ease-in-out infinite'}}/>}
-              <Piece color={PC2[id]} dark={PD2[id]}/>
+              <Piece color={PC2[id]} dark={PD2[id]} size={sz}/>
               <div style={{position:'absolute',right:-2,bottom:-2,width:13,height:13,borderRadius:'50%',
                 background:reached[id]?'#16a34a':'white',color:reached[id]?'white':PD2[id],fontSize:9,fontWeight:900,lineHeight:'13px',textAlign:'center',
                 boxShadow:'0 1px 3px rgba(0,0,0,0.3)',fontFamily:'system-ui,sans-serif'}}>{reached[id]?'✓':id[1]}</div>
@@ -12125,67 +12122,58 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
       })()}
 
       {!winner&&(
-        <div style={{position:'fixed',bottom:'calc(16px + env(safe-area-inset-bottom, 0px))',left:0,right:0,zIndex:200,
-          display:'flex',flexDirection:'column',justifyContent:'center',
-          alignItems:wallBarPos==='left'?'flex-start':wallBarPos==='right'?'flex-end':'center',
-          paddingLeft:wallBarPos==='left'?'calc(76px + env(safe-area-inset-left, 0px))':0,
-          paddingRight:wallBarPos==='right'?'calc(20px + env(safe-area-inset-right, 0px))':0,
-          gap:8,pointerEvents:'none'}}>
+        <div style={{position:'fixed',bottom:'calc(14px + env(safe-area-inset-bottom, 0px))',
+          left:'50%',transform:'translateX(-50%)',
+          width:'min('+(COLS2*CELL2+26)+'px, calc(100vw - 20px))',zIndex:200,
+          display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',
+          gap:6,pointerEvents:'none',opacity:dragging?0:1,transition:'opacity 0.12s ease'}}>
           {myTurnNow&&(reached[turn]||noMovesNow)?(
-            <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8,pointerEvents:'all'}}>
-              <div style={{fontSize:10,color:'#16a34a',fontWeight:700,letterSpacing:0.5}}>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6,pointerEvents:'none'}}>
+              <div style={{fontSize:10,color:'#16a34a',fontWeight:800,letterSpacing:0.5,pointerEvents:'none'}}>
                 {reached[turn]?t('tv2AtGoal'):t('tv2Stuck')}
               </div>
-              <div style={{display:'flex',gap:10,alignItems:'center'}}>
+              <div className="ww-wallctl" style={{pointerEvents:'none',display:'flex',alignItems:'center',gap:9,padding:'7px 11px'}}>
                 {['H','V'].map(function(orient){
-                  const col=isOnline?myTeam:team;
+                  const col=isOnline?myTeam:team;const colHex=col==='A'?'#ef4444':'#3b82f6';
                   return(
-                    <div key={orient} onMouseDown={function(e){return startDrag(e,orient);}} onTouchStart={function(e){return startDrag(e,orient);}}
-                      style={{width:orient==='H'?84:42,height:orient==='V'?54:42,
-                        display:'flex',alignItems:'center',justifyContent:'center',
-                        cursor:canPlace?'grab':'not-allowed',touchAction:'none',borderRadius:12,
-                        background:darkMode?'rgba(30,41,68,0.7)':'rgba(255,255,255,0.7)',
-                        backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)',
-                        border:'1.5px solid '+(canPlace?col==='A'?'#ef4444':'#3b82f6':'var(--border)'),
-                        opacity:canPlace?1:0.35,boxShadow:'var(--shadow-soft)'}}>
-                      <div style={{background:col==='A'?'#ef4444':'#3b82f6',borderRadius:3,
-                        width:orient==='H'?54:WW2,height:orient==='V'?32:WW2}}/>
+                    <div key={orient} className={"ww-wtool"+(canPlace?" armed":"")}
+                      onMouseDown={canPlace?function(e){return startDrag(e,orient);}:undefined} onTouchStart={canPlace?function(e){return startDrag(e,orient);}:undefined}
+                      style={{pointerEvents:'auto',width:orient==='H'?54:36,height:orient==='V'?40:34,
+                        cursor:canPlace?'grab':'not-allowed',opacity:canPlace?1:0.4,borderColor:canPlace?colHex+'99':undefined}}>
+                      <div style={{background:colHex,borderRadius:3,width:orient==='H'?34:WW2,height:orient==='V'?22:WW2,
+                        boxShadow:'inset 0 1px 0 rgba(255,255,255,0.4),0 2px 4px rgba(0,0,0,0.4)'}}/>
                     </div>
                   );
                 })}
-                <button onClick={skipTurn} style={{padding:'10px 16px',borderRadius:12,
-                  background:darkMode?'rgba(30,41,68,0.85)':'rgba(255,255,255,0.85)',
-                  border:'1.5px solid var(--border)',cursor:'pointer',
-                  fontWeight:700,fontSize:12,color:'var(--text)',
-                  fontFamily:'system-ui,-apple-system,sans-serif',
-                  backdropFilter:'blur(12px)',boxShadow:'var(--shadow-soft)'}}>
+                <button onClick={skipTurn} style={{pointerEvents:'auto',padding:'9px 14px',borderRadius:11,
+                  background:darkMode?'rgba(30,41,68,0.9)':'rgba(255,255,255,0.92)',
+                  border:'1px solid var(--border)',cursor:'pointer',fontWeight:800,fontSize:12,color:'var(--text)',
+                  fontFamily:'system-ui,-apple-system,sans-serif',boxShadow:'var(--shadow-soft)'}}>
                   {t('tv2SkipBtn')} {'\u2192'}
                 </button>
               </div>
             </div>
           ):(
-            <div style={{display:'flex',justifyContent:'center',pointerEvents:'none'}}>
-              <div className="ww-wallctl" style={{pointerEvents:'auto'}}>
-                <div className="wl">
-                  <svg width="13" height="13" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
-                  <span>{canPlace?teamName(isOnline?myTeam:team)+': '+barr[isOnline?myTeam:team]+' '+t('wallsLeft'):t('opponentTurn')}</span>
-                </div>
-                <div className="tools">
-                  {['H','V'].map(function(orient){
-                    const col=isOnline?myTeam:team;const colHex=col==='A'?'#ef4444':'#3b82f6';
-                    return(
-                      <div key={orient} className={"ww-wtool"+(canPlace?" armed":"")}
-                        onMouseDown={canPlace?function(e){return startDrag(e,orient);}:undefined} onTouchStart={canPlace?function(e){return startDrag(e,orient);}:undefined}
-                        style={{width:orient==='H'?64:46,height:orient==='V'?52:46,
-                          cursor:canPlace?'grab':'not-allowed',opacity:canPlace?1:0.4,
-                          borderColor:canPlace?colHex+'99':undefined}}>
-                        <div style={{background:colHex,borderRadius:3,
-                          width:orient==='H'?40:WW2,height:orient==='V'?28:WW2,
-                          boxShadow:'inset 0 1px 0 rgba(255,255,255,0.4),0 2px 4px rgba(0,0,0,0.4)'}}/>
-                      </div>
-                    );
-                  })}
-                </div>
+            <div className="ww-wallctl" style={{pointerEvents:'none'}}>
+              <div className="wl">
+                <svg width="12" height="12" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
+                <span>{canPlace?teamName(isOnline?myTeam:team)+': '+barr[isOnline?myTeam:team]+' '+t('wallsLeft'):t('opponentTurn')}</span>
+              </div>
+              <div className="tools">
+                {['H','V'].map(function(orient){
+                  const col=isOnline?myTeam:team;const colHex=col==='A'?'#ef4444':'#3b82f6';
+                  return(
+                    <div key={orient} className={"ww-wtool"+(canPlace?" armed":"")}
+                      onMouseDown={canPlace?function(e){return startDrag(e,orient);}:undefined} onTouchStart={canPlace?function(e){return startDrag(e,orient);}:undefined}
+                      style={{pointerEvents:'auto',width:orient==='H'?54:36,height:orient==='V'?40:34,
+                        cursor:canPlace?'grab':'not-allowed',opacity:canPlace?1:0.4,
+                        borderColor:canPlace?colHex+'99':undefined}}>
+                      <div style={{background:colHex,borderRadius:3,
+                        width:orient==='H'?34:WW2,height:orient==='V'?22:WW2,
+                        boxShadow:'inset 0 1px 0 rgba(255,255,255,0.4),0 2px 4px rgba(0,0,0,0.4)'}}/>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -12239,7 +12227,7 @@ function ModeDemo({kind,dark}){
       border:'1px solid var(--cell-line)',boxSizing:'border-box'}}/>);
   }
   const Tok=(r,c,col,dk,id)=>(<div key={id} style={{position:'absolute',left:c*CL+4,top:r*CL+4,width:CL-8,height:CL-8,zIndex:5,
-    transition:'left 0.45s cubic-bezier(.25,.46,.45,.94),top 0.45s cubic-bezier(.25,.46,.45,.94)'}}><Piece color={col} dark={dk}/></div>);
+    transition:'left 0.45s cubic-bezier(.25,.46,.45,.94),top 0.45s cubic-bezier(.25,.46,.45,.94)'}}><Piece color={col} dark={dk} size={CL-8}/></div>);
   const Wall=(key,dk)=>{
     const a=key.split('-');const ty=a[0],r=+a[1],c=+a[2];
     const p=ty==='H'?{left:c*CL,top:(r+1)*CL-WW/2,width:2*CL,height:WW,anim:'wall-enter-h'}:{left:(c+1)*CL-WW/2,top:r*CL,width:WW,height:2*CL,anim:'wall-enter-v'};
@@ -12349,7 +12337,7 @@ function TutBoard({step,dark}){
       background:isGoal?'var(--goal)':((r+c)%2===0?'var(--cell-b)':'var(--cell-a)'),
       border:'1px solid var(--cell-line)',boxSizing:'border-box'}}/>);
   }
-  const tok=(r,c,col,dk)=>(<div style={{position:'absolute',left:c*CL+5,top:r*CL+5,width:CL-10,height:CL-10,zIndex:5}}><Piece color={col} dark={dk}/></div>);
+  const tok=(r,c,col,dk)=>(<div style={{position:'absolute',left:c*CL+5,top:r*CL+5,width:CL-10,height:CL-10,zIndex:5}}><Piece color={col} dark={dk} size={CL-10}/></div>);
   const dot=(r,c)=>(<div key={'d'+r+'-'+c} style={{position:'absolute',left:c*CL+CL/2-4,top:r*CL+CL/2-4,width:8,height:8,borderRadius:'50%',background:'#ef4444',opacity:0.4,zIndex:4}}/>);
   const hWall=(r,c)=>(<div key={'h'+r+'-'+c} style={{position:'absolute',left:c*CL,top:(r+1)*CL-WW/2,width:2*CL,height:WW,background:dark?'#e2e8f0':'#1e293b',borderRadius:WW/2,zIndex:6}}/>);
   const vWall=(r,c)=>(<div key={'v'+r+'-'+c} style={{position:'absolute',left:(c+1)*CL-WW/2,top:r*CL,width:WW,height:2*CL,background:dark?'#e2e8f0':'#1e293b',borderRadius:WW/2,zIndex:6}}/>);
