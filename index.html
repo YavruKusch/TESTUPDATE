@@ -8805,15 +8805,21 @@ function App(){
             <div style={{flex:1,height:2,borderRadius:2,background:'#16a34a',opacity:0.4}}/>
           )}
         </div>
-        <div style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,...sGrid}}>
+        <div style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,...sGrid,
+          background:darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
+          border:darkMode?'1.5px solid rgba(255,255,255,0.08)':'1.5px solid rgba(20,28,45,0.1)',
+          boxShadow:darkMode?'0 20px 50px rgba(0,0,0,0.5),0 8px 18px rgba(0,0,0,0.4),inset 0 2px 1px rgba(255,255,255,0.12),inset 0 -3px 8px rgba(0,0,0,0.4)':'0 18px 44px rgba(20,28,45,0.18),0 6px 16px rgba(20,28,45,0.12),inset 0 2px 1px rgba(255,255,255,0.7),inset 0 -3px 8px rgba(20,28,45,0.08)'}}>
+          <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
+          <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
+          <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
+          <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(180deg,rgba(225,70,60,0.15),transparent)'}}/>
+          <div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL*0.6),pointerEvents:'none',zIndex:0,background:'linear-gradient(0deg,rgba(70,135,235,0.15),transparent)'}}/>
+          <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
+            backgroundImage:`linear-gradient(${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
+            backgroundSize:`${CELL}px ${CELL}px,${CELL}px ${CELL}px,${CELL}px ${CELL}px`}}/>
           {Array.from({length:ROWS},function(_,r){return Array.from({length:COLS},function(_,c){return(
             <div key={r+'-'+c} style={{position:'absolute',left:c*CELL,top:r*CELL,width:CELL,height:CELL,
-              background:r===0?(rMap==='duel'?'rgba(239,68,68,0.13)':'var(--goal)'):r===ROWS-1?(rMap==='duel'?'rgba(59,130,246,0.13)':'var(--start)'):(r+c)%2===0?'var(--cell-b)':'var(--cell-a)',
-              border:'1px solid var(--cell-line)',boxSizing:'border-box'}}>
-              {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,
-                background:rMap==='duel'?'linear-gradient(90deg,#ef4444,#f87171)':'linear-gradient(90deg,#16a34a,#22c55e)'}}/>}
-              {rMap==='duel'&&r===ROWS-1&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,
-                background:'linear-gradient(90deg,#3b82f6,#60a5fa)'}}/>}
+              background:'transparent',boxSizing:'border-box'}}>
             </div>
           );})})}
           {[...rs.walls].map(function(k){
@@ -11832,16 +11838,25 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
 
       <div style={{fontSize:9,letterSpacing:3,color:'#16a34a',fontWeight:700,textTransform:'uppercase',marginBottom:2}}>{'\u25b2'} {t('tv2Goal')} {'\u25b2'}</div>
 
-      <div ref={gridRef} style={{position:'relative',width:COLS2*CELL2,height:ROWS2*CELL2,touchAction:'auto',...sGrid}}>
+      <div ref={gridRef} style={{position:'relative',width:COLS2*CELL2,height:ROWS2*CELL2,touchAction:'auto',...sGrid,
+        background:darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
+        border:darkMode?'1.5px solid rgba(255,255,255,0.08)':'1.5px solid rgba(20,28,45,0.1)',
+        boxShadow:darkMode?'0 20px 50px rgba(0,0,0,0.5),0 8px 18px rgba(0,0,0,0.4),inset 0 2px 1px rgba(255,255,255,0.12),inset 0 -3px 8px rgba(0,0,0,0.4)':'0 18px 44px rgba(20,28,45,0.18),0 6px 16px rgba(20,28,45,0.12),inset 0 2px 1px rgba(255,255,255,0.7),inset 0 -3px 8px rgba(20,28,45,0.08)'}}>
+        <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
+        <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
+        <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
+        <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
+          backgroundImage:`linear-gradient(${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
+          backgroundSize:`${CELL2}px ${CELL2}px,${CELL2}px ${CELL2}px,${CELL2}px ${CELL2}px`}}/>
         {Array.from({length:ROWS2},function(_,r){return Array.from({length:COLS2},function(_,c){
           const vDot=validDot(r,c);
           const isGoal=r===0||r===ROWS2-1;
-          let bg=(r+c)%2===0?'var(--cell-b)':'var(--cell-a)';
+          let bg='transparent';
           if(isGoal)bg='var(--goal)';
           return(
             <div key={r+'-'+c} onClick={()=>moveTo(r,c)}
               style={{position:'absolute',left:c*CELL2,top:r*CELL2,width:CELL2,height:CELL2,
-                background:bg,border:'1px solid var(--cell-line)',
+                background:bg,
                 display:'flex',alignItems:'center',justifyContent:'center',
                 cursor:vDot&&!dragging?'pointer':'default',boxSizing:'border-box'}}>
               {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#16a34a,#22c55e)',pointerEvents:'none'}}/>}
