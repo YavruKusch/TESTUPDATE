@@ -580,6 +580,66 @@
   .ww-stud{position:absolute;width:9px;height:9px;top:50%;margin-top:-4.5px;transform:rotate(45deg);border-radius:2px;z-index:4;pointer-events:none;background:linear-gradient(135deg,#aab4c6,#3a4252);box-shadow:0 1px 2px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.5);}
   .ww-stud-l{left:3px;} .ww-stud-r{right:3px;}
   @keyframes ww-dotb{0%,100%{transform:scale(1);opacity:0.9;}50%{transform:scale(1.16);opacity:1;}}
+  /* ===== Design v8: Spielerkarten + VS-Trenner (Preview) ===== */
+  .ww-players{display:flex;align-items:stretch;gap:9px;}
+  .ww-pcard{flex:1;border-radius:17px;padding:9px 11px;display:flex;align-items:center;gap:11px;position:relative;overflow:hidden;
+    box-shadow:0 7px 20px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.15),inset 0 -3px 7px rgba(0,0,0,0.26);
+    transition:transform 0.3s,box-shadow 0.4s,filter 0.4s;}
+  .ww-pcard .ww-sheen2{position:absolute;top:0;bottom:0;width:38%;left:-50%;pointer-events:none;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.28),transparent);}
+  .ww-pcard.pA{background:linear-gradient(150deg,#e54d3c,#b41d1d);}
+  .ww-pcard.pB{background:linear-gradient(150deg,#4385ee,#1b4cc0);}
+  .ww-pcard.dim{filter:saturate(0.55) brightness(0.82);box-shadow:0 4px 12px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.08);}
+  .ww-pcard.pA.live{box-shadow:0 7px 22px rgba(229,77,60,0.45),inset 0 1px 0 rgba(255,255,255,0.2),inset 0 -3px 7px rgba(0,0,0,0.28);transform:translateY(-1px);}
+  .ww-pcard.pB.live{box-shadow:0 7px 22px rgba(67,133,238,0.45),inset 0 1px 0 rgba(255,255,255,0.2),inset 0 -3px 7px rgba(0,0,0,0.28);transform:translateY(-1px);}
+  .ww-pcard.live .ww-sheen2{animation:ww-sheen 2.8s cubic-bezier(0.4,0,0.2,1) infinite;}
+  .ww-figslot{width:46px;height:46px;flex-shrink:0;position:relative;border-radius:50%;
+    background:radial-gradient(circle at 50% 38%,rgba(0,0,0,0.12),rgba(0,0,0,0.28));
+    box-shadow:inset 0 2px 5px rgba(0,0,0,0.4),inset 0 -1px 0 rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;}
+  .ww-pinfo{flex:1;min-width:0;color:#fff;}
+  .ww-pname{font-size:16px;font-weight:900;letter-spacing:-0.3px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ww-pwalls{font-size:12px;font-weight:800;display:flex;align-items:center;gap:4px;margin-top:3px;color:rgba(255,255,255,0.92);}
+  .ww-pclock{flex-shrink:0;text-align:center;color:#fff;display:flex;flex-direction:column;align-items:center;gap:1px;
+    background:rgba(0,0,0,0.24);border:1px solid rgba(255,255,255,0.15);border-radius:11px;padding:5px 8px;min-width:54px;transition:background 0.3s,box-shadow 0.3s;}
+  .ww-pcard.live .ww-pclock{background:rgba(0,0,0,0.32);box-shadow:0 0 0 1.5px rgba(255,255,255,0.28),inset 0 1px 2px rgba(0,0,0,0.3);}
+  .ww-pcard.dim .ww-pclock{opacity:0.78;}
+  .ww-ptime{font-size:16px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:0.5px;line-height:1;}
+  .ww-pcap{font-size:7px;font-weight:800;letter-spacing:1px;opacity:0.75;}
+  .ww-vs{width:36px;flex-shrink:0;border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    background:linear-gradient(180deg,#f3f6fb,#ffffff);border:1px solid rgba(15,23,42,0.07);box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.9);}
+  body.dark .ww-vs,html.dark .ww-vs{background:linear-gradient(180deg,#1b2438,#141c2d);border:1px solid rgba(255,255,255,0.08);box-shadow:0 6px 16px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.06);}
+  .ww-vt{font-size:11px;font-weight:900;letter-spacing:1px;color:var(--subtle);}
+  .ww-vd{display:flex;flex-direction:column;gap:3px;}
+  .ww-vd i{width:3px;height:3px;border-radius:50%;background:var(--subtle);opacity:0.5;}
+  @keyframes ww-sheen{0%{left:-50%;}40%{left:130%;}100%{left:130%;}}
+  /* ===== Design v8: Ziel-Glühlinien (Preview) ===== */
+  .ww-goalext{display:flex;align-items:center;justify-content:center;gap:8px;}
+  .ww-goalext.t{margin-bottom:6px;} .ww-goalext.b{margin-top:6px;}
+  .ww-goalext .ln{flex:0 1 80px;height:2px;border-radius:2px;background:currentColor;opacity:0.6;box-shadow:0 0 7px currentColor;}
+  .ww-goalext .ar{font-size:15px;line-height:1;text-shadow:0 0 9px currentColor;}
+  .ww-goalext .nm2{font-size:12px;font-weight:900;letter-spacing:2px;white-space:nowrap;text-shadow:0 0 8px currentColor;}
+  /* ===== Design v8: untere Steuerleiste (Preview) ===== */
+  .ww-bottombar{display:flex;align-items:flex-end;gap:10px;}
+  .ww-bottombar.pos-bottom{justify-content:flex-start;}
+  .ww-bottombar.pos-bottom .ww-wallctl{flex:1;}
+  .ww-bottombar.pos-right{justify-content:space-between;}
+  .ww-bottombar.pos-left{flex-direction:row-reverse;justify-content:space-between;}
+  .ww-iconbtn{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;
+    border:1px solid var(--border);background:linear-gradient(180deg,#ffffff,#e9edf3);
+    box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.9),inset 0 -2px 5px rgba(0,0,0,0.12);
+    transition:transform 0.14s cubic-bezier(0.34,1.56,0.64,1);}
+  .ww-iconbtn:active{transform:scale(0.92);}
+  .ww-wallctl{border-radius:17px;padding:8px 12px 10px;
+    background:linear-gradient(180deg,#f3f6fb,#ffffff);border:1px solid var(--border);
+    box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.9),inset 0 -2px 5px rgba(0,0,0,0.08);}
+  body.dark .ww-wallctl,html.dark .ww-wallctl{background:linear-gradient(180deg,#1b2438,#141c2d);box-shadow:0 6px 16px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -2px 5px rgba(0,0,0,0.26);}
+  .ww-wallctl .wl{font-size:10px;font-weight:900;letter-spacing:0.8px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:7px;}
+  .ww-wallctl .tools{display:flex;justify-content:center;align-items:center;gap:11px;}
+  .ww-wtool{border-radius:13px;display:flex;align-items:center;justify-content:center;position:relative;touch-action:none;
+    background:linear-gradient(180deg,#eef2f8,#d2d9e4);border:1px solid rgba(0,0,0,0.06);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.7),0 3px 7px rgba(0,0,0,0.18);transition:transform 0.14s,box-shadow 0.2s,opacity 0.2s;}
+  body.dark .ww-wtool,html.dark .ww-wtool{background:linear-gradient(180deg,#27344b,#0e131d);border:1px solid rgba(255,255,255,0.07);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 3px 7px rgba(0,0,0,0.42);}
+  .ww-wtool.armed:active{transform:scale(0.94);}
 </style>
 </head>
 <body>
@@ -907,7 +967,7 @@ const I18N={
     waitingStart:'Waiting for game to start...',cancel:'Cancel',codePrefix:'Code: ',
     replay:'Replay',step:'Step',wallPlaced:'Wall placed',
     wins:'wins!',givenUp:'Given up',lostGiveUp:'gave up',rematch:'Rematch',replayBtn:'Replay',menu:'Menu',
-    giveUp:'Give up',sure:'Sure?',walls:'Walls',statusWait:'WAITING',statusThink:'THINKING',statusTurn:'TURN',
+    giveUp:'Give up',sure:'Sure?',walls:'Walls',statusWait:'WAITING',statusThink:'THINKING',statusTurn:'TURN',timeLabel:'TIME',
     goalLabel:'▲ GOAL ▲',startLabel:'▼ START ▼',invalidPos:'Invalid position!',opponentTurn:"Opponent's turn...",
     wallsLeft:'walls left',wallCtrl:'Wall controls',wpBottom:'Bottom',wpLeft:'Left',wpRight:'Right',tapContinue:'Tap to continue',red:'Red',blue:'Blue',
     options:'Options',language:'Language',close:'Close',theme:'Theme',light:'Light',dark:'Dark',
@@ -933,7 +993,7 @@ const I18N={
     waitingStart:'Warte auf Spielstart...',cancel:'Abbrechen',codePrefix:'Code: ',
     replay:'Replay',step:'Schritt',wallPlaced:'Mauer gesetzt',
     wins:'gewinnt!',givenUp:'Aufgegeben',lostGiveUp:'hat aufgegeben',rematch:'Revanche',replayBtn:'Replay',menu:'Menü',
-    giveUp:'Aufgeben',sure:'Sicher?',walls:'Mauern',statusWait:'WARTET',statusThink:'DENKT',statusTurn:'DRAN',
+    giveUp:'Aufgeben',sure:'Sicher?',walls:'Mauern',statusWait:'WARTET',statusThink:'DENKT',statusTurn:'DRAN',timeLabel:'ZEIT',
     goalLabel:'▲ ZIEL ▲',startLabel:'▼ START ▼',invalidPos:'Ungültige Position!',opponentTurn:'Gegner ist dran...',
     wallsLeft:'Mauern übrig',wallCtrl:'Wand-Steuerung',wpBottom:'Unten',wpLeft:'Links',wpRight:'Rechts',tapContinue:'Tippen um fortzufahren',red:'Rot',blue:'Blau',
     options:'Optionen',language:'Sprache',close:'Schließen',theme:'Design',light:'Hell',dark:'Dunkel',
@@ -959,7 +1019,7 @@ const I18N={
     waitingStart:'Oyun başlatılıyor...',cancel:'İptal',codePrefix:'Kod: ',
     replay:'Tekrar',step:'Adım',wallPlaced:'Duvar yerleştirildi',
     wins:'kazandı!',givenUp:'Pes etti',lostGiveUp:'pes etti',rematch:'Rövanş',replayBtn:'Tekrar',menu:'Menü',
-    giveUp:'Pes et',sure:'Emin misin?',walls:'Duvar',statusWait:'BEKLİYOR',statusThink:'DÜŞÜNÜYOR',statusTurn:'SIRA',
+    giveUp:'Pes et',sure:'Emin misin?',walls:'Duvar',statusWait:'BEKLİYOR',statusThink:'DÜŞÜNÜYOR',statusTurn:'SIRA',timeLabel:'SÜRE',
     goalLabel:'▲ HEDEF ▲',startLabel:'▼ BAŞLANGIÇ ▼',invalidPos:'Geçersiz konum!',opponentTurn:'Rakibin sırası...',
     wallsLeft:'duvar kaldı',wallCtrl:'Duvar kontrolü',wpBottom:'Alt',wpLeft:'Sol',wpRight:'Sağ',tapContinue:'Devam etmek için dokun',red:'Kırmızı',blue:'Mavi',
     options:'Seçenekler',language:'Dil',close:'Kapat',theme:'Tema',light:'Açık',dark:'Koyu',
@@ -985,7 +1045,7 @@ const I18N={
     waitingStart:'En attente du début...',cancel:'Annuler',codePrefix:'Code: ',
     replay:'Replay',step:'Pas',wallPlaced:'Mur placé',
     wins:'gagne!',givenUp:'Abandonné',lostGiveUp:'a abandonné',rematch:'Revanche',replayBtn:'Replay',menu:'Menu',
-    giveUp:'Abandonner',sure:'Sûr?',walls:'Murs',statusWait:'ATTENTE',statusThink:'RÉFLEXION',statusTurn:'TOUR',
+    giveUp:'Abandonner',sure:'Sûr?',walls:'Murs',statusWait:'ATTENTE',statusThink:'RÉFLEXION',statusTurn:'TOUR',timeLabel:'TEMPS',
     goalLabel:'▲ BUT ▲',startLabel:'▼ DÉPART ▼',invalidPos:'Position invalide!',opponentTurn:"Tour de l'adversaire...",
     wallsLeft:'murs restants',wallCtrl:'Contrôles des murs',wpBottom:'Bas',wpLeft:'Gauche',wpRight:'Droite',tapContinue:'Touche pour continuer',red:'Rouge',blue:'Bleu',
     options:'Options',language:'Langue',close:'Fermer',theme:'Thème',light:'Clair',dark:'Sombre',
@@ -8793,15 +8853,15 @@ function App(){
         )}
 
         {/* Header */}
-        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',maxWidth:360,marginBottom:10}}>
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <div style={{width:28,height:28,borderRadius:9,
-              background:'linear-gradient(140deg,#ef4444 0%,#8b5cf6 52%,#3b82f6 100%)',
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:COLS*CELL+26,marginBottom:10}}>
+          <div style={{display:'flex',alignItems:'center',gap:11}}>
+            <div style={{width:36,height:36,borderRadius:11,
+              background:'linear-gradient(145deg,#7c3aed,#6366f1 48%,#3b82f6)',
               display:'flex',alignItems:'center',justifyContent:'center',
-              boxShadow:'0 2px 8px rgba(99,102,241,0.3)'}}>
-              <BrickWallIcon size={16} light/>
+              boxShadow:'0 5px 16px rgba(99,102,241,0.5),inset 0 1px 0 rgba(255,255,255,0.4),inset 0 -3px 6px rgba(49,46,129,0.6)'}}>
+              <BrickWallIcon size={20} light/>
             </div>
-            <div style={{fontSize:15,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>{t('replay')}</div>
+            <div style={{fontSize:19,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>{t('replay')}</div>
           </div>
           <div style={{display:'flex',alignItems:'center',gap:6,
             background:'var(--card)',border:'1.5px solid var(--border)',
@@ -8814,22 +8874,15 @@ function App(){
         </div>
 
         {/* Progress bar */}
-        <div style={{width:'100%',maxWidth:360,height:3,background:'var(--border)',borderRadius:2,marginBottom:10,overflow:'hidden'}}>
+        <div style={{width:COLS*CELL+26,height:3,background:'var(--border)',borderRadius:2,marginBottom:10,overflow:'hidden'}}>
           <div style={{height:'100%',width:progress+'%',background:'linear-gradient(90deg,#3b82f6,#8b5cf6)',borderRadius:2,transition:'width 0.15s'}}/>
         </div>
 
-        <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4,width:COLS*CELL}}>
-          {rMap==='duel'?(
-            <>
-              <div style={{flex:1,height:3,borderRadius:2,background:`linear-gradient(90deg,transparent,${PC['A']})`}}/>
-              <div style={{fontSize:10,fontWeight:800,color:PC['A'],display:'flex',alignItems:'center',gap:3}}>
-                <span style={{fontSize:14}}>▲</span><span>{pname('A')}</span>
-              </div>
-              <div style={{flex:1,height:3,borderRadius:2,background:`linear-gradient(90deg,${PC['A']},transparent)`}}/>
-            </>
-          ):(
-            <div style={{flex:1,height:2,borderRadius:2,background:'#16a34a',opacity:0.4}}/>
-          )}
+        <div className="ww-goalext t" style={{width:COLS*CELL+26,color:rMap==='duel'?PC['A']:'#16a34a'}}>
+          <span className="ln"/>
+          <span className="ar">{'\u25b2'}</span>
+          {rMap==='duel'&&<span className="nm2">{pname('A').toUpperCase()}</span>}
+          <span className="ln"/>
         </div>
         <div style={{position:'relative',width:COLS*CELL+26,margin:'0 auto',borderRadius:24,padding:13,
           background:darkMode?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
@@ -8877,18 +8930,11 @@ function App(){
           )}
         </div>
         </div>
-        <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4,marginBottom:14,width:COLS*CELL}}>
-          {rMap==='duel'?(
-            <>
-              <div style={{flex:1,height:3,borderRadius:2,background:`linear-gradient(90deg,transparent,${PC['B']})`}}/>
-              <div style={{fontSize:10,fontWeight:800,color:PC['B'],display:'flex',alignItems:'center',gap:3}}>
-                <span style={{fontSize:14}}>▼</span><span>{pname('B')}</span>
-              </div>
-              <div style={{flex:1,height:3,borderRadius:2,background:`linear-gradient(90deg,${PC['B']},transparent)`}}/>
-            </>
-          ):(
-            <div style={{flex:1,height:2,borderRadius:2,background:'var(--subtle)',opacity:0.2}}/>
-          )}
+        <div className="ww-goalext b" style={{width:COLS*CELL+26,marginBottom:14,color:rMap==='duel'?PC['B']:'var(--subtle)',opacity:rMap==='duel'?1:0.4}}>
+          <span className="ln"/>
+          {rMap==='duel'&&<span className="ar">{'\u25bc'}</span>}
+          {rMap==='duel'&&<span className="nm2">{pname('B').toUpperCase()}</span>}
+          <span className="ln"/>
         </div>
 
         {/* Legende Wandfarben */}
@@ -9273,15 +9319,15 @@ function App(){
       )}
 
       {/* Header */}
-      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',maxWidth:360,marginBottom:12}}>
-        <div style={{display:'flex',alignItems:'center',gap:8}}>
-          <div style={{width:28,height:28,borderRadius:9,
-            background:'linear-gradient(140deg,#ef4444 0%,#8b5cf6 52%,#3b82f6 100%)',
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:COLS*CELL+26,marginBottom:13}}>
+        <div style={{display:'flex',alignItems:'center',gap:11}}>
+          <div style={{width:36,height:36,borderRadius:11,
+            background:'linear-gradient(145deg,#7c3aed,#6366f1 48%,#3b82f6)',
             display:'flex',alignItems:'center',justifyContent:'center',
-            boxShadow:'0 2px 8px rgba(99,102,241,0.3)'}}>
-            <BrickWallIcon size={16} light/>
+            boxShadow:'0 5px 16px rgba(99,102,241,0.5),inset 0 1px 0 rgba(255,255,255,0.4),inset 0 -3px 6px rgba(49,46,129,0.6)'}}>
+            <BrickWallIcon size={20} light/>
           </div>
-          <div style={{fontSize:15,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>{t('title')}</div>
+          <div style={{fontSize:19,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>{t('title')}</div>
         </div>
         {!winner&&(
           <div style={{display:'flex',alignItems:'center',gap:8}}>
@@ -9297,13 +9343,16 @@ function App(){
               </div>
             )}
             <button onClick={handleGiveUp} style={{
-              padding:'6px 15px',fontSize:11,fontWeight:800,cursor:'pointer',
-              background:giveUpArmed?'#ef4444':'var(--card)',
-              color:giveUpArmed?'white':'var(--subtle)',
-              border:'1.5px solid '+(giveUpArmed?'#ef4444':'var(--border)'),
-              borderRadius:20,transition:'all 0.2s',boxShadow:giveUpArmed?'0 2px 10px rgba(239,68,68,0.35)':'var(--shadow-soft)',
+              height:48,padding:'0 16px',cursor:'pointer',
+              display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2,
+              background:giveUpArmed?'#ef4444':(darkMode?'linear-gradient(180deg,#1b2438,#141c2d)':'linear-gradient(180deg,#f3f6fb,#ffffff)'),
+              color:giveUpArmed?'#fff':'var(--muted)',
+              border:'1px solid '+(giveUpArmed?'#ef4444':'var(--border)'),
+              borderRadius:14,transition:'transform 0.14s cubic-bezier(0.34,1.56,0.64,1)',
+              boxShadow:giveUpArmed?'0 2px 10px rgba(239,68,68,0.35)':(darkMode?'0 5px 14px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.06)':'0 5px 14px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.9)'),
               fontFamily:'system-ui,-apple-system,sans-serif'}}>
-              {giveUpArmed?t('sure'):t('giveUp')}
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-1.5 3.5L16 11H5"/></svg>
+              <span style={{fontSize:8,fontWeight:800,letterSpacing:0.3}}>{giveUpArmed?t('sure'):t('giveUp')}</span>
             </button>
           </div>
         )}
@@ -9348,69 +9397,64 @@ function App(){
 
       {/* Score cards */}
       {oppProfileModal&&<OppProfileModal data={oppProfileModal} onClose={()=>setOppProfileModal(null)} darkMode={darkMode} t={t}/>}
-      <div style={{display:'flex',gap:8,marginBottom:10,width:'100%',maxWidth:360}}>
-        {(gameMode==='online'&&onlineRole==='B'?['B','A']:['A','B']).map(p=>{
+      <div className="ww-players" style={{width:COLS*CELL+26,marginBottom:9}}>
+        {(gameMode==='online'&&onlineRole==='B'?['B','A']:['A','B']).map((p,idx)=>{
           const active=turn===p&&!winner;
           const isOpp=(gameMode==='online'&&p!==onlineRole)||(gameMode==='pvc'&&p==='B');
           const canTapProfile=isOpp&&oppAccountKey;
           const eyeCol=p==='A'?'#ef4444':'#3b82f6';
+          const classic=gameTimeMode&&gameTimeMode.indexOf('classic-')===0;
           return(
-            <div key={p} onClick={canTapProfile?openOppProfile:undefined}
-              style={{flex:1,padding:'9px 13px',borderRadius:13,position:'relative',
-              background:active?PC[p]:'var(--score-bg)',
-              border:`1.5px solid ${active?'transparent':'var(--score-border)'}`,
-              boxShadow:active?`0 5px 0 rgba(0,0,0,0.18),0 8px 24px ${PC[p]}55`:'0 3px 0 rgba(0,0,0,0.07),0 2px 8px rgba(0,0,0,0.04)',
-              transition:'all 0.28s cubic-bezier(0.34,1.56,0.64,1)',display:'flex',alignItems:'center',gap:9,
-              cursor:canTapProfile?'pointer':'default',overflow:'hidden'}}>
-              {active&&<div style={{position:'absolute',top:0,left:0,right:0,height:'45%',
-                background:'linear-gradient(180deg,rgba(255,255,255,0.14),transparent)',
-                borderRadius:'15px 15px 0 0',pointerEvents:'none'}}/>}
+            <React.Fragment key={p}>
+            <div onClick={canTapProfile?openOppProfile:undefined}
+              className={"ww-pcard p"+p+(active?" live":" dim")}
+              style={{cursor:canTapProfile?'pointer':'default'}}>
+              <div className="ww-sheen2"/>
               {spectatorCount>0&&gameMode==='online'&&(
-                <div style={{position:'absolute',top:-7,right:6,
+                <div style={{position:'absolute',top:5,right:7,zIndex:6,
                   display:'flex',alignItems:'center',gap:2,
                   background:eyeCol,borderRadius:10,padding:'2px 5px',
-                  boxShadow:'0 2px 8px '+eyeCol+'60',zIndex:5}}>
+                  boxShadow:'0 2px 8px '+eyeCol+'60'}}>
                   <EyeIcon size={9} color="#fff"/>
                   <span style={{fontSize:10,fontWeight:900,color:'#fff'}}>{spectatorCount}</span>
                 </div>
               )}
-              <div style={{width:28,height:28,borderRadius:'50%',flexShrink:0,
-                display:'flex',alignItems:'center',justifyContent:'center',
-                background:active?'rgba(0,0,0,0.2)':'rgba(0,0,0,0.14)',
-                border:active?'1.5px solid rgba(255,255,255,0.4)':`1.5px solid ${PC[p]}40`,
-                boxShadow:active?'inset 0 1px 3px rgba(0,0,0,0.3)':'inset 0 1px 2px rgba(0,0,0,0.18)'}}>
-                <div style={{position:'relative',width:18,height:18}}>
+              <div className="ww-figslot">
+                <div className="ww-stone" style={{width:38,height:38,position:'relative'}}>
                   <div style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',borderRadius:'50%',
-                    background:`radial-gradient(circle at 38% 32%, ${PC[p]}, ${PD[p]})`,
-                    boxShadow:`inset 0 1px 2px rgba(255,255,255,0.32),inset 0 -2px 4px rgba(0,0,0,0.4),0 1px 2px rgba(0,0,0,0.3)`}}/>
+                    background:`radial-gradient(circle at 38% 32%, ${PC[p]}, ${PD[p]} 100%)`,
+                    boxShadow:`inset 0 2px 3px rgba(255,255,255,0.28),inset 0 -4px 7px rgba(0,0,0,0.4),inset 0 0 0 1px rgba(0,0,0,0.12),0 3px 6px rgba(0,0,0,0.4)`}}/>
                   <div className="ww-stone-tex"/>
                   <div className="ww-stone-sheen"/>
                 </div>
               </div>
-              <div style={{minWidth:0,flex:1}}>
-                <div style={{fontSize:10,fontWeight:800,letterSpacing:0.2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',
-                  color:active?'rgba(255,255,255,0.82)':'var(--subtle)'}}>
-                  {pname(p)}{canTapProfile?<span style={{opacity:0.5,marginLeft:3,fontSize:9}}>↗</span>:null}
-                </div>
-                <div style={{fontSize:13,fontWeight:900,display:'flex',alignItems:'center',gap:4,marginTop:1,
-                  color:active?'white':'var(--text)'}}>
-                  <BrickMini size={12}/>{barrLeft[p]}
+              <div className="ww-pinfo">
+                <div className="ww-pname">{pname(p)}{canTapProfile?<span style={{opacity:0.55,marginLeft:3,fontSize:11,fontWeight:900}}>{'\u2197'}</span>:null}</div>
+                <div className="ww-pwalls">
+                  <svg width="12" height="12" viewBox="0 0 24 24" style={{opacity:0.85}}><g fill="currentColor"><rect x="2" y="5" width="9" height="5" rx="1"/><rect x="13" y="5" width="9" height="5" rx="1"/><rect x="7" y="12" width="10" height="5" rx="1"/></g></svg>
+                  {barrLeft[p]}
                 </div>
               </div>
-              {gameTimeMode&&gameTimeMode.indexOf('classic-')===0&&(
-                <div style={{fontSize:13,fontWeight:900,letterSpacing:0.3,flexShrink:0,
-                  fontVariantNumeric:'tabular-nums',
-                  color:active?'white':(timeLeft[p]<=30?'#ef4444':'var(--text)')}}>
-                  {Math.floor(timeLeft[p]/60)}:{(timeLeft[p]%60).toString().padStart(2,'0')}
+              {classic?(
+                <div className="ww-pclock">
+                  <div className="ww-ptime" style={{color:timeLeft[p]<=30?'#fde047':'#fff'}}>{Math.floor(timeLeft[p]/60)}:{(timeLeft[p]%60).toString().padStart(2,'0')}</div>
+                  <div className="ww-pcap">{t('timeLabel')}</div>
                 </div>
-              )}
-              {active&&!winner&&!(gameTimeMode&&gameTimeMode.indexOf('classic-')===0)&&(
-                <div style={{flexShrink:0,fontSize:8,letterSpacing:0.8,textAlign:'right',
-                  color:'rgba(255,255,255,0.82)',fontWeight:800,textTransform:'uppercase',lineHeight:1.2}}>
-                  {isOnlineWait&&p===turn?t('statusWait'):aiThinking&&p==='B'?t('statusThink'):t('statusTurn')}
+              ):active&&!winner?(
+                <div className="ww-pclock" style={{padding:'6px 9px'}}>
+                  <div style={{fontSize:9,fontWeight:900,letterSpacing:0.6,textTransform:'uppercase',lineHeight:1.15,color:'#fff'}}>
+                    {isOnlineWait&&p===turn?t('statusWait'):aiThinking&&p==='B'?t('statusThink'):t('statusTurn')}
+                  </div>
                 </div>
-              )}
+              ):null}
             </div>
+            {idx===0&&(
+              <div className="ww-vs">
+                <div className="ww-vt">VS</div>
+                <div className="ww-vd"><i/><i/><i/></div>
+              </div>
+            )}
+            </React.Fragment>
           );
         })}
       </div>
@@ -9434,21 +9478,11 @@ function App(){
       {flash&&<div style={{color:'#ef4444',fontSize:11,marginBottom:4,fontWeight:500}}>{flash}</div>}
 
       {/* Goal-Richtungsanzeige oben */}
-      <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4,width:COLS*CELL}}>
-        {selectedMap==='duel'?(
-          <>
-            <div style={{flex:1,height:3,borderRadius:2,
-              background:`linear-gradient(90deg,transparent,${PC['A']})`}}/>
-            <div style={{fontSize:10,fontWeight:800,color:PC['A'],letterSpacing:1,display:'flex',alignItems:'center',gap:3}}>
-              <span style={{fontSize:14,lineHeight:1}}>▲</span>
-              <span>{pname('A')}</span>
-            </div>
-            <div style={{flex:1,height:3,borderRadius:2,
-              background:`linear-gradient(90deg,${PC['A']},transparent)`}}/>
-          </>
-        ):(
-          <div style={{flex:1,height:2,borderRadius:2,background:'#16a34a',opacity:0.4}}/>
-        )}
+      <div className="ww-goalext t" style={{width:COLS*CELL+26,color:selectedMap==='duel'?PC['A']:'#16a34a'}}>
+        <span className="ln"/>
+        <span className="ar">{'\u25b2'}</span>
+        {selectedMap==='duel'&&<span className="nm2">{pname('A').toUpperCase()}</span>}
+        <span className="ln"/>
       </div>
 
       {/* Grid */}
@@ -9541,21 +9575,11 @@ function App(){
       </div>{/* /game-enter wrapper */}
 
       {/* Goal-Richtungsanzeige unten */}
-      <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4,width:COLS*CELL}}>
-        {selectedMap==='duel'?(
-          <>
-            <div style={{flex:1,height:3,borderRadius:2,
-              background:`linear-gradient(90deg,transparent,${PC['B']})`}}/>
-            <div style={{fontSize:10,fontWeight:800,color:PC['B'],letterSpacing:1,display:'flex',alignItems:'center',gap:3}}>
-              <span style={{fontSize:14,lineHeight:1}}>▼</span>
-              <span>{pname('B')}</span>
-            </div>
-            <div style={{flex:1,height:3,borderRadius:2,
-              background:`linear-gradient(90deg,${PC['B']},transparent)`}}/>
-          </>
-        ):(
-          <div style={{flex:1,height:2,borderRadius:2,background:'var(--subtle)',opacity:0.2}}/>
-        )}
+      <div className="ww-goalext b" style={{width:COLS*CELL+26,color:selectedMap==='duel'?PC['B']:'var(--subtle)',opacity:selectedMap==='duel'?1:0.4}}>
+        <span className="ln"/>
+        {selectedMap==='duel'&&<span className="ar">{'\u25bc'}</span>}
+        {selectedMap==='duel'&&<span className="nm2">{pname('B').toUpperCase()}</span>}
+        <span className="ln"/>
       </div>
 
       {!winner&&gameTimeMode&&((gameTimeMode.indexOf('classic-')===0&&turnTimeLeft<=30)||gameTimeMode.indexOf('blitz-')===0)&&(
@@ -9630,35 +9654,37 @@ function App(){
         </div>
       )}
 
-      {/* Floating barricade chips */}
-      {!winner&&myTurn&&!isOnlineWait&&(
-        <div style={{position:'fixed',bottom:'calc(16px + env(safe-area-inset-bottom, 0px))',left:0,right:0,zIndex:200,
-          display:'flex',justifyContent:wallBarPos==='left'?'flex-start':wallBarPos==='right'?'flex-end':'center',
-          paddingLeft:wallBarPos==='left'?'calc(76px + env(safe-area-inset-left, 0px))':0,
-          paddingRight:wallBarPos==='right'?'calc(20px + env(safe-area-inset-right, 0px))':0,
-          alignItems:'flex-end',gap:12,pointerEvents:'none'}}>
-          <div style={{position:'absolute',bottom:'100%',marginBottom:5,
-            fontSize:9,color:'var(--muted)',fontWeight:600,letterSpacing:1,
-            background:darkMode?'rgba(20,30,50,0.7)':'rgba(255,255,255,0.72)',backdropFilter:'blur(8px)',
-            padding:'2px 10px',borderRadius:20,border:`1px solid ${darkMode?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)'}`}}>
-            {barrLeft[turn]} {t('wallsLeft')}
-          </div>
-          {[['H'],['V']].map(([orient])=>(
-            <div key={orient}
-              onMouseDown={e=>startDrag(e,orient)}
-              onTouchStart={e=>startDrag(e,orient)}
-              style={{pointerEvents:'all',
-                width:orient==='H'?84:42,height:orient==='V'?54:42,
-                display:'flex',alignItems:'center',justifyContent:'center',
-                cursor:canDrag?'grab':'not-allowed',touchAction:'none',
-                borderRadius:12,background:darkMode?'rgba(30,41,68,0.7)':'rgba(255,255,255,0.7)',
-                backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)',
-                border:`1px solid ${darkMode?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.85)'}`,
-                boxShadow:'0 4px 14px rgba(0,0,0,0.1)',opacity:canDrag?1:0.35}}>
-              <div style={{width:orient==='H'?58:WW,height:orient==='V'?28:WW,
-                background:canDrag?(darkMode?'#e2e8f0':'#1e293b'):(darkMode?'#475569':'#aaa'),borderRadius:3,pointerEvents:'none'}}/>
+      {/* Untere Steuerleiste: Chat + Wand-Steuerung (Drag bleibt) */}
+      {!winner&&screen==='game'&&(
+        <div className={"ww-bottombar pos-"+wallBarPos} style={{position:'fixed',zIndex:200,
+          left:'calc(14px + env(safe-area-inset-left, 0px))',right:'calc(14px + env(safe-area-inset-right, 0px))',
+          bottom:'calc(16px + env(safe-area-inset-bottom, 0px))',pointerEvents:'none'}}>
+          <button onClick={()=>!emoteCooldown&&setEmotePicker(p=>!p)} disabled={emoteCooldown}
+            className="ww-iconbtn chat"
+            style={{pointerEvents:'auto',opacity:emoteCooldown?0.5:1,
+              animation:emotePicker?'none':'bubble-pulse 2.5s ease-in-out infinite'}}>
+            <BubbleIcon size={26} color="#6366f1"/>
+          </button>
+          <div className="ww-wallctl" style={{pointerEvents:'auto'}}>
+            <div className="wl">
+              <svg width="13" height="13" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
+              <span>{barrLeft[turn]} {t('wallsLeft')}</span>
             </div>
-          ))}
+            <div className="tools">
+              {[['H'],['V']].map(([orient])=>(
+                <div key={orient}
+                  className={"ww-wtool"+(canDrag?" armed":"")}
+                  onMouseDown={canDrag?e=>startDrag(e,orient):undefined}
+                  onTouchStart={canDrag?e=>startDrag(e,orient):undefined}
+                  style={{width:orient==='H'?64:46,height:orient==='V'?52:46,
+                    cursor:canDrag?'grab':'not-allowed',opacity:canDrag?1:0.4}}>
+                  <div style={{width:orient==='H'?40:WW,height:orient==='V'?28:WW,
+                    background:canDrag?(darkMode?'#e2e8f0':'#1e293b'):(darkMode?'#475569':'#94a3b8'),
+                    borderRadius:3,pointerEvents:'none',boxShadow:'inset 0 1px 0 rgba(255,255,255,0.4),0 2px 4px rgba(0,0,0,0.4)'}}/>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -9704,7 +9730,9 @@ function App(){
         <div onClick={()=>setEmotePicker(false)} style={{
           position:'fixed',inset:0,zIndex:480}}>
           <div onClick={e=>e.stopPropagation()} style={{
-            position:'fixed',left:14,bottom:74,
+            position:'fixed',bottom:74,
+            left:wallBarPos==='left'?'auto':'calc(14px + env(safe-area-inset-left, 0px))',
+            right:wallBarPos==='left'?'calc(14px + env(safe-area-inset-right, 0px))':'auto',
             background:darkMode?'rgba(22,30,51,0.96)':'rgba(255,255,255,0.97)',
             borderRadius:18,padding:10,
             display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,
@@ -9821,25 +9849,6 @@ function App(){
         </div>
       )}
 
-      {/* Sprachblase-Button unten links */}
-      {!winner&&screen==='game'&&(
-        <button onClick={()=>!emoteCooldown&&setEmotePicker(p=>!p)}
-          disabled={emoteCooldown}
-          style={{
-            position:'fixed',left:14,bottom:16,zIndex:200,
-            width:48,height:48,borderRadius:'50%',
-            background:darkMode?'rgba(30,41,68,0.75)':'rgba(255,255,255,0.78)',
-            backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)',
-            border:`1px solid ${darkMode?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.85)'}`,
-            boxShadow:'0 4px 14px rgba(0,0,0,0.12)',
-            cursor:emoteCooldown?'not-allowed':'pointer',
-            display:'flex',alignItems:'center',justifyContent:'center',
-            fontSize:22,opacity:emoteCooldown?0.45:1,
-            animation:emotePicker?'none':'bubble-pulse 2.5s ease-in-out infinite',
-            fontFamily:'system-ui,-apple-system,sans-serif'}}>
-          <BubbleIcon size={24} color={darkMode?'#c4b5fd':'#8b5cf6'}/>
-        </button>
-      )}
     </div>
   );
 }
@@ -11837,23 +11846,47 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
       <button onClick={()=>{if(isOnline)leaveLobby();else setSub('config');}} style={backChevron}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
 
       {/* Team-Status */}
-      <div style={{display:'flex',gap:8,marginBottom:8,marginTop:6,position:'relative',zIndex:1,width:Math.min(COLS2*CELL2,window.innerWidth-16),maxWidth:'96vw'}}>
-        {['A','B'].map(tm=>{
+      <div className="ww-players" style={{width:Math.min(COLS2*CELL2+26,window.innerWidth-16),maxWidth:'96vw',marginBottom:8,marginTop:6,position:'relative',zIndex:1}}>
+        {['A','B'].map((tm,idx)=>{
           const active=TEAM_2V2(turn)===tm&&!winner;
           const col=tm==='A'?'#ef4444':'#3b82f6';
+          const colD=tm==='A'?'#7f1d1d':'#1e3a5f';
           const isMy=isOnline&&myTeam===tm;
           return(
-            <div key={tm} style={{flex:1,padding:'7px 10px',borderRadius:12,
-              background:active?tm==='A'?'rgba(239,68,68,0.12)':'rgba(59,130,246,0.12)':'var(--card)',
-              border:'1.5px solid '+(active?col:'var(--border)'),
-              display:'flex',alignItems:'center',justifyContent:'space-between',transition:'all 0.2s'}}>
-              <span style={{display:'flex',alignItems:'center',gap:5,fontSize:11,fontWeight:800,color:col}}>
-                <span style={{width:8,height:8,borderRadius:'50%',background:col}}/>
-                {teamName(tm)}{isMy?' \u2605':''}
-                {active&&<span style={{fontSize:9,color:'var(--muted)',fontWeight:600}}> {turn[1]==='1'?('\u2191 '+t('tv2Bottom')):('\u2193 '+t('tv2Top'))}</span>}
-              </span>
-              <span style={{fontSize:11,fontWeight:800,color:'var(--text)',display:'flex',alignItems:'center',gap:2}}>{barr[tm]}<BrickMini size={10}/></span>
+            <React.Fragment key={tm}>
+            <div className={"ww-pcard p"+tm+(active?" live":" dim")}>
+              <div className="ww-sheen2"/>
+              <div className="ww-figslot">
+                <div className="ww-stone" style={{width:38,height:38,position:'relative'}}>
+                  <div style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',borderRadius:'50%',
+                    background:`radial-gradient(circle at 38% 32%, ${col}, ${colD} 100%)`,
+                    boxShadow:`inset 0 2px 3px rgba(255,255,255,0.28),inset 0 -4px 7px rgba(0,0,0,0.4),inset 0 0 0 1px rgba(0,0,0,0.12),0 3px 6px rgba(0,0,0,0.4)`}}/>
+                  <div className="ww-stone-tex"/>
+                  <div className="ww-stone-sheen"/>
+                </div>
+              </div>
+              <div className="ww-pinfo">
+                <div className="ww-pname">{teamName(tm)}{isMy?' \u2605':''}</div>
+                <div className="ww-pwalls">
+                  <svg width="12" height="12" viewBox="0 0 24 24" style={{opacity:0.85}}><g fill="currentColor"><rect x="2" y="5" width="9" height="5" rx="1"/><rect x="13" y="5" width="9" height="5" rx="1"/><rect x="7" y="12" width="10" height="5" rx="1"/></g></svg>
+                  {barr[tm]}
+                </div>
+              </div>
+              {active&&isOnline&&useWS&&tickSec>0?(
+                <div className="ww-pclock">
+                  <div className="ww-ptime" style={{color:tickSec<=5?'#fde047':'#fff'}}>{tickSec}s</div>
+                  <div className="ww-pcap">{t('timeLabel')}</div>
+                </div>
+              ):active&&!winner?(
+                <div className="ww-pclock" style={{padding:'6px 9px'}}>
+                  <div style={{fontSize:9,fontWeight:900,letterSpacing:0.6,textTransform:'uppercase',lineHeight:1.15,color:'#fff'}}>{t('statusTurn')}</div>
+                </div>
+              ):null}
             </div>
+            {idx===0&&(
+              <div className="ww-vs"><div className="ww-vt">VS</div><div className="ww-vd"><i/><i/><i/></div></div>
+            )}
+            </React.Fragment>
           );
         })}
       </div>
@@ -11881,7 +11914,12 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
         </div>
       )}
 
-      <div style={{fontSize:9,letterSpacing:3,color:'#16a34a',fontWeight:700,textTransform:'uppercase',marginBottom:2}}>{'\u25b2'} {t('tv2Goal')} {'\u25b2'}</div>
+      <div className="ww-goalext t" style={{width:Math.min(COLS2*CELL2+26,window.innerWidth-16),maxWidth:'96vw',color:'#16a34a',marginBottom:2}}>
+        <span className="ln"/>
+        <span className="ar">{'\u25b2'}</span>
+        <span className="nm2">{t('tv2Goal')}</span>
+        <span className="ln"/>
+      </div>
 
       <div style={{position:'relative',width:COLS2*CELL2+26,margin:'0 auto',borderRadius:24,padding:13,
         background:darkMode?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
@@ -12066,28 +12104,29 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
               </div>
             </div>
           ):(
-            <div style={{display:'flex',justifyContent:'center',alignItems:'flex-end',gap:12,pointerEvents:'none'}}>
-              <div style={{position:'absolute',bottom:'100%',marginBottom:5,fontSize:9,color:'var(--muted)',fontWeight:600,letterSpacing:1,
-                background:darkMode?'rgba(20,30,50,0.7)':'rgba(255,255,255,0.72)',backdropFilter:'blur(8px)',
-                padding:'2px 10px',borderRadius:20,border:'1px solid '+(darkMode?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)')}}>
-                {canPlace?teamName(isOnline?myTeam:team)+': '+barr[isOnline?myTeam:team]+' '+t('wallsLeft'):t('opponentTurn')}
+            <div style={{display:'flex',justifyContent:'center',pointerEvents:'none'}}>
+              <div className="ww-wallctl" style={{pointerEvents:'auto'}}>
+                <div className="wl">
+                  <svg width="13" height="13" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
+                  <span>{canPlace?teamName(isOnline?myTeam:team)+': '+barr[isOnline?myTeam:team]+' '+t('wallsLeft'):t('opponentTurn')}</span>
+                </div>
+                <div className="tools">
+                  {['H','V'].map(function(orient){
+                    const col=isOnline?myTeam:team;const colHex=col==='A'?'#ef4444':'#3b82f6';
+                    return(
+                      <div key={orient} className={"ww-wtool"+(canPlace?" armed":"")}
+                        onMouseDown={canPlace?function(e){return startDrag(e,orient);}:undefined} onTouchStart={canPlace?function(e){return startDrag(e,orient);}:undefined}
+                        style={{width:orient==='H'?64:46,height:orient==='V'?52:46,
+                          cursor:canPlace?'grab':'not-allowed',opacity:canPlace?1:0.4,
+                          borderColor:canPlace?colHex+'99':undefined}}>
+                        <div style={{background:colHex,borderRadius:3,
+                          width:orient==='H'?40:WW2,height:orient==='V'?28:WW2,
+                          boxShadow:'inset 0 1px 0 rgba(255,255,255,0.4),0 2px 4px rgba(0,0,0,0.4)'}}/>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              {['H','V'].map(function(orient){
-                const col=isOnline?myTeam:team;
-                return(
-                  <div key={orient} onMouseDown={function(e){return startDrag(e,orient);}} onTouchStart={function(e){return startDrag(e,orient);}}
-                    style={{pointerEvents:'all',width:orient==='H'?84:42,height:orient==='V'?54:42,
-                      display:'flex',alignItems:'center',justifyContent:'center',
-                      cursor:canPlace?'grab':'not-allowed',touchAction:'none',borderRadius:12,
-                      background:darkMode?'rgba(30,41,68,0.7)':'rgba(255,255,255,0.7)',
-                      backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)',
-                      border:'1.5px solid '+(canPlace?col==='A'?'#ef4444':'#3b82f6':'var(--border)'),
-                      opacity:canPlace?1:0.35,boxShadow:'var(--shadow-soft)'}}>
-                    <div style={{background:col==='A'?'#ef4444':'#3b82f6',borderRadius:3,
-                      width:orient==='H'?54:WW2,height:orient==='V'?32:WW2}}/>
-                  </div>
-                );
-              })}
             </div>
           )}
         </div>
