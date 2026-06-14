@@ -67,9 +67,9 @@
   input,button{-webkit-appearance:none;font-family:inherit;}
   button{transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1);touch-action:manipulation;}
   button:active{transform:scale(0.94);}
-  .mi-btn{transition:transform 0.11s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.11s ease !important;}
-  .mi-btn:active{transform:translateY(4px) scale(0.985) !important;box-shadow:0 0px 4px rgba(0,0,0,0.10) !important;}
-  .mi-btn-hl:active{transform:translateY(4px) scale(0.985) !important;box-shadow:0 0px 8px rgba(0,0,0,0.18) !important;}
+  .mi-btn{transition:transform 0.13s cubic-bezier(0.34,1.4,0.64,1),box-shadow 0.13s ease !important;}
+  .mi-btn:active{transform:scale(0.972) !important;box-shadow:0 1px 4px rgba(15,23,42,0.07) !important;}
+  .mi-btn-hl:active{transform:scale(0.972) !important;box-shadow:0 2px 9px rgba(15,23,42,0.18) !important;}
   input{font-size:16px !important;}
   #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;flex-direction:column;gap:16px;font-family:system-ui,-apple-system,sans-serif;}
   #loader .dot{font-size:40px;}
@@ -230,6 +230,11 @@
   @keyframes piece-pulse{
     0%,100%{transform:scale(0.9);opacity:0.5;}
     50%{transform:scale(1.55);opacity:0;}
+  }
+  @keyframes ww-land{
+    0%{transform:scale(0.35);opacity:0;}
+    35%{opacity:0.45;}
+    100%{transform:scale(1.7);opacity:0;}
   }
   @keyframes confetti-fall{
     0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
@@ -640,7 +645,7 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.7),0 3px 7px rgba(0,0,0,0.18);transition:transform 0.14s,box-shadow 0.2s,opacity 0.2s;}
   body.dark .ww-wtool,html.dark .ww-wtool{background:linear-gradient(180deg,#27344b,#0e131d);border:1px solid rgba(255,255,255,0.07);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 3px 7px rgba(0,0,0,0.42);}
   .ww-wtool.armed:active{transform:scale(0.94);}
-  @keyframes ww-goalpulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
+  @keyframes ww-goalpulse{0%,100%{opacity:0.3;}50%{opacity:0.7;}}
 </style>
 </head>
 <body>
@@ -4209,10 +4214,14 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
             <div className="ww-board-tex" style={{mixBlendMode:dk?'screen':'multiply',opacity:dk?0.12:0.4}}/>
             <div className="ww-board-veins" style={{opacity:dk?0.3:0.45}}/>
             <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:dk?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
-            <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(SC*0.85),pointerEvents:'none',zIndex:1,background:`linear-gradient(180deg,${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}55,transparent)`,boxShadow:`inset 0 3px 16px ${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}aa`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
-            <div style={{position:'absolute',top:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:gs&&gs.map==='duel'?'#ef4444':'#22c55e',boxShadow:`0 0 12px ${gs&&gs.map==='duel'?'#ef4444':'#22c55e'},0 0 5px ${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
-            {gs&&gs.map==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(SC*0.85),pointerEvents:'none',zIndex:1,background:'linear-gradient(0deg,rgba(59,130,246,0.33),transparent)',boxShadow:'inset 0 -3px 16px rgba(59,130,246,0.67)',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
-            {gs&&gs.map==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:'#3b82f6',boxShadow:'0 0 12px #3b82f6,0 0 5px #3b82f6',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+            <div style={{position:'absolute',top:0,left:0,right:0,height:SC,pointerEvents:'none',zIndex:1,
+              background:`linear-gradient(180deg,${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}28 0%,${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}12 60%,transparent 100%)`,
+              boxShadow:`inset 0 0 0 1.5px ${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}55,inset 0 2px 10px ${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}33`,
+              animation:'ww-goalpulse 3s ease-in-out infinite'}}/>
+            {gs&&gs.map==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:SC,pointerEvents:'none',zIndex:1,
+              background:'linear-gradient(0deg,rgba(59,130,246,0.16) 0%,rgba(59,130,246,0.07) 60%,transparent 100%)',
+              boxShadow:'inset 0 0 0 1.5px rgba(59,130,246,0.33),inset 0 -2px 10px rgba(59,130,246,0.2)',
+              animation:'ww-goalpulse 3s ease-in-out infinite'}}/>}
             <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
               backgroundImage:`linear-gradient(${dk?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${dk?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${dk?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
               backgroundSize:`${SC}px ${SC}px,${SC}px ${SC}px,${SC}px ${SC}px`}}/>
@@ -7022,7 +7031,7 @@ function App(){
         border:'1.5px solid var(--border)',
         borderLeft:selectedMap==='duel'?'4px solid #8b5cf6':'4px solid #3b82f6',
         borderRadius:16,cursor:'pointer',display:'flex',alignItems:'center',gap:12,
-        boxShadow:'0 4px 0 rgba(0,0,0,0.08),0 2px 10px rgba(0,0,0,0.06)',
+        boxShadow:'0 1px 2px rgba(15,23,42,0.05),0 10px 26px rgba(15,23,42,0.08)',
         fontFamily:'system-ui,-apple-system,sans-serif'}}>
         <div style={{width:40,height:40,borderRadius:12,
           background:selectedMap==='duel'
@@ -8956,10 +8965,14 @@ function App(){
           <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
           <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
-          <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL*0.85),pointerEvents:'none',zIndex:1,background:`linear-gradient(180deg,${rMap==='duel'?'#ef4444':'#22c55e'}55,transparent)`,boxShadow:`inset 0 3px 16px ${rMap==='duel'?'#ef4444':'#22c55e'}aa`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
-          <div style={{position:'absolute',top:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:rMap==='duel'?'#ef4444':'#22c55e',boxShadow:`0 0 12px ${rMap==='duel'?'#ef4444':'#22c55e'},0 0 5px ${rMap==='duel'?'#ef4444':'#22c55e'}`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
-          {rMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL*0.85),pointerEvents:'none',zIndex:1,background:'linear-gradient(0deg,rgba(59,130,246,0.33),transparent)',boxShadow:'inset 0 -3px 16px rgba(59,130,246,0.67)',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
-          {rMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:'#3b82f6',boxShadow:'0 0 12px #3b82f6,0 0 5px #3b82f6',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+          <div style={{position:'absolute',top:0,left:0,right:0,height:CELL,pointerEvents:'none',zIndex:1,
+            background:`linear-gradient(180deg,${rMap==='duel'?'#ef4444':'#22c55e'}28 0%,${rMap==='duel'?'#ef4444':'#22c55e'}12 60%,transparent 100%)`,
+            boxShadow:`inset 0 0 0 1.5px ${rMap==='duel'?'#ef4444':'#22c55e'}55,inset 0 2px 10px ${rMap==='duel'?'#ef4444':'#22c55e'}33`,
+            animation:'ww-goalpulse 3s ease-in-out infinite'}}/>
+          {rMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:CELL,pointerEvents:'none',zIndex:1,
+            background:'linear-gradient(0deg,rgba(59,130,246,0.16) 0%,rgba(59,130,246,0.07) 60%,transparent 100%)',
+            boxShadow:'inset 0 0 0 1.5px rgba(59,130,246,0.33),inset 0 -2px 10px rgba(59,130,246,0.2)',
+            animation:'ww-goalpulse 3s ease-in-out infinite'}}/>}
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
             backgroundImage:`linear-gradient(${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
             backgroundSize:`${CELL}px ${CELL}px,${CELL}px ${CELL}px,${CELL}px ${CELL}px`}}/>
@@ -9560,10 +9573,14 @@ function App(){
         <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
         <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
-        <div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL*0.85),pointerEvents:'none',zIndex:1,background:`linear-gradient(180deg,${gcGoal}55,transparent)`,boxShadow:`inset 0 3px 16px ${gcGoal}aa`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
-        <div style={{position:'absolute',top:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:gcGoal,boxShadow:`0 0 12px ${gcGoal},0 0 5px ${gcGoal}`,animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>
-        {selectedMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL*0.85),pointerEvents:'none',zIndex:1,background:'linear-gradient(0deg,rgba(59,130,246,0.33),transparent)',boxShadow:'inset 0 -3px 16px rgba(59,130,246,0.67)',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
-        {selectedMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,pointerEvents:'none',zIndex:1,background:'#3b82f6',boxShadow:'0 0 12px #3b82f6,0 0 5px #3b82f6',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+        <div style={{position:'absolute',top:0,left:0,right:0,height:CELL,pointerEvents:'none',zIndex:1,
+          background:`linear-gradient(180deg,${gcGoal}28 0%,${gcGoal}12 60%,transparent 100%)`,
+          boxShadow:`inset 0 0 0 1.5px ${gcGoal}55,inset 0 2px 10px ${gcGoal}33`,
+          animation:'ww-goalpulse 3s ease-in-out infinite'}}/>
+        {selectedMap==='duel'&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:CELL,pointerEvents:'none',zIndex:1,
+          background:'linear-gradient(0deg,rgba(59,130,246,0.16) 0%,rgba(59,130,246,0.07) 60%,transparent 100%)',
+          boxShadow:'inset 0 0 0 1.5px rgba(59,130,246,0.33),inset 0 -2px 10px rgba(59,130,246,0.2)',
+          animation:'ww-goalpulse 3s ease-in-out infinite'}}/>}
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
           backgroundImage:`linear-gradient(${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
           backgroundSize:`${CELL}px ${CELL}px,${CELL}px ${CELL}px,${CELL}px ${CELL}px`}}/>
@@ -9618,10 +9635,12 @@ function App(){
           return(
             <div key={p} style={{position:'absolute',left:pos.c*CELL+off,top:pos.r*CELL+off,
               width:sz,height:sz,
-              transition:'left 0.18s cubic-bezier(0.25,0.46,0.45,0.94),top 0.18s cubic-bezier(0.25,0.46,0.45,0.94)',
+              transition:'left 0.25s cubic-bezier(0.34,1.3,0.5,1),top 0.25s cubic-bezier(0.34,1.3,0.5,1)',
               zIndex:20,pointerEvents:'none',transform:boardFlip?'scaleY(-1)':'none'}}>
               {isActive&&<div style={{position:'absolute',inset:-2,borderRadius:'50%',
                 background:PC[p],animation:'piece-pulse 1.6s ease-in-out infinite'}}/>}
+              <div key={'land'+pos.r+'-'+pos.c} style={{position:'absolute',inset:-3,borderRadius:'50%',
+                border:'2px solid '+PC[p],animation:'ww-land 0.5s ease-out forwards',pointerEvents:'none'}}/>
               <Piece color={PC[p]} dark={PD[p]} size={sz}/>
             </div>
           );
@@ -10796,19 +10815,20 @@ function MapAura({map,dark}){
 function MenuBG({dark}){
   // Treibende Mauer-Segmente (Peripherie, nicht im Zentrum) – thematisch zum Spielbrett
   const bars=[
-    {o:'h',top:'12%',left:'6%',len:84,anim:'mbg-float-a',dur:13,delay:0},
-    {o:'v',top:'18%',left:'88%',len:74,anim:'mbg-float-b',dur:16,delay:1.5},
-    {o:'h',top:'34%',left:'80%',len:64,anim:'mbg-float-c',dur:15,delay:3},
-    {o:'v',top:'6%',left:'70%',len:60,anim:'mbg-float-a',dur:18,delay:2.2},
-    {o:'h',top:'78%',left:'10%',len:78,anim:'mbg-float-b',dur:14,delay:0.8},
-    {o:'v',top:'70%',left:'90%',len:80,anim:'mbg-float-c',dur:17,delay:2.8},
-    {o:'h',top:'88%',left:'62%',len:70,anim:'mbg-float-a',dur:15,delay:4},
-    {o:'v',top:'52%',left:'4%',len:66,anim:'mbg-float-b',dur:19,delay:1.2},
-    {o:'h',top:'60%',left:'34%',len:56,anim:'mbg-float-c',dur:20,delay:3.5},
+    {o:'h',top:'14%',left:'7%',len:78,anim:'mbg-float-a',dur:16,delay:0},
+    {o:'v',top:'20%',left:'89%',len:70,anim:'mbg-float-b',dur:18,delay:1.5},
+    {o:'h',top:'80%',left:'12%',len:72,anim:'mbg-float-b',dur:17,delay:0.8},
+    {o:'v',top:'72%',left:'90%',len:74,anim:'mbg-float-c',dur:19,delay:2.8},
+    {o:'h',top:'88%',left:'64%',len:62,anim:'mbg-float-a',dur:18,delay:4},
   ];
-  const barCol=dark?'rgba(226,232,240,0.06)':'rgba(15,23,42,0.05)';
-  const gridCol=dark?'rgba(148,163,184,0.06)':'rgba(15,23,42,0.035)';
+  const barCol=dark?'rgba(226,232,240,0.045)':'rgba(15,23,42,0.035)';
+  const gridCol=dark?'rgba(148,163,184,0.05)':'rgba(15,23,42,0.03)';
   return <div style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none',overflow:'hidden'}}>
+    {/* Weicher Tiefenschimmer wie die Brett-Platte */}
+    <div style={{position:'absolute',inset:0,
+      background:dark
+        ?'radial-gradient(125% 70% at 50% -8%,rgba(125,160,220,0.08),transparent 55%),radial-gradient(100% 60% at 50% 108%,rgba(10,14,24,0.5),transparent 60%)'
+        :'radial-gradient(125% 70% at 50% -8%,rgba(255,255,255,0.7),transparent 55%),radial-gradient(100% 65% at 50% 110%,rgba(148,163,184,0.16),transparent 62%)'}}/>
     {/* Brett-Raster, das sanft nach oben (Richtung Ziel) wandert */}
     <div style={{position:'absolute',inset:'-40px 0',
       backgroundImage:`linear-gradient(${gridCol} 1px,transparent 1px),linear-gradient(90deg,${gridCol} 1px,transparent 1px)`,
@@ -10831,14 +10851,14 @@ function MenuBG({dark}){
     {/* Spieler-Tokens, langsam treibend */}
     <div style={{position:'absolute',top:'66%',left:'22%',
       animation:'mbg-token-r 22s ease-in-out infinite'}}>
-      <div style={{width:18,height:18,borderRadius:'50%',background:'#ef4444',
-        boxShadow:'0 0 14px 3px rgba(239,68,68,0.45)',opacity:0.55,
+      <div style={{width:16,height:16,borderRadius:'50%',background:'#ef4444',
+        boxShadow:'0 0 12px 2px rgba(239,68,68,0.32)',opacity:0.4,
         animation:'mbg-glow 4s ease-in-out infinite'}}/>
     </div>
     <div style={{position:'absolute',top:'30%',left:'74%',
       animation:'mbg-token-b 26s ease-in-out infinite'}}>
-      <div style={{width:18,height:18,borderRadius:'50%',background:'#3b82f6',
-        boxShadow:'0 0 14px 3px rgba(59,130,246,0.45)',opacity:0.55,
+      <div style={{width:16,height:16,borderRadius:'50%',background:'#3b82f6',
+        boxShadow:'0 0 12px 2px rgba(59,130,246,0.32)',opacity:0.4,
         animation:'mbg-glow 5s ease-in-out 1s infinite'}}/>
     </div>
   </div>;
@@ -10902,8 +10922,8 @@ function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightB
         border:'1.5px solid '+(highlight?'transparent':'var(--border)'),
         display:'flex',alignItems:'center',gap:13,cursor:'pointer',
         boxShadow:highlight
-          ?'0 5px 0 rgba(0,0,0,0.22),0 8px 28px rgba(0,0,0,0.18)'
-          :'0 4px 0 rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.05)',
+          ?'0 2px 6px rgba(15,23,42,0.16),0 14px 32px rgba(15,23,42,0.2),inset 0 1px 0 rgba(255,255,255,0.22)'
+          :'0 1px 2px rgba(15,23,42,0.05),0 10px 26px rgba(15,23,42,0.08)',
         opacity:off?0.45:1,fontFamily:'system-ui,-apple-system,sans-serif',
         animation:pulse&&!off?'highlightPulse 2.5s ease-in-out infinite':highlight?'highlightGlow 3s ease-in-out infinite':'none',
         overflow:'hidden'}}>
@@ -12004,10 +12024,8 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
                 background:bg,
                 display:'flex',alignItems:'center',justifyContent:'center',
                 cursor:vDot&&!dragging?'pointer':'default',boxSizing:'border-box'}}>
-              {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,height:Math.round(CELL2*0.85),background:'linear-gradient(180deg,rgba(34,197,94,0.33),transparent)',boxShadow:'inset 0 3px 14px rgba(34,197,94,0.6)',pointerEvents:'none',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
-              {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'#22c55e',boxShadow:'0 0 12px #22c55e,0 0 5px #22c55e',pointerEvents:'none',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
-              {r===ROWS2-1&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:Math.round(CELL2*0.85),background:'linear-gradient(0deg,rgba(34,197,94,0.33),transparent)',boxShadow:'inset 0 -3px 14px rgba(34,197,94,0.6)',pointerEvents:'none',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
-              {r===ROWS2-1&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:3,background:'#22c55e',boxShadow:'0 0 12px #22c55e,0 0 5px #22c55e',pointerEvents:'none',animation:'ww-goalpulse 2.6s ease-in-out infinite'}}/>}
+              {r===0&&<div style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'linear-gradient(180deg,rgba(34,197,94,0.16) 0%,rgba(34,197,94,0.07) 60%,transparent 100%)',boxShadow:'inset 0 0 0 1.5px rgba(34,197,94,0.33),inset 0 2px 8px rgba(34,197,94,0.2)',pointerEvents:'none',animation:'ww-goalpulse 3s ease-in-out infinite'}}/>}
+              {r===ROWS2-1&&<div style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'linear-gradient(0deg,rgba(34,197,94,0.16) 0%,rgba(34,197,94,0.07) 60%,transparent 100%)',boxShadow:'inset 0 0 0 1.5px rgba(34,197,94,0.33),inset 0 -2px 8px rgba(34,197,94,0.2)',pointerEvents:'none',animation:'ww-goalpulse 3s ease-in-out infinite'}}/>}
               {vDot&&<div style={{width:Math.round(CELL2*0.26),height:Math.round(CELL2*0.26),borderRadius:'50%',pointerEvents:'none',background:`radial-gradient(circle at 40% 34%,rgba(255,255,255,0.6),${PC2[turn]} 62%,${PD2[turn]})`,boxShadow:`0 0 8px ${PC2[turn]}aa,0 1px 2px rgba(0,0,0,0.32),inset 0 1px 1px rgba(255,255,255,0.4)`,animation:'ww-dotb 1.7s ease-in-out infinite'}}/>}
             </div>
           );
@@ -12020,9 +12038,11 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
           return(
             <div key={id} style={{position:'absolute',left:pos.c*CELL2+off,top:pos.r*CELL2+off,
               width:sz,height:sz,
-              transition:'left 0.18s cubic-bezier(0.25,0.46,0.45,0.94),top 0.18s cubic-bezier(0.25,0.46,0.45,0.94)',
+              transition:'left 0.25s cubic-bezier(0.34,1.3,0.5,1),top 0.25s cubic-bezier(0.34,1.3,0.5,1)',
               zIndex:20,pointerEvents:'none'}}>
               {active&&<div style={{position:'absolute',inset:-2,borderRadius:'50%',background:PC2[id],animation:'piece-pulse 1.6s ease-in-out infinite'}}/>}
+              <div key={'land'+pos.r+'-'+pos.c} style={{position:'absolute',inset:-3,borderRadius:'50%',
+                border:'2px solid '+PC2[id],animation:'ww-land 0.5s ease-out forwards',pointerEvents:'none'}}/>
               <Piece color={PC2[id]} dark={PD2[id]} size={sz}/>
               <div style={{position:'absolute',right:-2,bottom:-2,width:13,height:13,borderRadius:'50%',
                 background:reached[id]?'#16a34a':'white',color:reached[id]?'white':PD2[id],fontSize:9,fontWeight:900,lineHeight:'13px',textAlign:'center',
