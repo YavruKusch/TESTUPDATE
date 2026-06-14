@@ -902,7 +902,7 @@ const I18N={
     wins:'wins!',givenUp:'Given up',lostGiveUp:'gave up',rematch:'Rematch',replayBtn:'Replay',menu:'Menu',
     giveUp:'Give up',sure:'Sure?',walls:'Walls',statusWait:'WAITING',statusThink:'THINKING',statusTurn:'TURN',
     goalLabel:'▲ GOAL ▲',startLabel:'▼ START ▼',invalidPos:'Invalid position!',opponentTurn:"Opponent's turn...",
-    wallsLeft:'walls left',tapContinue:'Tap to continue',red:'Red',blue:'Blue',
+    wallsLeft:'walls left',wallCtrl:'Wall controls',wpBottom:'Bottom',wpLeft:'Left',wpRight:'Right',tapContinue:'Tap to continue',red:'Red',blue:'Blue',
     options:'Options',language:'Language',close:'Close',theme:'Theme',light:'Light',dark:'Dark',
     tutHelp:'How to play',tutSkip:'Skip',tutNext:'Next',tutBack:'Back',tutDone:"Let's go!",
     tut1Title:'The goal',tut1Desc:'Get your piece to the green line at the top.',
@@ -928,7 +928,7 @@ const I18N={
     wins:'gewinnt!',givenUp:'Aufgegeben',lostGiveUp:'hat aufgegeben',rematch:'Revanche',replayBtn:'Replay',menu:'Menü',
     giveUp:'Aufgeben',sure:'Sicher?',walls:'Mauern',statusWait:'WARTET',statusThink:'DENKT',statusTurn:'DRAN',
     goalLabel:'▲ ZIEL ▲',startLabel:'▼ START ▼',invalidPos:'Ungültige Position!',opponentTurn:'Gegner ist dran...',
-    wallsLeft:'Mauern übrig',tapContinue:'Tippen um fortzufahren',red:'Rot',blue:'Blau',
+    wallsLeft:'Mauern übrig',wallCtrl:'Wand-Steuerung',wpBottom:'Unten',wpLeft:'Links',wpRight:'Rechts',tapContinue:'Tippen um fortzufahren',red:'Rot',blue:'Blau',
     options:'Optionen',language:'Sprache',close:'Schließen',theme:'Design',light:'Hell',dark:'Dunkel',
     tutHelp:"So funktioniert's",tutSkip:'Überspringen',tutNext:'Weiter',tutBack:'Zurück',tutDone:'Los geht\'s!',
     tut1Title:'Das Ziel',tut1Desc:'Bring deinen Spielstein nach oben zur grünen Linie.',
@@ -954,7 +954,7 @@ const I18N={
     wins:'kazandı!',givenUp:'Pes etti',lostGiveUp:'pes etti',rematch:'Rövanş',replayBtn:'Tekrar',menu:'Menü',
     giveUp:'Pes et',sure:'Emin misin?',walls:'Duvar',statusWait:'BEKLİYOR',statusThink:'DÜŞÜNÜYOR',statusTurn:'SIRA',
     goalLabel:'▲ HEDEF ▲',startLabel:'▼ BAŞLANGIÇ ▼',invalidPos:'Geçersiz konum!',opponentTurn:'Rakibin sırası...',
-    wallsLeft:'duvar kaldı',tapContinue:'Devam etmek için dokun',red:'Kırmızı',blue:'Mavi',
+    wallsLeft:'duvar kaldı',wallCtrl:'Duvar kontrolü',wpBottom:'Alt',wpLeft:'Sol',wpRight:'Sağ',tapContinue:'Devam etmek için dokun',red:'Kırmızı',blue:'Mavi',
     options:'Seçenekler',language:'Dil',close:'Kapat',theme:'Tema',light:'Açık',dark:'Koyu',
     tutHelp:'Nasıl oynanır',tutSkip:'Atla',tutNext:'İleri',tutBack:'Geri',tutDone:'Başlayalım!',
     tut1Title:'Hedef',tut1Desc:'Taşını yukarıdaki yeşil çizgiye ulaştır.',
@@ -980,7 +980,7 @@ const I18N={
     wins:'gagne!',givenUp:'Abandonné',lostGiveUp:'a abandonné',rematch:'Revanche',replayBtn:'Replay',menu:'Menu',
     giveUp:'Abandonner',sure:'Sûr?',walls:'Murs',statusWait:'ATTENTE',statusThink:'RÉFLEXION',statusTurn:'TOUR',
     goalLabel:'▲ BUT ▲',startLabel:'▼ DÉPART ▼',invalidPos:'Position invalide!',opponentTurn:"Tour de l'adversaire...",
-    wallsLeft:'murs restants',tapContinue:'Touche pour continuer',red:'Rouge',blue:'Bleu',
+    wallsLeft:'murs restants',wallCtrl:'Contrôles des murs',wpBottom:'Bas',wpLeft:'Gauche',wpRight:'Droite',tapContinue:'Touche pour continuer',red:'Rouge',blue:'Bleu',
     options:'Options',language:'Langue',close:'Fermer',theme:'Thème',light:'Clair',dark:'Sombre',
     tutHelp:'Comment jouer',tutSkip:'Passer',tutNext:'Suivant',tutBack:'Retour',tutDone:"C'est parti !",
     tut1Title:'Le but',tut1Desc:'Amène ton pion jusqu\'à la ligne verte en haut.',
@@ -4606,6 +4606,8 @@ function App(){
   const[selectedMap,setSelectedMap]=useState('duel');
   const[duelSize,setDuelSize]=useState(()=>{try{return localStorage.getItem('ww_duelsize')||'standard';}catch{return 'standard';}});
   useEffect(()=>{try{localStorage.setItem('ww_duelsize',duelSize);}catch{}},[duelSize]);
+  const[wallBarPos,setWallBarPos]=useState(()=>{try{return localStorage.getItem('ww_wallbarpos')||'bottom';}catch{return 'bottom';}});
+  useEffect(()=>{try{localStorage.setItem('ww_wallbarpos',wallBarPos);}catch{}},[wallBarPos]);
   useEffect(()=>{
     document.body.classList.toggle('dark',darkMode);
     document.documentElement.classList.toggle('dark',darkMode);
@@ -7116,6 +7118,23 @@ function App(){
                       </button>
                     ))}
                   </div>
+                  {/* Wand-Steuerung */}
+                  <div style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:1,marginBottom:8}}>
+                    {t('wallCtrl').toUpperCase()}
+                  </div>
+                  <div style={{display:'flex',gap:6,marginBottom:18}}>
+                    {[{k:'bottom',label:t('wpBottom')},{k:'left',label:t('wpLeft')},{k:'right',label:t('wpRight')}].map(o=>(
+                      <button key={o.k} onClick={()=>setWallBarPos(o.k)} style={{
+                        flex:1,padding:'11px 8px',borderRadius:10,fontSize:13,fontWeight:600,
+                        cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',
+                        background:wallBarPos===o.k?'var(--text)':'var(--bg)',
+                        color:wallBarPos===o.k?'var(--bg)':'var(--text)',
+                        border:`1.5px solid ${wallBarPos===o.k?'var(--text)':'var(--border)'}`,
+                        fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
                   {/* Sprache */}
                   <div style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:1,marginBottom:8}}>
                     {t('language').toUpperCase()}
@@ -9592,7 +9611,10 @@ function App(){
       {/* Floating barricade chips */}
       {!winner&&myTurn&&!isOnlineWait&&(
         <div style={{position:'fixed',bottom:'calc(16px + env(safe-area-inset-bottom, 0px))',left:0,right:0,zIndex:200,
-          display:'flex',justifyContent:'center',alignItems:'flex-end',gap:12,pointerEvents:'none'}}>
+          display:'flex',justifyContent:wallBarPos==='left'?'flex-start':wallBarPos==='right'?'flex-end':'center',
+          paddingLeft:wallBarPos==='left'?'calc(20px + env(safe-area-inset-left, 0px))':0,
+          paddingRight:wallBarPos==='right'?'calc(20px + env(safe-area-inset-right, 0px))':0,
+          alignItems:'flex-end',gap:12,pointerEvents:'none'}}>
           <div style={{position:'absolute',bottom:'100%',marginBottom:5,
             fontSize:9,color:'var(--muted)',fontWeight:600,letterSpacing:1,
             background:darkMode?'rgba(20,30,50,0.7)':'rgba(255,255,255,0.72)',backdropFilter:'blur(8px)',
