@@ -6876,7 +6876,7 @@ function App(){
       <div style={{position:'fixed',bottom:8,left:8,zIndex:99999,
         background:'#dc2626',color:'#fff',fontSize:10,fontWeight:900,letterSpacing:0.5,
         padding:'3px 8px',borderRadius:6,fontFamily:'system-ui,-apple-system,sans-serif',
-        pointerEvents:'none'}}>BUILD v45</div>
+        pointerEvents:'none'}}>BUILD v46</div>
       <MapAura map={selectedMap} dark={darkMode}/>
       <button onClick={()=>{setOptionsTab('main');setShowOptions(true);}} style={{
         position:'fixed',top:'calc(env(safe-area-inset-top) + 14px)',right:14,
@@ -7854,12 +7854,12 @@ function App(){
       return(
         <button onClick={()=>setGameTimeMode(val)} style={{
           flex:1,padding:'11px 4px',borderRadius:12,position:'relative',overflow:'hidden',
-          background:sel?'linear-gradient(135deg,#7c3aed,#8b5cf6)':'var(--card)',
+          background:sel?'linear-gradient(135deg,#7c3aed,#8b5cf6)':(darkMode?'#1b2740':'var(--card)'),
           color:sel?'#fff':'var(--text)',
-          border:`1.5px solid ${sel?'transparent':'var(--border)'}`,
+          border:`1.5px solid ${sel?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')}`,
           cursor:'pointer',
           opacity:1,
-          boxShadow:sel?'0 3px 10px rgba(124,58,237,0.35),0 0 22px rgba(124,58,237,0.35),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 5px rgba(15,23,42,0.1),0 8px 18px rgba(15,23,42,0.14),inset 0 1px 0 rgba(255,255,255,0.5)',
+          boxShadow:sel?'0 3px 10px rgba(124,58,237,0.35),0 0 22px rgba(124,58,237,0.35),inset 0 1px 0 rgba(255,255,255,0.22)':(darkMode?'0 2px 8px rgba(0,0,0,0.4)':'0 2px 5px rgba(15,23,42,0.1),0 8px 18px rgba(15,23,42,0.14),inset 0 1px 0 rgba(255,255,255,0.5)'),
           fontSize:12,fontWeight:800,letterSpacing:0.3,
           fontFamily:'system-ui,-apple-system,sans-serif'}}>
           {label}
@@ -7891,7 +7891,7 @@ function App(){
     return(
       <div style={{...sPage,justifyContent:'flex-start',paddingTop:'calc(env(safe-area-inset-top) + 20px)',animation:pageAnim,background:'transparent',position:'relative',zIndex:1}}>
         <MenuBG dark={darkMode}/>
-        <div style={{position:'fixed',top:'calc(env(safe-area-inset-top) + 30px)',left:0,right:0,height:210,zIndex:0,pointerEvents:'none',overflow:'hidden'}}>
+        <div style={{position:'absolute',top:'calc(env(safe-area-inset-top) + 40px)',left:0,right:0,height:200,zIndex:0,pointerEvents:'none',overflow:'hidden'}}>
           <DecoStone dark={darkMode} size={48} style={{top:34,left:'7%'}}
             hi="#c4b5fd" mid="#8b5cf6" lo="#6d28d9" wall="#5b21b6" rim="#c4b5fd"/>
           <DecoStone dark={darkMode} size={58} style={{top:54,right:'8%'}}
@@ -7907,10 +7907,10 @@ function App(){
         <div style={{position:'fixed',bottom:8,left:8,zIndex:99999,
           background:'#dc2626',color:'#fff',fontSize:10,fontWeight:900,letterSpacing:0.5,
           padding:'3px 8px',borderRadius:6,fontFamily:'system-ui,-apple-system,sans-serif',
-          pointerEvents:'none'}}>BUILD v45</div>
+          pointerEvents:'none'}}>BUILD v46</div>
         <MapAura map={selectedMap} dark={darkMode}/>
         <button onClick={goBack} style={backChevron}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
-        <div style={{width:'100%',maxWidth:340}}>
+        <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
           <ScreenHead icon={<MazeIcon size={28} color="#fff"/>} iconBg="linear-gradient(135deg,#8b5cf6,#3b82f6)"
             title={t('mode')} sub={t('modeConfigSub')}/>
 
@@ -7965,9 +7965,9 @@ function App(){
               flex:1,padding:'14px 10px',borderRadius:14,cursor:'pointer',textAlign:'center',
               background:selectedMap==='duel'
                 ?'linear-gradient(135deg,#7c3aed,#8b5cf6)'
-                :'var(--card)',
+                :(darkMode?'#1b2740':'var(--card)'),
               color:selectedMap==='duel'?'#fff':'var(--text)',
-              border:'1.5px solid '+(selectedMap==='duel'?'transparent':'var(--border)'),
+              border:'1.5px solid '+(selectedMap==='duel'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
               fontFamily:'system-ui,-apple-system,sans-serif',
               boxShadow:selectedMap==='duel'
                 ?'0 4px 10px rgba(124,58,237,0.28),0 14px 32px rgba(124,58,237,0.32),inset 0 1px 0 rgba(255,255,255,0.25)'
@@ -7997,9 +7997,9 @@ function App(){
               flex:1,padding:'14px 10px',borderRadius:14,cursor:'pointer',textAlign:'center',
               background:selectedMap==='classic'
                 ?'linear-gradient(135deg,#2563eb,#8b5cf6)'
-                :'var(--card)',
+                :(darkMode?'#1b2740':'var(--card)'),
               color:selectedMap==='classic'?'#fff':'var(--text)',
-              border:'1.5px solid '+(selectedMap==='classic'?'transparent':'var(--border)'),
+              border:'1.5px solid '+(selectedMap==='classic'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
               fontFamily:'system-ui,-apple-system,sans-serif',
               boxShadow:selectedMap==='classic'
                 ?'0 4px 10px rgba(37,99,235,0.28),0 14px 32px rgba(37,99,235,0.32),inset 0 1px 0 rgba(255,255,255,0.25)'
@@ -8037,9 +8037,9 @@ function App(){
                 {feat('duelBlitz')&&(
                   <button onClick={()=>setDuelSize('blitz')} className="mi-btn" style={{
                     flex:1,padding:'12px 8px',borderRadius:13,cursor:'pointer',textAlign:'center',
-                    background:duelSize==='blitz'?'linear-gradient(135deg,#7c3aed,#8b5cf6)':'var(--card)',
+                    background:duelSize==='blitz'?'linear-gradient(135deg,#7c3aed,#8b5cf6)':(darkMode?'#1b2740':'var(--card)'),
                     color:duelSize==='blitz'?'#fff':'var(--text)',
-                    border:'1.5px solid '+(duelSize==='blitz'?'transparent':'var(--border)'),
+                    border:'1.5px solid '+(duelSize==='blitz'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
                     fontFamily:'system-ui,-apple-system,sans-serif',
                     boxShadow:duelSize==='blitz'?'0 3px 10px rgba(124,58,237,0.3),0 0 26px rgba(124,58,237,0.4),0 12px 28px rgba(124,58,237,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
                     transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
@@ -8051,9 +8051,9 @@ function App(){
                 {feat('duelStandard')&&(
                   <button onClick={()=>setDuelSize('standard')} className="mi-btn" style={{
                     flex:1,padding:'12px 8px',borderRadius:13,cursor:'pointer',textAlign:'center',
-                    background:duelSize==='standard'?'linear-gradient(135deg,#7c3aed,#8b5cf6)':'var(--card)',
+                    background:duelSize==='standard'?'linear-gradient(135deg,#7c3aed,#8b5cf6)':(darkMode?'#1b2740':'var(--card)'),
                     color:duelSize==='standard'?'#fff':'var(--text)',
-                    border:'1.5px solid '+(duelSize==='standard'?'transparent':'var(--border)'),
+                    border:'1.5px solid '+(duelSize==='standard'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
                     fontFamily:'system-ui,-apple-system,sans-serif',
                     boxShadow:duelSize==='standard'?'0 3px 10px rgba(124,58,237,0.3),0 0 26px rgba(124,58,237,0.4),0 12px 28px rgba(124,58,237,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
                     transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
