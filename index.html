@@ -6873,6 +6873,10 @@ function App(){
     <div style={{...sPage,position:'relative',zIndex:1,
       animation:navDir==='back'?'slide-in-left 0.32s cubic-bezier(0.25,1,0.5,1) backwards':'none'}}>
       <MenuBG dark={darkMode}/>
+      <div style={{position:'fixed',bottom:8,left:8,zIndex:99999,
+        background:'#dc2626',color:'#fff',fontSize:10,fontWeight:900,letterSpacing:0.5,
+        padding:'3px 8px',borderRadius:6,fontFamily:'system-ui,-apple-system,sans-serif',
+        pointerEvents:'none'}}>BUILD v42</div>
       <MapAura map={selectedMap} dark={darkMode}/>
       <button onClick={()=>{setOptionsTab('main');setShowOptions(true);}} style={{
         position:'fixed',top:'calc(env(safe-area-inset-top) + 14px)',right:14,
@@ -7887,6 +7891,10 @@ function App(){
     return(
       <div style={{...sPage,justifyContent:'flex-start',paddingTop:'calc(env(safe-area-inset-top) + 20px)',animation:pageAnim,background:'transparent',position:'relative',zIndex:1}}>
         <MenuBG dark={darkMode}/>
+        <div style={{position:'fixed',bottom:8,left:8,zIndex:99999,
+          background:'#dc2626',color:'#fff',fontSize:10,fontWeight:900,letterSpacing:0.5,
+          padding:'3px 8px',borderRadius:6,fontFamily:'system-ui,-apple-system,sans-serif',
+          pointerEvents:'none'}}>BUILD v42</div>
         <MapAura map={selectedMap} dark={darkMode}/>
         <button onClick={goBack} style={backChevron}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
         <div style={{width:'100%',maxWidth:340}}>
