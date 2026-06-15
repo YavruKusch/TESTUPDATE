@@ -6873,6 +6873,12 @@ function App(){
     <div style={{...sPage,position:'relative',zIndex:1,
       animation:navDir==='back'?'slide-in-left 0.32s cubic-bezier(0.25,1,0.5,1) backwards':'none'}}>
       <MenuBG dark={darkMode}/>
+      <div style={{position:'fixed',top:0,left:0,right:0,zIndex:99999,
+        background:'#dc2626',color:'#fff',textAlign:'center',
+        fontSize:13,fontWeight:900,letterSpacing:1,padding:'6px 0',
+        fontFamily:'system-ui,-apple-system,sans-serif'}}>
+        DESIGN-TEST v40 AKTIV
+      </div>
       <MapAura map={selectedMap} dark={darkMode}/>
       <button onClick={()=>{setOptionsTab('main');setShowOptions(true);}} style={{
         position:'fixed',top:'calc(env(safe-area-inset-top) + 14px)',right:14,
