@@ -6876,7 +6876,7 @@ function App(){
       <div style={{position:'fixed',bottom:8,left:8,zIndex:99999,
         background:'#dc2626',color:'#fff',fontSize:10,fontWeight:900,letterSpacing:0.5,
         padding:'3px 8px',borderRadius:6,fontFamily:'system-ui,-apple-system,sans-serif',
-        pointerEvents:'none'}}>BUILD v42</div>
+        pointerEvents:'none'}}>BUILD v43</div>
       <MapAura map={selectedMap} dark={darkMode}/>
       <button onClick={()=>{setOptionsTab('main');setShowOptions(true);}} style={{
         position:'fixed',top:'calc(env(safe-area-inset-top) + 14px)',right:14,
@@ -7854,12 +7854,12 @@ function App(){
       return(
         <button onClick={()=>setGameTimeMode(val)} style={{
           flex:1,padding:'11px 4px',borderRadius:12,position:'relative',overflow:'hidden',
-          background:sel?'var(--text)':'var(--card)',
-          color:sel?'var(--bg)':'var(--text)',
-          border:`1.5px solid ${sel?'var(--text)':'var(--border)'}`,
+          background:sel?'linear-gradient(135deg,#7c3aed,#8b5cf6)':'var(--card)',
+          color:sel?'#fff':'var(--text)',
+          border:`1.5px solid ${sel?'transparent':'var(--border)'}`,
           cursor:'pointer',
           opacity:1,
-          boxShadow:sel?'0 4px 14px rgba(15,23,42,0.3),0 2px 5px rgba(15,23,42,0.18)':'0 2px 5px rgba(15,23,42,0.1),0 8px 18px rgba(15,23,42,0.14),inset 0 1px 0 rgba(255,255,255,0.5)',
+          boxShadow:sel?'0 3px 10px rgba(124,58,237,0.35),0 0 22px rgba(124,58,237,0.35),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 5px rgba(15,23,42,0.1),0 8px 18px rgba(15,23,42,0.14),inset 0 1px 0 rgba(255,255,255,0.5)',
           fontSize:12,fontWeight:800,letterSpacing:0.3,
           fontFamily:'system-ui,-apple-system,sans-serif'}}>
           {label}
@@ -7894,7 +7894,7 @@ function App(){
         <div style={{position:'fixed',bottom:8,left:8,zIndex:99999,
           background:'#dc2626',color:'#fff',fontSize:10,fontWeight:900,letterSpacing:0.5,
           padding:'3px 8px',borderRadius:6,fontFamily:'system-ui,-apple-system,sans-serif',
-          pointerEvents:'none'}}>BUILD v42</div>
+          pointerEvents:'none'}}>BUILD v43</div>
         <MapAura map={selectedMap} dark={darkMode}/>
         <button onClick={goBack} style={backChevron}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
         <div style={{width:'100%',maxWidth:340}}>
@@ -8028,7 +8028,7 @@ function App(){
                     color:duelSize==='blitz'?'#fff':'var(--text)',
                     border:'1.5px solid '+(duelSize==='blitz'?'transparent':'var(--border)'),
                     fontFamily:'system-ui,-apple-system,sans-serif',
-                    boxShadow:duelSize==='blitz'?'0 2px 6px rgba(124,58,237,0.3),0 10px 24px rgba(124,58,237,0.22),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 5px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.15)',
+                    boxShadow:duelSize==='blitz'?'0 3px 10px rgba(124,58,237,0.3),0 0 26px rgba(124,58,237,0.4),0 12px 28px rgba(124,58,237,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
                     transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
                     <div style={{fontSize:14,fontWeight:900,marginBottom:2}}>7 × 7</div>
                     <div style={{fontSize:11,fontWeight:800,marginBottom:1}}>{t('duelBlitzName')}</div>
@@ -8042,7 +8042,7 @@ function App(){
                     color:duelSize==='standard'?'#fff':'var(--text)',
                     border:'1.5px solid '+(duelSize==='standard'?'transparent':'var(--border)'),
                     fontFamily:'system-ui,-apple-system,sans-serif',
-                    boxShadow:duelSize==='standard'?'0 2px 6px rgba(124,58,237,0.3),0 10px 24px rgba(124,58,237,0.22),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 5px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.15)',
+                    boxShadow:duelSize==='standard'?'0 3px 10px rgba(124,58,237,0.3),0 0 26px rgba(124,58,237,0.4),0 12px 28px rgba(124,58,237,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
                     transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
                     <div style={{fontSize:14,fontWeight:900,marginBottom:2}}>9 × 9</div>
                     <div style={{fontSize:11,fontWeight:800,marginBottom:1}}>Standard</div>
@@ -8172,6 +8172,37 @@ function App(){
                 cursor:'pointer',fontSize:18,fontWeight:800,color:'var(--text)',
                 fontFamily:'system-ui,-apple-system,sans-serif'}}>+</button>
           </div>
+
+          {/* START BUTTON */}
+          <button onClick={()=>{setNavDir('fwd');setLobbyCfgPrivate(false);setLobbyCfgMode('classic');setFlash('');setScreen('online');}}
+            className="mi-btn" style={{
+            width:'100%',marginTop:22,padding:'16px 18px',borderRadius:20,position:'relative',overflow:'hidden',
+            background:'linear-gradient(135deg,#7c3aed 0%,#8b5cf6 55%,#6d28d9 100%)',
+            border:'none',cursor:'pointer',display:'flex',alignItems:'center',gap:14,
+            boxShadow:'0 4px 14px rgba(124,58,237,0.4),0 0 40px rgba(124,58,237,0.35),0 14px 34px rgba(124,58,237,0.3),inset 0 1px 0 rgba(255,255,255,0.25)',
+            fontFamily:'system-ui,-apple-system,sans-serif',
+            animation:'highlightGlow 3s ease-in-out infinite'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:'50%',
+              background:'linear-gradient(180deg,rgba(255,255,255,0.14),transparent)',borderRadius:'20px 20px 0 0',pointerEvents:'none'}}/>
+            <div style={{width:46,height:46,borderRadius:14,flexShrink:0,
+              background:'rgba(255,255,255,0.2)',display:'flex',alignItems:'center',justifyContent:'center',
+              boxShadow:'inset 0 1px 0 rgba(255,255,255,0.25)'}}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div style={{flex:1,textAlign:'left',minWidth:0,zIndex:1}}>
+              <div style={{fontSize:17,fontWeight:900,color:'#fff',letterSpacing:-0.4,lineHeight:1.15}}>
+                {selectedMap==='duel'
+                  ?(lang==='de'?'Duell starten':lang==='tr'?'Düello başlat':lang==='fr'?'Démarrer le duel':'Start Duel')
+                  :(lang==='de'?'Rennen starten':lang==='tr'?'Yarış başlat':lang==='fr'?'Démarrer la course':'Start Race')}
+              </div>
+              <div style={{fontSize:12,fontWeight:600,color:'rgba(255,255,255,0.82)',marginTop:2}}>
+                {lang==='de'?'Gegner finden':lang==='tr'?'Rakip bul':lang==='fr'?'Trouver un adversaire':'Find an opponent'}
+              </div>
+            </div>
+            <div style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',opacity:0.18,pointerEvents:'none'}}>
+              <SwordsIcon size={52} color="#fff"/>
+            </div>
+          </button>
 
         </div>
         {helpKey&&<ModeHelpModal kind={helpKey} lang={lang} onClose={()=>setHelpKey(null)}/>}
