@@ -6873,12 +6873,6 @@ function App(){
     <div style={{...sPage,position:'relative',zIndex:1,
       animation:navDir==='back'?'slide-in-left 0.32s cubic-bezier(0.25,1,0.5,1) backwards':'none'}}>
       <MenuBG dark={darkMode}/>
-      <div style={{position:'fixed',top:0,left:0,right:0,zIndex:99999,
-        background:'#dc2626',color:'#fff',textAlign:'center',
-        fontSize:13,fontWeight:900,letterSpacing:1,padding:'6px 0',
-        fontFamily:'system-ui,-apple-system,sans-serif'}}>
-        DESIGN-TEST v40 AKTIV
-      </div>
       <MapAura map={selectedMap} dark={darkMode}/>
       <button onClick={()=>{setOptionsTab('main');setShowOptions(true);}} style={{
         position:'fixed',top:'calc(env(safe-area-inset-top) + 14px)',right:14,
@@ -7855,12 +7849,13 @@ function App(){
       const sel=gameTimeMode===val;
       return(
         <button onClick={()=>setGameTimeMode(val)} style={{
-          flex:1,padding:'10px 4px',borderRadius:10,
+          flex:1,padding:'11px 4px',borderRadius:12,position:'relative',overflow:'hidden',
           background:sel?'var(--text)':'var(--card)',
           color:sel?'var(--bg)':'var(--text)',
           border:`1.5px solid ${sel?'var(--text)':'var(--border)'}`,
           cursor:'pointer',
           opacity:1,
+          boxShadow:sel?'0 4px 14px rgba(15,23,42,0.3),0 2px 5px rgba(15,23,42,0.18)':'0 2px 5px rgba(15,23,42,0.1),0 8px 18px rgba(15,23,42,0.14),inset 0 1px 0 rgba(255,255,255,0.5)',
           fontSize:12,fontWeight:800,letterSpacing:0.3,
           fontFamily:'system-ui,-apple-system,sans-serif'}}>
           {label}
@@ -7871,10 +7866,11 @@ function App(){
       const sel=dropMode===val;
       return(
         <button onClick={()=>setDropMode(d=>d===val?false:val)} style={{
-          flex:1,padding:'7px 2px',borderRadius:8,
+          flex:1,padding:'8px 2px',borderRadius:9,
           background:sel?'#ec4899':'var(--card)',
           color:sel?'white':'var(--text)',
           border:`1.5px solid ${sel?'#ec4899':'var(--border)'}`,
+          boxShadow:sel?'0 3px 12px rgba(236,72,153,0.4)':'0 2px 5px rgba(15,23,42,0.1),0 6px 14px rgba(15,23,42,0.12),inset 0 1px 0 rgba(255,255,255,0.5)',
           cursor:'pointer',fontSize:10,fontWeight:800,letterSpacing:0.2,
           fontFamily:'system-ui,-apple-system,sans-serif'}}>
           {label}
@@ -7953,8 +7949,8 @@ function App(){
               border:'1.5px solid '+(selectedMap==='duel'?'transparent':'var(--border)'),
               fontFamily:'system-ui,-apple-system,sans-serif',
               boxShadow:selectedMap==='duel'
-                ?'0 4px 0 rgba(0,0,0,0.18),0 6px 20px rgba(124,58,237,0.3)'
-                :'0 3px 0 rgba(0,0,0,0.07),0 2px 8px rgba(0,0,0,0.04)',
+                ?'0 4px 10px rgba(124,58,237,0.28),0 14px 32px rgba(124,58,237,0.32),inset 0 1px 0 rgba(255,255,255,0.25)'
+                :'0 2px 6px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.45)',
               transition:'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',overflow:'hidden',position:'relative'}}>
               {selectedMap==='duel'&&<div style={{position:'absolute',top:0,left:0,right:0,height:'50%',background:'linear-gradient(180deg,rgba(255,255,255,0.14),transparent)',borderRadius:'14px 14px 0 0',pointerEvents:'none'}}/>}
               {selectedMap!=='duel'&&<div style={{position:'absolute',top:6,right:6,fontSize:8,fontWeight:800,
@@ -7985,8 +7981,8 @@ function App(){
               border:'1.5px solid '+(selectedMap==='classic'?'transparent':'var(--border)'),
               fontFamily:'system-ui,-apple-system,sans-serif',
               boxShadow:selectedMap==='classic'
-                ?'0 4px 0 rgba(0,0,0,0.18),0 6px 20px rgba(37,99,235,0.3)'
-                :'0 3px 0 rgba(0,0,0,0.07),0 2px 8px rgba(0,0,0,0.04)',
+                ?'0 4px 10px rgba(37,99,235,0.28),0 14px 32px rgba(37,99,235,0.32),inset 0 1px 0 rgba(255,255,255,0.25)'
+                :'0 2px 6px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.45)',
               transition:'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',overflow:'hidden',position:'relative'}}>
               {selectedMap==='classic'&&<div style={{position:'absolute',top:0,left:0,right:0,height:'50%',background:'linear-gradient(180deg,rgba(255,255,255,0.14),transparent)',borderRadius:'14px 14px 0 0',pointerEvents:'none'}}/>}
               <div style={{display:'flex',justifyContent:'center',marginBottom:8}}>
@@ -10816,35 +10812,46 @@ function MapAura({map,dark}){
     transition:'background 0.55s ease'}}/>;
 }
 function MenuBG({dark}){
-  var gc=dark?'rgba(150,180,235,0.05)':'rgba(20,30,60,0.04)';
+  var gc=dark?'rgba(150,180,235,0.07)':'rgba(20,30,60,0.04)';
   return <div style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none',overflow:'hidden',
     background:dark
-      ?'linear-gradient(180deg,#0c1320 0%,#070c16 55%,#04070e 100%)'
+      ?'linear-gradient(180deg,#0d1422 0%,#080d18 50%,#03060d 100%)'
       :'linear-gradient(180deg,#eef1f7 0%,#e4e9f1 55%,#d9e0ec 100%)'}}>
     <div className="ww-board-tex" style={{mixBlendMode:dark?'screen':'multiply',opacity:dark?0.06:0.14}}/>
+    {/* Violetter Glow oben hinterm Logo */}
     <div style={{position:'absolute',inset:0,
       background:dark
-        ?'radial-gradient(115% 50% at 50% 0%,rgba(120,95,235,0.16) 0%,transparent 52%)'
+        ?'radial-gradient(90% 38% at 50% 4%,rgba(124,92,246,0.22) 0%,transparent 50%)'
         :'radial-gradient(115% 50% at 50% 0%,rgba(255,255,255,0.85) 0%,transparent 52%)'}}/>
-    <div style={{position:'absolute',inset:'-50px 0 0',
-      backgroundImage:'linear-gradient('+gc+' 1px,transparent 1px),linear-gradient(90deg,'+gc+' 1px,transparent 1px)',
-      backgroundSize:'46px 46px',
-      maskImage:'radial-gradient(125% 90% at 50% 25%,#000 40%,transparent 92%)',
-      WebkitMaskImage:'radial-gradient(125% 90% at 50% 25%,#000 40%,transparent 92%)',
-      animation:'mbg-grid-pan 16s linear infinite'}}/>
+    {dark
+      ? <div style={{position:'absolute',left:'-30%',right:'-30%',bottom:0,height:'62%',
+          transform:'perspective(420px) rotateX(62deg)',transformOrigin:'50% 100%',
+          backgroundImage:'linear-gradient('+gc+' 1px,transparent 1px),linear-gradient(90deg,'+gc+' 1px,transparent 1px)',
+          backgroundSize:'40px 40px',
+          maskImage:'linear-gradient(to top,#000 0%,transparent 85%)',
+          WebkitMaskImage:'linear-gradient(to top,#000 0%,transparent 85%)',
+          animation:'mbg-grid-pan 18s linear infinite'}}/>
+      : <div style={{position:'absolute',inset:'-50px 0 0',
+          backgroundImage:'linear-gradient('+gc+' 1px,transparent 1px),linear-gradient(90deg,'+gc+' 1px,transparent 1px)',
+          backgroundSize:'46px 46px',
+          maskImage:'radial-gradient(125% 90% at 50% 25%,#000 40%,transparent 92%)',
+          WebkitMaskImage:'radial-gradient(125% 90% at 50% 25%,#000 40%,transparent 92%)',
+          animation:'mbg-grid-pan 16s linear infinite'}}/>}
+    {/* Ziel-Zone rot oben */}
     <div style={{position:'absolute',top:0,left:'-10%',right:'-10%',height:'30%',
       background:dark
-        ?'radial-gradient(ellipse 75% 100% at 50% 0%,rgba(225,70,60,0.16) 0%,transparent 70%)'
+        ?'radial-gradient(ellipse 75% 100% at 50% 0%,rgba(225,70,60,0.18) 0%,transparent 70%)'
         :'radial-gradient(ellipse 75% 100% at 50% 0%,rgba(225,70,60,0.1) 0%,transparent 70%)',
       animation:'mbg-gp 6s ease-in-out infinite'}}/>
-    <div style={{position:'absolute',bottom:0,left:'-10%',right:'-10%',height:'28%',
+    {/* Start-Zone blau unten */}
+    <div style={{position:'absolute',bottom:0,left:'-10%',right:'-10%',height:'30%',
       background:dark
-        ?'radial-gradient(ellipse 75% 100% at 50% 100%,rgba(50,125,235,0.15) 0%,transparent 70%)'
+        ?'radial-gradient(ellipse 75% 100% at 50% 100%,rgba(50,125,235,0.2) 0%,transparent 70%)'
         :'radial-gradient(ellipse 75% 100% at 50% 100%,rgba(50,125,235,0.09) 0%,transparent 70%)',
       animation:'mbg-gp 6s ease-in-out 3s infinite'}}/>
     <div style={{position:'absolute',inset:0,
       background:dark
-        ?'linear-gradient(to bottom,transparent 52%,rgba(0,0,0,0.55) 100%)'
+        ?'linear-gradient(to bottom,rgba(3,6,13,0.4) 0%,transparent 22%,transparent 60%,rgba(2,4,9,0.6) 100%)'
         :'linear-gradient(to bottom,transparent 58%,rgba(80,100,135,0.1) 100%)'}}/>
   </div>;
 }
@@ -10907,8 +10914,8 @@ function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightB
         border:'1.5px solid '+(highlight?'transparent':'var(--border)'),
         display:'flex',alignItems:'center',gap:13,cursor:'pointer',
         boxShadow:highlight
-          ?('0 2px 6px rgba(15,23,42,0.18),0 16px 34px rgba(15,23,42,0.26),inset 0 1px 0 rgba(255,255,255,0.22)'+(glowColor?(',0 8px 30px '+glowColor):''))
-          :'0 2px 5px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16)',
+          ?('0 2px 6px rgba(15,23,42,0.2),0 16px 38px rgba(15,23,42,0.3),inset 0 1px 0 rgba(255,255,255,0.28)'+(glowColor?(',0 6px 34px '+glowColor+',0 0 60px '+glowColor):''))
+          :'0 2px 6px rgba(15,23,42,0.12),0 14px 32px rgba(15,23,42,0.2),inset 0 1px 0 rgba(255,255,255,0.4)',
         opacity:off?0.45:1,fontFamily:'system-ui,-apple-system,sans-serif',
         animation:pulse&&!off?'highlightPulse 2.5s ease-in-out infinite':highlight?'highlightGlow 3s ease-in-out infinite':'none',
         overflow:'hidden'}}>
