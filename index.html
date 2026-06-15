@@ -7031,7 +7031,7 @@ function App(){
         border:'1.5px solid var(--border)',
         borderLeft:selectedMap==='duel'?'4px solid #8b5cf6':'4px solid #3b82f6',
         borderRadius:16,cursor:'pointer',display:'flex',alignItems:'center',gap:12,
-        boxShadow:'0 1px 2px rgba(15,23,42,0.05),0 10px 26px rgba(15,23,42,0.08)',
+        boxShadow:'0 2px 5px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16)',
         fontFamily:'system-ui,-apple-system,sans-serif'}}>
         <div style={{width:40,height:40,borderRadius:12,
           background:selectedMap==='duel'
@@ -7819,7 +7819,7 @@ function App(){
       <div style={{position:'relative',zIndex:1,textAlign:'center',marginTop:-2,marginBottom:'calc(env(safe-area-inset-bottom) + 12px)'}}>
         <span style={{fontSize:10,fontWeight:800,letterSpacing:1,color:'var(--subtle)',
           background:'var(--card)',border:'1.5px solid var(--border)',borderRadius:9,padding:'3px 10px',opacity:0.92}}>
-          v34
+          v35
         </span>
       </div>
 
@@ -8031,7 +8031,7 @@ function App(){
                     color:duelSize==='blitz'?'#fff':'var(--text)',
                     border:'1.5px solid '+(duelSize==='blitz'?'transparent':'var(--border)'),
                     fontFamily:'system-ui,-apple-system,sans-serif',
-                    boxShadow:duelSize==='blitz'?'0 2px 6px rgba(124,58,237,0.3),0 10px 24px rgba(124,58,237,0.22),inset 0 1px 0 rgba(255,255,255,0.22)':'0 1px 2px rgba(15,23,42,0.05),0 8px 20px rgba(15,23,42,0.09)',
+                    boxShadow:duelSize==='blitz'?'0 2px 6px rgba(124,58,237,0.3),0 10px 24px rgba(124,58,237,0.22),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 5px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.15)',
                     transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
                     <div style={{fontSize:14,fontWeight:900,marginBottom:2}}>7 × 7</div>
                     <div style={{fontSize:11,fontWeight:800,marginBottom:1}}>{t('duelBlitzName')}</div>
@@ -8045,7 +8045,7 @@ function App(){
                     color:duelSize==='standard'?'#fff':'var(--text)',
                     border:'1.5px solid '+(duelSize==='standard'?'transparent':'var(--border)'),
                     fontFamily:'system-ui,-apple-system,sans-serif',
-                    boxShadow:duelSize==='standard'?'0 2px 6px rgba(124,58,237,0.3),0 10px 24px rgba(124,58,237,0.22),inset 0 1px 0 rgba(255,255,255,0.22)':'0 1px 2px rgba(15,23,42,0.05),0 8px 20px rgba(15,23,42,0.09)',
+                    boxShadow:duelSize==='standard'?'0 2px 6px rgba(124,58,237,0.3),0 10px 24px rgba(124,58,237,0.22),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 5px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.15)',
                     transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
                     <div style={{fontSize:14,fontWeight:900,marginBottom:2}}>9 × 9</div>
                     <div style={{fontSize:11,fontWeight:800,marginBottom:1}}>Standard</div>
@@ -10827,7 +10827,7 @@ function MenuBG({dark}){
   return <div style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none',overflow:'hidden',
     background:dark
       ?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)'
-      :'linear-gradient(170deg,#fcfcfb,#f3f5f8 52%,#eaedf2)'}}>
+      :'linear-gradient(170deg,#eceff5,#dfe4ed 52%,#cfd6e2)'}}>
     {/* feine Steinkörnung, sehr dezent */}
     <div className="ww-board-tex" style={{mixBlendMode:dark?'screen':'multiply',opacity:dark?0.07:0.18}}/>
     {/* Toplight oben + Tiefe unten wie die Brett-Platte */}
@@ -10908,8 +10908,8 @@ function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightB
         border:'1.5px solid '+(highlight?'transparent':'var(--border)'),
         display:'flex',alignItems:'center',gap:13,cursor:'pointer',
         boxShadow:highlight
-          ?('0 2px 6px rgba(15,23,42,0.16),0 14px 32px rgba(15,23,42,0.2),inset 0 1px 0 rgba(255,255,255,0.22)'+(glowColor?(',0 8px 30px '+glowColor):''))
-          :'0 1px 2px rgba(15,23,42,0.05),0 10px 26px rgba(15,23,42,0.08)',
+          ?('0 2px 6px rgba(15,23,42,0.18),0 16px 34px rgba(15,23,42,0.26),inset 0 1px 0 rgba(255,255,255,0.22)'+(glowColor?(',0 8px 30px '+glowColor):''))
+          :'0 2px 5px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16)',
         opacity:off?0.45:1,fontFamily:'system-ui,-apple-system,sans-serif',
         animation:pulse&&!off?'highlightPulse 2.5s ease-in-out infinite':highlight?'highlightGlow 3s ease-in-out infinite':'none',
         overflow:'hidden'}}>
