@@ -7815,6 +7815,14 @@ function App(){
         {lang==='de'?'Datenschutz & Impressum':lang==='tr'?'Gizlilik & K\u00fcnye':lang==='fr'?'Confidentialit\u00e9 & Mentions':'Privacy & Legal'}
       </button>
 
+      {/* Versions-Anzeige (Deploy-Check) */}
+      <div style={{position:'relative',zIndex:1,textAlign:'center',marginTop:-2,marginBottom:'calc(env(safe-area-inset-bottom) + 12px)'}}>
+        <span style={{fontSize:10,fontWeight:800,letterSpacing:1,color:'var(--subtle)',
+          background:'var(--card)',border:'1.5px solid var(--border)',borderRadius:9,padding:'3px 10px',opacity:0.92}}>
+          v34
+        </span>
+      </div>
+
       {/* Cookie Banner */}
       {!cookieConsent&&(
         <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:3000,padding:'0 0 calc(env(safe-area-inset-bottom) + 0px) 0'}}>
