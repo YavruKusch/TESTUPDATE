@@ -5018,7 +5018,7 @@ function App(){
   const savedScroll=useRef(0);
   const lastOnlineTs=useRef(0);
   const S=useRef({});
-  S.current={pA,pB,walls,barrLeft,turn,winner,moveHist,gameMode,lobbyId,onlineRole,rematchA,rematchB,rematchDeclined,gameNum,chaosItem,goldenWalls,hammers,hammerHeld,hammerUsed,hammerMode,gaveUp,gameTimeMode,isRanked,rankedMode,rankedMyRating,rankedOppRating,rankedOppKey,playerNames,selectedMap,duelSize,screen};
+  S.current={pA,pB,walls,barrLeft,turn,winner,moveHist,gameMode,lobbyId,onlineRole,rematchA,rematchB,rematchDeclined,gameNum,chaosItem,goldenWalls,hammers,hammerHeld,hammerUsed,hammerMode,chaosMode,dropMode,gaveUp,gameTimeMode,isRanked,rankedMode,rankedMyRating,rankedOppRating,rankedOppKey,playerNames,selectedMap,duelSize,screen};
   useEffect(()=>{snapPosRef.current=snapPos;},[snapPos]);
   useEffect(()=>{hammerTargetRef.current=hammerTarget;},[hammerTarget]);
 
@@ -5366,7 +5366,7 @@ function App(){
     if(wsGo){
       // Raum existiert schon seit der Lobby -> nur den Handler aufs laufende Spiel umhaengen.
       WSNET.onState=applyServerState;
-    }else if(WS_ENABLED&&mode==='online'&&!ranked&&!effHammer&&!chaosMode&&!effDrop){
+    }else if(WS_ENABLED&&mode==='online'&&!ranked&&!S.current.hammerMode&&!S.current.chaosMode&&!S.current.dropMode){
       // Spielernamen aus dem Lobby-Spielstand holen (Sieg-Zaehler nach Namen, nicht Farbe)
       if(lid){ try{ stoGet('barricade_game_'+lid).then(function(g){ if(g&&(g.nameA||g.nameB))setPlayerNames({A:g.nameA||'',B:g.nameB||''}); }); }catch(e){} }
       WSNET.connect(lid,role,applyServerState,{map:mapToUse,size:sizeToUse,barr:gameBarr,tm:tm});
