@@ -2496,12 +2496,24 @@ async function changeAccountPassword(key,oldPw,newPw,confirmPw){
   }
 }
 async function adminResetAllRanked(){
-  const all=await stoGet('ww_profiles');
+  const snap=await window.db.ref('ww_leaderboard').once('value');
+  const all=snap.val();
   if(!all)return 0;
   const keys=Object.keys(all);
-  await Promise.all(keys.map(async k=>{
-    const p=all[k];if(!p)return;
-    await stoSet(PROFILE_KEY(k),Object.assign({},p,{stats:Object.assign({},p.stats||{},{ranked:freshRankedStats()})}));
+  const resetMode={rating:1000,wins:0,losses:0};
+  await Promise.all(keys.map(async function(k){
+    const entry=all[k];if(!entry)return;
+    // Bogus-Eintraege ohne Namen oder mit '?' loeschen
+    if(!entry.name||entry.name==='?'){
+      try{await window.db.ref('ww_leaderboard/'+k).remove();}catch(e){}
+      return;
+    }
+    const update={};
+    if(entry.classic)update.classic=resetMode;
+    if(entry.duel)update.duel=resetMode;
+    if(Object.keys(update).length>0){
+      try{await window.db.ref('ww_leaderboard/'+k).update(update);}catch(e){}
+    }
   }));
   return keys.length;
 }async function registerAccount(email,name,pw,color){
