@@ -4427,7 +4427,27 @@ function App(){
         return;
       }
       const prof=await stoGet(PROFILE_KEY(uid));
-      if(prof&&prof.name)setAccount({...prof,key:uid,isGoogle:isG});
+      if(prof&&prof.name){
+        // ELO aus ww_leaderboard lesen (server schreibt nur noch dort, nicht mehr ins Profil)
+        try{
+          const lb=await stoGet('ww_leaderboard/'+uid);
+          if(lb&&typeof lb==='object'){
+            if(!prof.stats)prof.stats={};
+            if(!prof.stats.ranked)prof.stats.ranked={};
+            var lbModes=['classic','duel'];
+            for(var lbI=0;lbI<lbModes.length;lbI++){
+              var lbM=lbModes[lbI];
+              if(lb[lbM]&&typeof lb[lbM].rating==='number'){
+                if(!prof.stats.ranked[lbM])prof.stats.ranked[lbM]={};
+                prof.stats.ranked[lbM].rating=lb[lbM].rating;
+                if(typeof lb[lbM].wins==='number')prof.stats.ranked[lbM].wins=lb[lbM].wins;
+                if(typeof lb[lbM].losses==='number')prof.stats.ranked[lbM].losses=lb[lbM].losses;
+              }
+            }
+          }
+        }catch(e){}
+        setAccount({...prof,key:uid,isGoogle:isG});
+      }
       // Kein Profil + Google = Erstanmeldung -> Namenswahl laeuft ueber den Google-Button
     });
     return()=>unsub();
@@ -5229,7 +5249,19 @@ function App(){
   // ── Init game ──
   // Wendet einen Server-Zustand auf das React-Spiel an (Adapter Server -> Spiel)
   const applyServerState=(d)=>{
-    if(d&&d.type==='elo_update'){ setEloChange({change:d.change,newRating:d.newRating,won:d.won}); return; } // Ranked-ELO vom Server (Stufe 2)
+    if(d&&d.type==='elo_update'){
+      setEloChange({change:d.change,newRating:d.newRating,won:d.won});
+      // Account-State sofort aktualisieren (kein App-Neustart noetig)
+      var euMode=d.mode||'classic';
+      var euAcc=accRef.current;
+      if(euAcc&&typeof d.newRating==='number'){
+        var euStats=Object.assign({},euAcc.stats||{});
+        euStats.ranked=Object.assign({},euStats.ranked||{});
+        euStats.ranked[euMode]=Object.assign({},euStats.ranked[euMode]||{},{rating:d.newRating});
+        setAccount(Object.assign({},euAcc,{stats:euStats}));
+      }
+      return;
+    } // Ranked-ELO vom Server (Stufe 2)
     if(d.type==='match_start'||d.type==='resync'||d.type==='state'){
       setWsConn(true);
       // Schutz bei gemischten Versionen: Server-Brett muss zum Client-Brett passen
