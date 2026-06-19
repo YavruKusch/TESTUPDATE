@@ -2501,20 +2501,28 @@ async function adminResetAllRanked(){
   if(!all)return 0;
   const keys=Object.keys(all);
   const resetMode={rating:1000,wins:0,losses:0};
+  var errors=[];
   await Promise.all(keys.map(async function(k){
-    const entry=all[k];if(!entry)return;
-    // Bogus-Eintraege ohne Namen oder mit '?' loeschen
-    if(!entry.name||entry.name==='?'){
-      try{await window.db.ref('ww_leaderboard/'+k).remove();}catch(e){}
+    const entry=all[k];
+    if(!entry||typeof entry!=='object'){return;}
+    // Bogus-Eintraege loeschen: kein Name, Name '?', oder Rating > 4000 (Cheat)
+    var classicR=(entry.classic&&typeof entry.classic.rating==='number')?entry.classic.rating:0;
+    var duelR=(entry.duel&&typeof entry.duel.rating==='number')?entry.duel.rating:0;
+    var isBogus=(!entry.name||entry.name==='?'||classicR>4000||duelR>4000);
+    if(isBogus){
+      try{await window.db.ref('ww_leaderboard/'+k).remove();}
+      catch(e){errors.push('del '+k+': '+(e&&e.message?e.message:e));}
       return;
     }
     const update={};
     if(entry.classic)update.classic=resetMode;
     if(entry.duel)update.duel=resetMode;
     if(Object.keys(update).length>0){
-      try{await window.db.ref('ww_leaderboard/'+k).update(update);}catch(e){}
+      try{await window.db.ref('ww_leaderboard/'+k).update(update);}
+      catch(e){errors.push('rst '+k+': '+(e&&e.message?e.message:e));}
     }
   }));
+  if(errors.length>0)throw new Error(errors.join(' | '));
   return keys.length;
 }async function registerAccount(email,name,pw,color){
   const key=normUser(name);
@@ -3438,12 +3446,18 @@ function AdminConfirmAction({label,confirmLabel,btnLabel,danger,active,onConfirm
   );
 }
 function RankedResetAdmin({t}){
-  const[step,setStep]=React.useState(0); // 0=idle, 1=confirm1, 2=confirm2, 3=busy, 4=done
+  const[step,setStep]=React.useState(0); // 0=idle, 1=confirm1, 2=confirm2, 3=busy, 4=done, 5=error
+  const[errMsg,setErrMsg]=React.useState('');
   const doReset=async()=>{
-    setStep(3);
-    const n=await adminResetAllRanked();
-    setStep(4);
-    setTimeout(()=>setStep(0),4000);
+    setStep(3);setErrMsg('');
+    try{
+      await adminResetAllRanked();
+      setStep(4);
+      setTimeout(()=>setStep(0),4000);
+    }catch(e){
+      setErrMsg(e&&e.message?e.message:'Unbekannter Fehler');
+      setStep(5);
+    }
   };
   if(step===0)return(
     <button onClick={()=>setStep(1)} style={{width:'100%',padding:'11px',borderRadius:10,
@@ -3480,6 +3494,15 @@ function RankedResetAdmin({t}){
     </div>
   );
   if(step===3)return <div style={{textAlign:'center',padding:'14px',color:'var(--subtle)',fontSize:13,fontWeight:600}}>⏳ Wird zurückgesetzt…</div>;
+  if(step===5)return(
+    <div style={{background:'rgba(239,68,68,0.1)',border:'1.5px solid #ef4444',borderRadius:10,padding:'12px 14px'}}>
+      <div style={{fontSize:12,fontWeight:700,color:'#ef4444',marginBottom:6}}>Fehler beim Zurücksetzen:</div>
+      <div style={{fontSize:11,color:'var(--subtle)',wordBreak:'break-all',marginBottom:8}}>{errMsg}</div>
+      <button onClick={()=>setStep(0)} style={{padding:'8px 16px',borderRadius:8,background:'var(--card)',
+        color:'var(--text)',border:'1.5px solid var(--border)',cursor:'pointer',fontSize:12,
+        fontFamily:'system-ui,-apple-system,sans-serif'}}>Schließen</button>
+    </div>
+  );
   return <div style={{textAlign:'center',padding:'12px',color:'#16a34a',fontSize:13,fontWeight:700}}>✓ {t('adminResetRankedDone')}</div>;
 }
 function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack}){
@@ -4440,9 +4463,10 @@ function App(){
       }
       const prof=await stoGet(PROFILE_KEY(uid));
       if(prof&&prof.name){
-        // ELO aus ww_leaderboard lesen (server schreibt nur noch dort, nicht mehr ins Profil)
+        // ELO direkt aus ww_leaderboard lesen (stoGet wuerde JSON.parse auf natives Objekt machen = crash)
         try{
-          const lb=await stoGet('ww_leaderboard/'+uid);
+          const lbSnap=await window.db.ref('ww_leaderboard/'+uid).once('value');
+          const lb=lbSnap.val();
           if(lb&&typeof lb==='object'){
             if(!prof.stats)prof.stats={};
             if(!prof.stats.ranked)prof.stats.ranked={};
