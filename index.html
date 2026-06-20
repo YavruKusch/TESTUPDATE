@@ -2557,6 +2557,71 @@ async function adminFixLeaderboardNames(){
   if(errors.length>0)throw new Error(errors.join(' | '));
   return fixed;
 }
+async function adminFlagWsCmd(flag, value){
+  return new Promise(function(resolve,reject){
+    var ws=new WebSocket(WW_URL);
+    var authed=false,done=false;
+    var tmr=setTimeout(function(){if(!done){done=true;try{ws.close();}catch(e){}reject(new Error('Timeout'));}},10000);
+    ws.onopen=function(){
+      firebase.auth().currentUser.getIdToken(true).then(function(tok){
+        if(done)return;
+        ws.send(JSON.stringify({type:'auth',idToken:tok}));
+      }).catch(function(e){if(!done){done=true;clearTimeout(tmr);try{ws.close();}catch(e2){}reject(e);}});
+    };
+    ws.onmessage=function(ev){
+      if(done)return;
+      var d;try{d=JSON.parse(ev.data);}catch(e){return;}
+      if(d.type==='authed'&&!authed){authed=true;ws.send(JSON.stringify({type:'admin_set_flag',flag:flag,value:value}));return;}
+      if(d.type==='admin_flag_ok'){done=true;clearTimeout(tmr);try{ws.close();}catch(e){}resolve(d);return;}
+      if(d.type==='error'){done=true;clearTimeout(tmr);try{ws.close();}catch(e){}reject(new Error(d.grund||'Fehler'));}
+    };
+    ws.onerror=function(){if(!done){done=true;clearTimeout(tmr);reject(new Error('WS-Fehler'));}};
+    ws.onclose=function(){if(!done){done=true;clearTimeout(tmr);reject(new Error('Verbindung getrennt'));}};
+  });
+}
+function AdminFlagsPanel(){
+  var[flags,setFlags]=React.useState({XP_SYSTEM:false,COIN_SYSTEM:false});
+  var[busy,setBusy]=React.useState('');
+  var[msg,setMsg]=React.useState('');
+  React.useEffect(function(){
+    if(!window.db)return;
+    var ref=window.db.ref('ww_flags');
+    ref.on('value',function(snap){
+      var v=snap.val()||{};
+      setFlags({XP_SYSTEM:!!v.XP_SYSTEM,COIN_SYSTEM:!!v.COIN_SYSTEM});
+    });
+    return function(){ref.off('value');};
+  },[]);
+  function toggle(flag){
+    var newVal=!flags[flag];
+    setBusy(flag);setMsg('');
+    adminFlagWsCmd(flag,newVal).then(function(){
+      setMsg(flag+' = '+newVal);setBusy('');
+    }).catch(function(e){setMsg('Fehler: '+(e&&e.message));setBusy('');});
+  }
+  return(
+    <div>
+      {[['XP_SYSTEM','XP-System (Level)','#7c3aed'],['COIN_SYSTEM','Coin-System','#f59e0b']].map(function(f){
+        var on=flags[f[0]];
+        return(
+          <button key={f[0]} onClick={function(){toggle(f[0]);}} disabled={busy===f[0]}
+            style={{display:'flex',alignItems:'center',justifyContent:'space-between',
+              padding:'10px 12px',borderRadius:9,background:'var(--card)',
+              border:'1.5px solid '+(on?f[2]+'66':'var(--border)'),cursor:'pointer',
+              fontFamily:'system-ui,sans-serif',width:'100%',marginBottom:7,
+              opacity:busy===f[0]?0.6:1}}>
+            <span style={{fontSize:13,fontWeight:700,color:'var(--text)'}}>{f[1]}</span>
+            <span style={{fontSize:11,fontWeight:800,color:on?f[2]:'var(--subtle)',
+              background:on?f[2]+'22':'var(--bg)',borderRadius:6,padding:'3px 8px'}}>
+              {busy===f[0]?'...':(on?'AN':'AUS')}
+            </span>
+          </button>
+        );
+      })}
+      {msg&&<div style={{fontSize:11,color:'var(--subtle)',marginTop:4}}>{msg}</div>}
+    </div>
+  );
+}
 async function adminCoinsWsCmd(msg){
   return new Promise(function(resolve,reject){
     var ws=new WebSocket(WW_URL);
@@ -8012,6 +8077,14 @@ function App(){
                   </div>
                 </div>
               )}
+            </AdminSection>
+
+            {/* ── FEATURE FLAGS ── */}
+            <AdminSection label="FEATURE FLAGS">
+              <div style={{fontSize:11,color:'var(--subtle)',marginBottom:10,lineHeight:1.5}}>
+                XP- und Coin-System live ein-/ausschalten. Wirkt sofort auf den Server.
+              </div>
+              <AdminFlagsPanel/>
             </AdminSection>
 
             {/* ── COINS & SHOP ── */}
