@@ -747,7 +747,7 @@
   // Fehler sichtbar anzeigen (kein DevTools nötig)
   window.onerror = function(msg,src,line){
     var m=document.getElementById('loader-msg');
-    if(m)m.innerHTML='<span style="color:#ef4444">Fehler Zeile '+line+':<br>'+msg+'</span>';
+    if(m){m.style.color='#ef4444';m.textContent='Fehler Zeile '+line+': '+msg;}
   };
   // Nach 12s: Hinweis wenn noch loading
   setTimeout(function(){
@@ -5513,11 +5513,11 @@ function App(){
   // Wendet einen Server-Zustand auf das React-Spiel an (Adapter Server -> Spiel)
   const applyServerState=(d)=>{
     if(d&&d.type==='coins_update'){
-      if(typeof d.balance==='number')setCoins(d.balance);
+      if(typeof d.balance==='number')setCoins(function(prev){return Math.max(prev===null?0:prev,d.balance);});
       return;
     }
     if(d&&d.type==='xp_update'){
-      if(typeof d.xp==='number')setXp(d.xp);
+      if(typeof d.xp==='number')setXp(function(prev){return Math.max(prev===null?0:prev,d.xp);});
       return;
     }
     if(d&&d.type==='elo_update'){
