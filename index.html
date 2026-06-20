@@ -3669,7 +3669,7 @@ function RankedResetAdmin({t}){
   );
   return <div style={{textAlign:'center',padding:'12px',color:'#16a34a',fontSize:13,fontWeight:700}}>✓ {t('adminResetRankedDone')}</div>;
 }
-function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack}){
+function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack,xp,coins}){
   const[showNC,setShowNC]=React.useState(false);
   const[ncInput,setNcInput]=React.useState('');
   const[ncErr,setNcErr]=React.useState('');
@@ -8940,7 +8940,8 @@ function App(){
     return <ProfileScreen account={account}
       onUpdate={acc=>{setAccount(acc);}}
       onLogout={doLogout}
-      t={t} darkMode={darkMode} goBack={goBack}/>;
+      t={t} darkMode={darkMode} goBack={goBack}
+      xp={xp} coins={coins}/>;
   }
 
   // ── DIFFICULTY ──────────────────────────────────────────
