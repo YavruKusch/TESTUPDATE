@@ -8216,7 +8216,7 @@ function App(){
           </div>
 
           {/* Spieler-Vergleich */}
-          {(statMovA+statMovB)>0&&(
+          {mh.filter(function(m){return m.type!=='emote';}).length>0&&(
             <div style={{marginBottom:12,borderRadius:16,background:'var(--card)',border:'1.5px solid var(--border)',overflow:'hidden'}}>
               <div style={{display:'flex',alignItems:'stretch'}}>
                 {/* Player A */}
