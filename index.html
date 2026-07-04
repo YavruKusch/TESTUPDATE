@@ -1021,6 +1021,10 @@ var WSNET={
 };
 if(WS_ENABLED){ try{ WSNET._dbg('bereit (ws=1)'); }catch(e){} }
 try{ document.addEventListener('visibilitychange',function(){ if(document.hidden)return; if(!WSNET.roomId&&!WSNET.browseOn&&!WSNET.rankedOn&&!WSNET.spectateCode)return; if(!WSNET.sock||WSNET.sock.readyState!==1){ WSNET._open(); } else if(WSNET.roomId){ try{ WSNET.requestSync(); }catch(e){} } else if(WSNET.spectateCode){ try{ WSNET._send({type:'spectate_join',code:WSNET.spectateCode}); }catch(e){} } else { try{ var lmv={type:'list_lobbies'}; if(WSNET.browseMode)lmv.mode=WSNET.browseMode; WSNET._send(lmv); }catch(e){} } }); }catch(e){}
+// iOS Safari stellt einen geschlossenen Tab beim Wiederoeffnen manchmal aus dem bfcache wieder her
+// (eingefrorener alter Seitenzustand, KEIN echter Reload - unser ganzer Reconnect-Code laeuft dann
+// nie erneut). e.persisted===true erkennt genau diesen Fall -> echten Reload erzwingen.
+try{ window.addEventListener('pageshow',function(e){ if(e.persisted){ try{ WSNET._dbg('bfcache-restore -> reload'); }catch(e2){} location.reload(); } }); }catch(e){}
 
 // ── 2v2 (Beta) ─────────────────────────────────────────────
 const COLS2=9,ROWS2=9,WW2=8,BARR2=10,MIN_PATHS_2V2=2;
