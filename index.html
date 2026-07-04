@@ -968,10 +968,11 @@ var WSNET={
       if(d.type==='error'&&d.grund==='raum nicht gefunden'&&self.role==='B'&&self.roomId&&!self._jr){ self._jr=true; setTimeout(function(){ if(self.roomId&&self.role==='B')self._send(self._joinMsg()); },1000); return; }
       if(d.type==='room_created'||d.type==='room_joined')self._dbg('raum ok, warte Gegner');
       if(d.type==='match_start')self._dbg('MATCH laeuft!');
+      if(d.type==='resync')self._dbg('resync erhalten (gestartet='+d.gestartet+')');
       if(d.type==='state'&&d.winner!==undefined&&d.winner!==null)self._dbg('Runde vorbei');
       if(d.type==='error')self._dbg('FEHLER: '+(d.grund||'?'));
       if(d.type==='room_created'||d.type==='room_joined'||d.type==='match_start'||d.type==='resync'){ if(d.token){ self.token=d.token; self._saveResume(); } }
-      if(d.type==='reconnect_failed'){ self.token=null; self._clearResume(); } // toter Token: nie wieder damit reconnecten
+      if(d.type==='reconnect_failed'){ self.token=null; self._clearResume(); self._dbg('reconnect_failed - Raum/Token weg'); } // toter Token: nie wieder damit reconnecten
       if(d.type==='ranked_found'){ self.roomId=d.code; self.token=d.token||null; self.role=(d.deineNummer===0?'A':'B'); self.rankedOn=false; self._lastOppRating=d.oppRating||1000; self._lastRankedMode=d.rankedMode||d.mode||'classic'; self._saveResume(); if(!d.isLargeGap){ try{ self._send({type:'ranked_confirm'}); }catch(e){} } }
       if(d.type==='ranked_denied'){ self.rankedOn=false; }
       if(d.type==='ranked_cancelled'){ self.roomId=null; self.token=null; self.role=null; self._clearResume(); if(d.grund!=='declined') self.rankedOn=false; }
@@ -3174,6 +3175,7 @@ function App(){
   useEffect(()=>{
     if(!WS_ENABLED)return;
     var saved=null; try{ var raw=localStorage.getItem('ww_resume'); if(raw)saved=JSON.parse(raw); }catch(e){}
+    if(WS_DEBUG)WSNET._dbg(saved?('resume gefunden: '+saved.roomId):'kein resume-eintrag');
     if(saved&&saved.token&&saved.roomId){ WSNET.resumeMatch(saved.token,saved.roomId,saved.role,wsLobbyTrampRef.current); }
   },[]);
   // Firebase Verbindungsstatus ueberwachen
