@@ -2183,8 +2183,14 @@ function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack,xp,coins,xpS
     const user=firebase.auth().currentUser;
     if(!user){setDeleteBusy(false);setDeleteErr(t('auth_notFound')||'Fehler');return;}
     try{
-      // Reauth: Google-Konten direkt loeschen (kein Passwort), E-Mail-Konten mit Passwort
-      if(!account.isGoogle){
+      // Reauth ZUERST fuer beide Konto-Typen: ohne frischen Login wirft currentUser.delete()
+      // spaeter auth/requires-recent-login — dann waeren Server-/Client-Daten schon geloescht,
+      // das Auth-Konto selbst aber nicht (Daten-Verlust ohne echte Loeschung).
+      if(account.isGoogle){
+        const provider=new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({prompt:'select_account'});
+        await user.reauthenticateWithPopup(provider);
+      }else{
         const pwVal=deletePw.trim();
         const cred=firebase.auth.EmailAuthProvider.credential(user.email,pwVal);
         await user.reauthenticateWithCredential(cred);
@@ -2223,7 +2229,7 @@ function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack,xp,coins,xpS
       const c=e&&e.code?e.code:'';
       if(c==='auth/wrong-password'||c==='auth/invalid-credential')setDeleteErr(t('auth_wrongLogin')||'Falsches Passwort');
       else if(c==='auth/requires-recent-login')setDeleteErr('Bitte abmelden, neu anmelden und dann sofort loeschen');
-      else if(c==='auth/popup-blocked'||c==='auth/popup-closed-by-user')setDeleteErr('Bitte abmelden, neu anmelden und dann sofort loeschen');
+      else if(c==='auth/popup-blocked'||c==='auth/popup-closed-by-user')setDeleteErr('Google-Anmeldung abgebrochen oder Popup blockiert — bitte erneut versuchen');
       else setDeleteErr('Fehler: '+(c||e.message||'unbekannt'));
       setDeleteBusy(false);
     }
