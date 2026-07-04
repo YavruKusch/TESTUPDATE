@@ -5350,17 +5350,21 @@ function App(){
     cleanup();
   },[gameMode,onlineRole,screen,lobbyId]);
 
-  // ── WS-Gast-Warteschutz: kommt nach 25s kein Match, zurueck zur Lobby-Liste ──
+  // ── WS-Gast-Warteschutz: kommt nach 60s kein Match, zurueck zur Lobby-Liste ──
+  // War 25s: zu knapp fuer den echten Ablauf (Code teilen, Freund oeffnet App, tippt Code ein).
+  // Spieler-Feedback: "host not responding" obwohl der Host nur noch nicht so weit war.
+  // Server-Raum hat kein eigenes Timeout hierfuer, bleibt beliebig lang bestehen - laengere
+  // Geduld hier kostet nichts ausser etwas spaeterem Feedback im echten Abbruch-Fall.
   useEffect(()=>{
     if(!WS_ENABLED||screen!=='waiting')return;
     if(onlineRole!=='B')return;
     const tmo=setTimeout(function(){
       if(S.current.screen!=='waiting')return;
-      if(!WSNET.roomId)return; // lobby_ready-Uebergabe laeuft bereits (waitForGame hat eigenes Timeout)
+      if(!WSNET.roomId)return;
       try{WSNET.leaveRoom();}catch(e){}
       setFlash(t('hostNotResponding'));
       setNavDir('back');setScreen('online');
-    },25000);
+    },60000);
     return()=>clearTimeout(tmo);
   },[screen,onlineRole]);
 
