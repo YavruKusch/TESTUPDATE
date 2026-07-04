@@ -1005,10 +1005,13 @@ var WSNET={
   rematchCancel:function(){ this._send({type:'rematch_cancel'}); },
   _dbg:function(msg){ if(!WS_DEBUG)return; try{ var el=document.getElementById('wsdbg'); if(!el){ el=document.createElement('div'); el.id='wsdbg'; el.style.cssText='position:fixed;top:4px;left:4px;z-index:999999;background:#000;color:#0f0;font:bold 12px monospace;padding:3px 8px;border-radius:5px;'; if(document.body)document.body.appendChild(el); } if(el)el.textContent='WS: '+msg; }catch(e){} },
   close:function(){ this._stopHb(); if(this._lp){ clearInterval(this._lp); this._lp=null; } this.browseOn=false; this.rankedOn=false; this.onLobbies=null; this.roomId=null; this.role=null; this.onState=null; this.token=null; this.settings=null; this.meta=null; this.spectateCode=null; this.onSpectate=null; this._clearResume(); if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } },
-  // Match ueberlebt Seiten-Reload: Token+Raum+Rolle liegen im sessionStorage (nur dieser Tab, weg wenn Tab/Browser zu ist -
-  // verhindert dass zwei Tabs sich um denselben Reconnect streiten). Server raeumt tote Tokens ueber reconnect_failed selbst auf.
-  _saveResume:function(){ try{ sessionStorage.setItem('ww_resume', JSON.stringify({ token:this.token, roomId:this.roomId, role:this.role })); }catch(e){} },
-  _clearResume:function(){ try{ sessionStorage.removeItem('ww_resume'); }catch(e){} },
+  // Match ueberlebt Reload UND komplettes Schliessen/Neuoeffnen (App/Browser): Token+Raum+Rolle
+  // liegen in localStorage. Wird bei jedem regulaeren Verlassen (leaveRoom/close) wieder geloescht,
+  // ein totes/altes Token raeumt der Server ueber reconnect_failed selbst auf (siehe dort).
+  // Zwei gleichzeitig offene Tabs desselben Matches sind ein seltener Sonderfall: der Server bleibt
+  // die Wahrheit (haengt sich immer an den zuletzt reconnecteten Socket), es entsteht kein Datenfehler.
+  _saveResume:function(){ try{ localStorage.setItem('ww_resume', JSON.stringify({ token:this.token, roomId:this.roomId, role:this.role })); }catch(e){} },
+  _clearResume:function(){ try{ localStorage.removeItem('ww_resume'); }catch(e){} },
   resumeMatch:function(token,roomId,role,onState){
     if(this.sock){ try{ this.sock.onopen=null; this.sock.onmessage=null; this.sock.onclose=null; this.sock.close(); }catch(e){} this.sock=null; }
     this.roomId=roomId; this.role=role; this.token=token; this.onState=onState; this.settings=null; this.meta=null; this._jr=false; this.lastRecv=Date.now();
@@ -3165,11 +3168,12 @@ function App(){
   const wsLobbyTrampRef=useRef(null);
   if(!wsLobbyTrampRef.current){wsLobbyTrampRef.current=function(d){if(wsLobbyMsgRef.current)wsLobbyMsgRef.current(d);};}
   const[wsConn,setWsConn]=useState(true); // WS-Socket-Status (nur in WS-Matches relevant)
-  // Seiten-Reload waehrend eines laufenden Matches: Token liegt im sessionStorage (siehe WSNET._saveResume) -
-  // sofort reconnecten statt Match+Elo an den 30s-Forfeit-Timer des Servers zu verlieren.
+  // Reload ODER App/Browser komplett geschlossen+neu geoeffnet waehrend eines laufenden Matches:
+  // Token liegt in localStorage (siehe WSNET._saveResume) - sofort reconnecten statt Match+Elo an
+  // den 30s-Forfeit-Timer des Servers zu verlieren.
   useEffect(()=>{
     if(!WS_ENABLED)return;
-    var saved=null; try{ var raw=sessionStorage.getItem('ww_resume'); if(raw)saved=JSON.parse(raw); }catch(e){}
+    var saved=null; try{ var raw=localStorage.getItem('ww_resume'); if(raw)saved=JSON.parse(raw); }catch(e){}
     if(saved&&saved.token&&saved.roomId){ WSNET.resumeMatch(saved.token,saved.roomId,saved.role,wsLobbyTrampRef.current); }
   },[]);
   // Firebase Verbindungsstatus ueberwachen
