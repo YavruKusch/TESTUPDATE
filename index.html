@@ -909,7 +909,7 @@ var WSNET={
   // Warteraum bewusst verlassen: Server raeumt sofort auf, Code wird frei
   leaveRoom:function(){
     try{ this._send({type:'leave_room'}); }catch(e){}
-    this.roomId=null; this.role=null; this.settings=null; this.meta=null; this.token=null;
+    this.roomId=null; this.role=null; this.settings=null; this.meta=null; this.token=null; this._clearResume();
     if(!this.browseOn){ this._stopHb(); this.onState=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
   },
   // Lobby-Liste beobachten: 4s-Poll, nur bei sichtbarem Tab (WS-Traffic ist quasi kostenlos).
@@ -935,7 +935,17 @@ var WSNET={
     if(!self.roomId&&!self.browseOn&&!self.rankedOn&&!self.spectateCode)return;
     if(self.sock&&(self.sock.readyState===0||self.sock.readyState===1))return;
     try{ self.sock=new WebSocket(WW_URL); }catch(e){ return; }
+    var _mySock=self.sock;
+    // Verbindungsaufbau-Timeout: haengt der Socket im CONNECTING-Zustand fest (Netzwechsel, totes WLAN),
+    // wuerde _open() sonst fuer immer frueh abbrechen (readyState 0) und nie neu verbinden -> "Reconnecting" haengt ewig.
+    var _connTmr=setTimeout(function(){
+      if(self.sock===_mySock&&_mySock.readyState===0){
+        try{ _mySock.close(); }catch(e){}
+        self.sock=null; self._open();
+      }
+    },7000);
     self.sock.onopen=function(){
+      clearTimeout(_connTmr);
       self._dbg('socket offen'); self.lastRecv=Date.now();
       try{ var _fu=(typeof firebase!=='undefined'&&firebase.auth)?firebase.auth().currentUser:null; var _rq=function(tok){ if(self.rankedOn&&!self.roomId){ try{ self._send({type:'ranked_queue',idToken:tok||null,mode:self.rankedMode,rating:self.rankedRating,akey:(self.meta?self.meta.akey:null),name:(self.meta?self.meta.name:'Spieler'),queuedAt:self.rankedQueuedAt||Date.now()}); }catch(e){} } }; if(_fu&&_fu.getIdToken){ _fu.getIdToken().then(function(tok){ try{ self._send({type:'auth',idToken:tok}); }catch(e){} _rq(tok); }).catch(function(){ _rq(null); }); } else { _rq(null); } }catch(e){} // Identitaet verifizieren + Ranked-Queue (mit Token; Server lehnt ohne verifizierte Anmeldung ab)
       if(self.onState)self.onState({type:'ws_open'});
@@ -960,14 +970,14 @@ var WSNET={
       if(d.type==='match_start')self._dbg('MATCH laeuft!');
       if(d.type==='state'&&d.winner!==undefined&&d.winner!==null)self._dbg('Runde vorbei');
       if(d.type==='error')self._dbg('FEHLER: '+(d.grund||'?'));
-      if(d.type==='room_created'||d.type==='room_joined'||d.type==='match_start'||d.type==='resync'){ if(d.token)self.token=d.token; }
-      if(d.type==='reconnect_failed'){ self.token=null; } // toter Token: nie wieder damit reconnecten
-      if(d.type==='ranked_found'){ self.roomId=d.code; self.token=d.token||null; self.role=(d.deineNummer===0?'A':'B'); self.rankedOn=false; self._lastOppRating=d.oppRating||1000; self._lastRankedMode=d.rankedMode||d.mode||'classic'; if(!d.isLargeGap){ try{ self._send({type:'ranked_confirm'}); }catch(e){} } }
+      if(d.type==='room_created'||d.type==='room_joined'||d.type==='match_start'||d.type==='resync'){ if(d.token){ self.token=d.token; self._saveResume(); } }
+      if(d.type==='reconnect_failed'){ self.token=null; self._clearResume(); } // toter Token: nie wieder damit reconnecten
+      if(d.type==='ranked_found'){ self.roomId=d.code; self.token=d.token||null; self.role=(d.deineNummer===0?'A':'B'); self.rankedOn=false; self._lastOppRating=d.oppRating||1000; self._lastRankedMode=d.rankedMode||d.mode||'classic'; self._saveResume(); if(!d.isLargeGap){ try{ self._send({type:'ranked_confirm'}); }catch(e){} } }
       if(d.type==='ranked_denied'){ self.rankedOn=false; }
-      if(d.type==='ranked_cancelled'){ self.roomId=null; self.token=null; self.role=null; if(d.grund!=='declined') self.rankedOn=false; }
+      if(d.type==='ranked_cancelled'){ self.roomId=null; self.token=null; self.role=null; self._clearResume(); if(d.grund!=='declined') self.rankedOn=false; }
       if(self.onState)self.onState(d);
     };
-    self.sock.onclose=function(){ self._dbg('getrennt'); if(self.onState)self.onState({type:'ws_closed'}); if(self.roomId||self.browseOn||self.rankedOn||self.spectateCode){ setTimeout(function(){ self._open(); },1500); } };
+    self.sock.onclose=function(){ clearTimeout(_connTmr); self._dbg('getrennt'); if(self.onState)self.onState({type:'ws_closed'}); if(self.roomId||self.browseOn||self.rankedOn||self.spectateCode){ setTimeout(function(){ self._open(); },1500); } };
   },
   _send:function(o){ if(this.sock&&this.sock.readyState===1)this.sock.send(JSON.stringify(o)); },
   _startHb:function(){
@@ -994,7 +1004,16 @@ var WSNET={
   rematch:function(){ this._send({type:'rematch'}); },
   rematchCancel:function(){ this._send({type:'rematch_cancel'}); },
   _dbg:function(msg){ if(!WS_DEBUG)return; try{ var el=document.getElementById('wsdbg'); if(!el){ el=document.createElement('div'); el.id='wsdbg'; el.style.cssText='position:fixed;top:4px;left:4px;z-index:999999;background:#000;color:#0f0;font:bold 12px monospace;padding:3px 8px;border-radius:5px;'; if(document.body)document.body.appendChild(el); } if(el)el.textContent='WS: '+msg; }catch(e){} },
-  close:function(){ this._stopHb(); if(this._lp){ clearInterval(this._lp); this._lp=null; } this.browseOn=false; this.rankedOn=false; this.onLobbies=null; this.roomId=null; this.role=null; this.onState=null; this.token=null; this.settings=null; this.meta=null; this.spectateCode=null; this.onSpectate=null; if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } }
+  close:function(){ this._stopHb(); if(this._lp){ clearInterval(this._lp); this._lp=null; } this.browseOn=false; this.rankedOn=false; this.onLobbies=null; this.roomId=null; this.role=null; this.onState=null; this.token=null; this.settings=null; this.meta=null; this.spectateCode=null; this.onSpectate=null; this._clearResume(); if(this.sock){ try{ this.sock.close(); }catch(e){} this.sock=null; } },
+  // Match ueberlebt Seiten-Reload: Token+Raum+Rolle liegen im sessionStorage (nur dieser Tab, weg wenn Tab/Browser zu ist -
+  // verhindert dass zwei Tabs sich um denselben Reconnect streiten). Server raeumt tote Tokens ueber reconnect_failed selbst auf.
+  _saveResume:function(){ try{ sessionStorage.setItem('ww_resume', JSON.stringify({ token:this.token, roomId:this.roomId, role:this.role })); }catch(e){} },
+  _clearResume:function(){ try{ sessionStorage.removeItem('ww_resume'); }catch(e){} },
+  resumeMatch:function(token,roomId,role,onState){
+    if(this.sock){ try{ this.sock.onopen=null; this.sock.onmessage=null; this.sock.onclose=null; this.sock.close(); }catch(e){} this.sock=null; }
+    this.roomId=roomId; this.role=role; this.token=token; this.onState=onState; this.settings=null; this.meta=null; this._jr=false; this.lastRecv=Date.now();
+    this._dbg('resume '+roomId); this._open(); this._startHb();
+  }
 };
 if(WS_ENABLED){ try{ WSNET._dbg('bereit (ws=1)'); }catch(e){} }
 try{ document.addEventListener('visibilitychange',function(){ if(document.hidden)return; if(!WSNET.roomId&&!WSNET.browseOn&&!WSNET.rankedOn&&!WSNET.spectateCode)return; if(!WSNET.sock||WSNET.sock.readyState!==1){ WSNET._open(); } else if(WSNET.roomId){ try{ WSNET.requestSync(); }catch(e){} } else if(WSNET.spectateCode){ try{ WSNET._send({type:'spectate_join',code:WSNET.spectateCode}); }catch(e){} } else { try{ var lmv={type:'list_lobbies'}; if(WSNET.browseMode)lmv.mode=WSNET.browseMode; WSNET._send(lmv); }catch(e){} } }); }catch(e){}
@@ -3146,6 +3165,13 @@ function App(){
   const wsLobbyTrampRef=useRef(null);
   if(!wsLobbyTrampRef.current){wsLobbyTrampRef.current=function(d){if(wsLobbyMsgRef.current)wsLobbyMsgRef.current(d);};}
   const[wsConn,setWsConn]=useState(true); // WS-Socket-Status (nur in WS-Matches relevant)
+  // Seiten-Reload waehrend eines laufenden Matches: Token liegt im sessionStorage (siehe WSNET._saveResume) -
+  // sofort reconnecten statt Match+Elo an den 30s-Forfeit-Timer des Servers zu verlieren.
+  useEffect(()=>{
+    if(!WS_ENABLED)return;
+    var saved=null; try{ var raw=sessionStorage.getItem('ww_resume'); if(raw)saved=JSON.parse(raw); }catch(e){}
+    if(saved&&saved.token&&saved.roomId){ WSNET.resumeMatch(saved.token,saved.roomId,saved.role,wsLobbyTrampRef.current); }
+  },[]);
   // Firebase Verbindungsstatus ueberwachen
   useEffect(()=>{
     const ref=window.db.ref('.info/connected');
