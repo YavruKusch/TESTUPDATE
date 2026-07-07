@@ -1392,6 +1392,87 @@ async function adminFlagWsCmd(flag, value){
     ws.onclose=function(){if(!done){done=true;clearTimeout(tmr);reject(new Error('Verbindung getrennt'));}};
   });
 }
+function AdminErrorsPanel(){
+  var[rows,setRows]=React.useState(null);
+  var[busy,setBusy]=React.useState(false);
+  var[msg,setMsg]=React.useState('');
+  var[open,setOpen]=React.useState(-1);
+  var[confirmDel,setConfirmDel]=React.useState(false);
+  function load(){
+    if(!window.db)return;
+    setBusy(true);setMsg('');setOpen(-1);setConfirmDel(false);
+    window.db.ref('ww_error_reports').once('value').then(function(snap){
+      var v=snap.val()||{};var list=[];
+      Object.keys(v).forEach(function(uid){
+        Object.keys(v[uid]||{}).forEach(function(slot){
+          var e=v[uid][slot];if(e&&e.msg){e=Object.assign({},e);e._uid=uid;list.push(e);}
+        });
+      });
+      var g={};
+      list.forEach(function(e){
+        var k=e.msg;
+        if(!g[k])g[k]={msg:k,n:0,uids:{},last:0,sample:e};
+        g[k].n++;g[k].uids[e._uid]=1;
+        if((e.ts||0)>=g[k].last){g[k].last=e.ts||0;g[k].sample=e;}
+      });
+      var arr=Object.keys(g).map(function(k){return g[k];});
+      arr.sort(function(a,b){return b.last-a.last;});
+      setRows(arr);setBusy(false);
+    }).catch(function(e){setMsg('Fehler: '+(e&&e.message));setBusy(false);});
+  }
+  function clearAll(){
+    if(!confirmDel){setConfirmDel(true);return;}
+    if(!window.db)return;
+    setBusy(true);
+    window.db.ref('ww_error_reports').set(null).then(function(){
+      setRows([]);setBusy(false);setConfirmDel(false);setMsg('Alle geloescht');
+    }).catch(function(e){setMsg('Fehler: '+(e&&e.message));setBusy(false);setConfirmDel(false);});
+  }
+  var btnSt={padding:'8px 12px',borderRadius:9,border:'1.5px solid var(--border)',
+    background:'var(--card)',color:'var(--text)',fontSize:12,fontWeight:700,
+    cursor:'pointer',fontFamily:'system-ui,sans-serif'};
+  var rowsUi=null;
+  if(rows&&rows.length===0)rowsUi=<div style={{fontSize:12,color:'var(--subtle)'}}>Keine Fehler-Reports.</div>;
+  if(rows&&rows.length>0)rowsUi=rows.map(function(r,idx){
+    var s=r.sample;var users=Object.keys(r.uids).length;
+    var when=new Date(r.last).toLocaleString();
+    var det=null;
+    if(open===idx)det=(
+      <div style={{fontSize:10,color:'var(--subtle)',whiteSpace:'pre-wrap',wordBreak:'break-all',
+        marginTop:5,padding:7,background:'var(--bg)',borderRadius:7}}>
+        {'typ: '+s.type+'\nver: '+(s.ver||'?')+'\nsrc: '+(s.src||'?')+' Z.'+(s.line||0)+
+         '\nua: '+(s.ua||'?')+'\nuid: '+s._uid+'\n\n'+(s.stack||'(kein Stack)')}
+      </div>
+    );
+    return(
+      <div key={r.msg} onClick={function(){setOpen(open===idx?-1:idx);}}
+        style={{padding:'8px 10px',borderRadius:9,background:'var(--card)',
+          border:'1.5px solid var(--border)',marginBottom:6,cursor:'pointer'}}>
+        <div style={{fontSize:12,fontWeight:700,color:'var(--text)',wordBreak:'break-all'}}>{r.msg}</div>
+        <div style={{fontSize:10,color:'var(--subtle)',marginTop:2}}>
+          {r.n+'x bei '+users+' Spieler(n), zuletzt '+when}
+        </div>
+        {det}
+      </div>
+    );
+  });
+  return(
+    <div>
+      <div style={{display:'flex',gap:7,marginBottom:8}}>
+        <button onClick={load} disabled={busy} style={btnSt}>
+          {busy?'...':(rows===null?'Reports laden':'Aktualisieren')}
+        </button>
+        {rows&&rows.length>0&&
+          <button onClick={clearAll} disabled={busy}
+            style={Object.assign({},btnSt,{borderColor:'#ef4444',color:'#ef4444'})}>
+            {confirmDel?'Wirklich ALLE loeschen?':'Alle loeschen'}
+          </button>}
+      </div>
+      {rowsUi}
+      {msg&&<div style={{fontSize:11,color:'var(--subtle)',marginTop:4}}>{msg}</div>}
+    </div>
+  );
+}
 function AdminFlagsPanel(){
   var[flags,setFlags]=React.useState({XP_SYSTEM:false,COIN_SYSTEM:false});
   var[busy,setBusy]=React.useState('');
@@ -6784,6 +6865,14 @@ function App(){
                 XP- und Coin-System live ein-/ausschalten. Wirkt sofort auf den Server.
               </div>
               <AdminFlagsPanel/>
+            </AdminSection>
+
+            {/* ── FEHLER-REPORTS ── */}
+            <AdminSection label="FEHLER-REPORTS">
+              <div style={{fontSize:11,color:'var(--subtle)',marginBottom:10,lineHeight:1.5}}>
+                JS-Fehler der Spieler (ww_error_reports). Laden nur auf Klick, kein Dauer-Listener.
+              </div>
+              <AdminErrorsPanel/>
             </AdminSection>
 
             {/* ── COINS & SHOP ── */}
