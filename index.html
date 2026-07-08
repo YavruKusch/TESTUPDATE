@@ -1085,6 +1085,7 @@ var WSNET={
   move:function(to){ this._send({type:'move',to:to}); },
   wall:function(key){ this._send({type:'wall',key:key}); },
   giveUp:function(){ this._send({type:'give_up'}); },
+  bugReport:function(payload){ var m={type:'bug_report'}; for(var k in payload){ if(Object.prototype.hasOwnProperty.call(payload,k))m[k]=payload[k]; } this._send(m); },
   timeout:function(){ this._send({type:'timeout'}); },
   skipTurn:function(){ this._send({type:'skip'}); },
   requestSync:function(){ this._send({type:'sync'}); },
@@ -1497,6 +1498,100 @@ function AdminErrorsPanel(){
           {r.n+'x bei '+users+' Spieler(n), zuletzt '+when}
         </div>
         {det}
+      </div>
+    );
+  });
+  return(
+    <div>
+      <div style={{display:'flex',gap:7,marginBottom:8}}>
+        <button onClick={load} disabled={busy} style={btnSt}>
+          {busy?'...':(rows===null?'Reports laden':'Aktualisieren')}
+        </button>
+        {rows&&rows.length>0&&
+          <button onClick={clearAll} disabled={busy}
+            style={Object.assign({},btnSt,{borderColor:'#ef4444',color:'#ef4444'})}>
+            {confirmDel?'Wirklich ALLE loeschen?':'Alle loeschen'}
+          </button>}
+      </div>
+      {rowsUi}
+      {msg&&<div style={{fontSize:11,color:'var(--subtle)',marginTop:4}}>{msg}</div>}
+    </div>
+  );
+}
+function AdminBugsPanel(props){
+  var[rows,setRows]=React.useState(null);
+  var[busy,setBusy]=React.useState(false);
+  var[msg,setMsg]=React.useState('');
+  var[open,setOpen]=React.useState(-1);
+  var[confirmDel,setConfirmDel]=React.useState(false);
+  var KAT_LABEL={connection:'Verbindung',unfair:'Unfairer Verlust',display:'Anzeige',other:'Sonstiges'};
+  function load(){
+    if(!window.db)return;
+    setBusy(true);setMsg('');setOpen(-1);setConfirmDel(false);
+    window.db.ref('ww_bug_reports').once('value').then(function(snap){
+      var v=snap.val()||{};var list=[];
+      Object.keys(v).forEach(function(uid){
+        Object.keys(v[uid]||{}).forEach(function(pid){
+          var e=v[uid][pid];
+          if(e&&e.text){e=Object.assign({},e);e._uid=uid;e._id=pid;list.push(e);}
+        });
+      });
+      list.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+      setRows(list);setBusy(false);
+    }).catch(function(e){setMsg('Fehler: '+(e&&e.message));setBusy(false);});
+  }
+  function clearAll(){
+    if(!confirmDel){setConfirmDel(true);return;}
+    if(!window.db)return;
+    setBusy(true);
+    window.db.ref('ww_bug_reports').set(null).then(function(){
+      setRows([]);setBusy(false);setConfirmDel(false);setMsg('Alle geloescht');
+    }).catch(function(e){setMsg('Fehler: '+(e&&e.message));setBusy(false);setConfirmDel(false);});
+  }
+  var btnSt={padding:'8px 12px',borderRadius:9,border:'1.5px solid var(--border)',
+    background:'var(--card)',color:'var(--text)',fontSize:12,fontWeight:700,
+    cursor:'pointer',fontFamily:'system-ui,sans-serif'};
+  var rowsUi=null;
+  if(rows&&rows.length===0)rowsUi=<div style={{fontSize:12,color:'var(--subtle)'}}>Keine Bug-Reports.</div>;
+  if(rows&&rows.length>0)rowsUi=rows.map(function(r,idx){
+    var when=new Date(r.ts||0).toLocaleString();
+    var srv=null;
+    try{srv=r.server?JSON.stringify(r.server,null,1):'(Server-Sicht fehlt — Raum war schon weg)';}catch(e){srv='?';}
+    var cli=null;
+    try{cli=r.client?JSON.stringify(r.client,null,1):'(kein Client-Kontext)';}catch(e){cli='?';}
+    var det=null;
+    if(open===idx)det=(
+      <div style={{fontSize:10,color:'var(--subtle)',whiteSpace:'pre-wrap',wordBreak:'break-all',
+        marginTop:5,padding:7,background:'var(--bg)',borderRadius:7}}>
+        {'uid: '+r._uid+'\n\nCLIENT:\n'+cli+'\n\nSERVER:\n'+srv}
+      </div>
+    );
+    var replayBtn=null;
+    if(open===idx&&r.replay&&r.replay.moveHist&&props.onWatch){
+      replayBtn=(
+        <button onClick={function(ev){ev.stopPropagation();props.onWatch(r.replay);}}
+          style={{marginTop:6,padding:'7px 12px',borderRadius:9,border:'none',cursor:'pointer',
+            background:'#3b82f6',color:'white',fontSize:11,fontWeight:800,fontFamily:'system-ui,sans-serif'}}>
+          Replay ansehen ({(r.replay.moveHist||[]).length} Zuege)
+        </button>
+      );
+    }
+    return(
+      <div key={r._uid+'_'+r._id} onClick={function(){setOpen(open===idx?-1:idx);}}
+        style={{padding:'8px 10px',borderRadius:9,background:'var(--card)',
+          border:'1.5px solid var(--border)',marginBottom:6,cursor:'pointer'}}>
+        <div style={{display:'flex',gap:6,alignItems:'center',marginBottom:2}}>
+          <span style={{fontSize:9,fontWeight:800,padding:'2px 7px',borderRadius:7,
+            background:'rgba(59,130,246,0.12)',color:'#3b82f6'}}>{KAT_LABEL[r.kat]||r.kat}</span>
+          {r.replay&&r.replay.moveHist?<span style={{fontSize:9,fontWeight:800,padding:'2px 7px',borderRadius:7,
+            background:'rgba(22,163,74,0.12)',color:'#16a34a'}}>REPLAY</span>:null}
+          {r.client&&r.client.ranked?<span style={{fontSize:9,fontWeight:800,padding:'2px 7px',borderRadius:7,
+            background:'rgba(245,158,11,0.12)',color:'#f59e0b'}}>RANKED</span>:null}
+        </div>
+        <div style={{fontSize:12,fontWeight:700,color:'var(--text)',wordBreak:'break-word'}}>{r.text}</div>
+        <div style={{fontSize:10,color:'var(--subtle)',marginTop:2}}>{when}</div>
+        {det}
+        {replayBtn}
       </div>
     );
   });
@@ -4020,6 +4115,10 @@ function App(){
   const[giveUpArmed,setGiveUpArmed]=useState(false);
   const[gaveUp,setGaveUp]=useState(null);
   const[lossReason,setLossReason]=useState(null); // 'timeout' etc. — klarer Grund im Endscreen (kein "aufgegeben"-Missverstaendnis)
+  const[bugOpen,setBugOpen]=useState(false); // Bug-Report-Formular im Endscreen
+  const[bugKat,setBugKat]=useState('other');
+  const[bugText,setBugText]=useState('');
+  const[bugStatus,setBugStatus]=useState(null); // null|'sending'|'ok'|'limit'|'err'|'login'
   const[dragging,setDragging]=useState(null);
   const[ghostPos,setGhostPos]=useState({x:0,y:0});
   const[previewKey,setPreviewKey]=useState(null);
@@ -4061,7 +4160,7 @@ function App(){
   const xpBeforeMatchRef=useRef(null);
   const pendingXpUpdateRef=useRef(null);
   const S=useRef({});
-  S.current={pA,pB,walls,barrLeft,turn,winner,moveHist,gameMode,lobbyId,onlineRole,rematchA,rematchB,rematchDeclined,oppLeft,gameNum,chaosItem,goldenWalls,hammers,hammerHeld,hammerUsed,hammerMode,chaosMode,dropMode,gaveUp,gameTimeMode,isRanked,rankedMode,rankedMyRating,rankedOppRating,rankedOppKey,playerNames,selectedMap,duelSize,screen};
+  S.current={pA,pB,walls,barrLeft,turn,winner,moveHist,gameMode,lobbyId,onlineRole,rematchA,rematchB,rematchDeclined,oppLeft,gameNum,chaosItem,goldenWalls,hammers,hammerHeld,hammerUsed,hammerMode,chaosMode,dropMode,gaveUp,gameTimeMode,isRanked,rankedMode,rankedMyRating,rankedOppRating,rankedOppKey,playerNames,selectedMap,duelSize,screen,bugOpen};
   useEffect(()=>{snapPosRef.current=snapPos;},[snapPos]);
   useEffect(()=>{hammerTargetRef.current=hammerTarget;},[hammerTarget]);
   useEffect(()=>{
@@ -4311,6 +4410,9 @@ function App(){
       setEloChange({change:0,newRating:null,won:d.won,reason:d.reason});
       return;
     }
+    if(d&&d.type==='bug_report_ok'){setBugStatus('ok');return;}
+    if(d&&d.type==='bug_report_limit'){setBugStatus('limit');return;}
+    if(d&&d.type==='error'&&d.grund==='nicht eingeloggt'&&S.current.bugOpen){setBugStatus('login');return;}
     if(d&&d.type==='elo_update'){
       setEloChange({change:d.change,newRating:d.newRating,won:d.won,oppChange:d.oppChange,oppNewRating:d.oppNewRating});
       // Account-State sofort aktualisieren (kein App-Neustart noetig)
@@ -4367,6 +4469,7 @@ function App(){
       // Verlorenen eigenen Zug automatisch erneut senden (Anti-Verlust auf wackeliger Verbindung)
       if(d.winner===undefined||d.winner===null){
         setLossReason(null); // laufendes Spiel -> Grund zuruecksetzen (kein stale beim naechsten Spiel)
+        setBugOpen(false);setBugStatus(null); // Bug-Report-Formular gehoert nur zum Endscreen
         var myRoleP=(typeof d.deineNummer==='number')?(d.deineNummer===0?'A':'B'):S.current.onlineRole;
         var myNumP=myRoleP==='A'?0:1;
         var srvTurnP=(typeof d.amZug==='number')?(d.amZug===0?'A':'B'):S.current.turn;
@@ -6937,6 +7040,19 @@ function App(){
               <AdminErrorsPanel/>
             </AdminSection>
 
+            {/* ── BUG-REPORTS (SPIELER) ── */}
+            <AdminSection label="BUG-REPORTS (SPIELER)">
+              <div style={{fontSize:11,color:'var(--subtle)',marginBottom:10,lineHeight:1.5}}>
+                Spieler-Meldungen vom Endscreen-Button (ww_bug_reports) — mit Replay + Server-Sicht. Laden nur auf Klick.
+              </div>
+              <AdminBugsPanel onWatch={function(entry){
+                try{applyBoardSize(entry.map||'classic',entry.duelSize||'standard');}catch(e){}
+                setReplayHistEntry(entry);
+                setReplayStep(0);
+                setScreen('replay');
+              }}/>
+            </AdminSection>
+
             {/* ── COINS & SHOP ── */}
             <AdminSection label="COINS & SHOP">
               <div style={{fontSize:11,color:'var(--subtle)',marginBottom:10,lineHeight:1.5}}>
@@ -8949,6 +9065,80 @@ function App(){
                 try{WSNET.close();}catch(e){}
                 setScreen('menu');setGameMode(null);setLobbyId(null);
               }}/>
+            {gameMode==='online'&&!bugOpen&&(
+              <button onClick={()=>{setBugOpen(true);setBugStatus(null);}}
+                style={{background:'none',border:'none',cursor:'pointer',padding:'6px 0 2px',
+                  fontSize:12,fontWeight:700,color:'var(--subtle)',textDecoration:'underline',
+                  fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                {t('reportBtn')}
+              </button>
+            )}
+            {gameMode==='online'&&bugOpen&&(
+              <div style={{padding:'12px 14px',borderRadius:14,background:'var(--card)',
+                border:'1.5px solid var(--border)',textAlign:'left'}}>
+                <div style={{fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:8}}>{t('reportTitle')}</div>
+                {bugStatus!=='ok'&&(
+                  <div>
+                    <div style={{display:'flex',gap:5,flexWrap:'wrap',marginBottom:8}}>
+                      {[['connection',t('catConnection')],['unfair',t('catUnfair')],['display',t('catDisplay')],['other',t('catOther')]].map(function(o){
+                        var selK=bugKat===o[0];
+                        return <button key={o[0]} onClick={()=>setBugKat(o[0])}
+                          style={{padding:'5px 10px',borderRadius:9,fontSize:11,fontWeight:700,cursor:'pointer',
+                            border:'1.5px solid '+(selK?'#3b82f6':'var(--border)'),
+                            background:selK?'rgba(59,130,246,0.12)':'var(--bg)',
+                            color:selK?'#3b82f6':'var(--subtle)',fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                          {o[1]}
+                        </button>;
+                      })}
+                    </div>
+                    <textarea value={bugText} onChange={e=>setBugText(e.target.value.slice(0,500))}
+                      placeholder={t('reportPlaceholder')} rows={3} maxLength={500}
+                      style={{width:'100%',padding:'9px 11px',borderRadius:10,fontSize:13,resize:'vertical',
+                        background:'var(--bg)',border:'1.5px solid var(--border)',color:'var(--text)',
+                        fontFamily:'system-ui,-apple-system,sans-serif',boxSizing:'border-box',outline:'none',marginBottom:8}}/>
+                  </div>
+                )}
+                {bugStatus==='ok'&&<div style={{fontSize:12,fontWeight:700,color:'#16a34a',marginBottom:8}}>{'✓'} {t('reportSent')}</div>}
+                {bugStatus==='limit'&&<div style={{fontSize:12,fontWeight:700,color:'#f59e0b',marginBottom:8}}>{t('reportLimit')}</div>}
+                {bugStatus==='login'&&<div style={{fontSize:12,fontWeight:700,color:'#f59e0b',marginBottom:8}}>{t('reportNeedLogin')}</div>}
+                {bugStatus==='err'&&<div style={{fontSize:12,fontWeight:700,color:'#ef4444',marginBottom:8}}>{t('auth_network')}</div>}
+                <div style={{display:'flex',gap:7}}>
+                  {bugStatus!=='ok'&&(
+                    <button disabled={!bugText.trim()||bugStatus==='sending'} onClick={()=>{
+                      var txt=bugText.trim();
+                      if(!txt||bugStatus==='sending')return;
+                      setBugStatus('sending');
+                      var sB=S.current;
+                      var pNB=sB.playerNames||{};
+                      var repB={ts:Date.now(),winner:winner,moveHist:sB.moveHist||[],map:sB.selectedMap||'classic',
+                        duelSize:sB.duelSize||'standard',nameA:pNB.A||null,nameB:pNB.B||null,
+                        gameMode:'online',myRole:sB.onlineRole||null};
+                      var payloadB={text:txt,kat:bugKat,
+                        client:{ranked:!!sB.isRanked,lossReason:lossReason,gaveUp:sB.gaveUp||null,
+                          map:sB.selectedMap||'classic',duelSize:sB.duelSize||'standard'},
+                        replay:repB};
+                      try{
+                        if(JSON.stringify(payloadB).length>14000){payloadB.replay=null;payloadB.client.replayZuGross=true;}
+                      }catch(eB){payloadB.replay=null;}
+                      WSNET.bugReport(payloadB);
+                      setTimeout(function(){setBugStatus(function(stB){return stB==='sending'?'err':stB;});},6000);
+                    }}
+                      style={{flex:1,padding:'9px',borderRadius:10,border:'none',fontSize:12,fontWeight:800,
+                        background:(!bugText.trim()||bugStatus==='sending')?'var(--border)':'#3b82f6',
+                        color:'white',cursor:(!bugText.trim()||bugStatus==='sending')?'default':'pointer',
+                        fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                      {bugStatus==='sending'?'...':t('reportSend')}
+                    </button>
+                  )}
+                  <button onClick={()=>{setBugOpen(false);setBugStatus(null);setBugText('');}}
+                    style={{flex:1,padding:'9px',borderRadius:10,fontSize:12,fontWeight:800,cursor:'pointer',
+                      background:'var(--bg)',border:'1.5px solid var(--border)',color:'var(--text)',
+                      fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                    {t('reportCancel')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
