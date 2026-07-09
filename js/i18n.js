@@ -112,7 +112,7 @@ var I18N_EXT={
 en:{
   lostOnTime:'Time ran out',
   lostConnection:'Connection lost',
-  reportBtn:'Report a problem',reportTitle:'What happened?',reportPlaceholder:'Describe what went wrong...',
+  reportBtn:'Report a problem',reportPlayerBtn:'Report player',reportPlayerTitle:'Report player',reportCheating:'Cheating / Hacking',reportHateSpeech:'Hate speech / Offensive',reportSpam:'Spam / Harassment',reportOther:'Other',reportDupe:'You already reported this player',reportChatBtn:'Report this message',reportTitle:'What happened?',reportPlaceholder:'Describe what went wrong...',
   reportSend:'Send report',reportCancel:'Close',reportSent:'Thanks! Report sent.',
   reportLimit:'Daily limit reached (3 per day)',reportNeedLogin:'Please sign in to send reports',
   catConnection:'Connection',catUnfair:'Unfair loss',catDisplay:'Display bug',catOther:'Other',
@@ -178,7 +178,7 @@ en:{
 de:{
   lostOnTime:'Zeit abgelaufen',
   lostConnection:'Verbindung getrennt',
-  reportBtn:'Problem melden',reportTitle:'Was ist passiert?',reportPlaceholder:'Beschreibe, was schiefgelaufen ist...',
+  reportBtn:'Problem melden',reportPlayerBtn:'Spieler melden',reportPlayerTitle:'Spieler melden',reportCheating:'Cheating / Hacking',reportHateSpeech:'Beleidigung / Anstößig',reportSpam:'Spam / Belästigung',reportOther:'Sonstiges',reportDupe:'Diesen Spieler hast du bereits gemeldet',reportChatBtn:'Diese Nachricht melden',reportTitle:'Was ist passiert?',reportPlaceholder:'Beschreibe, was schiefgelaufen ist...',
   reportSend:'Report senden',reportCancel:'Schliessen',reportSent:'Danke! Report gesendet.',
   reportLimit:'Tageslimit erreicht (3 pro Tag)',reportNeedLogin:'Zum Melden bitte einloggen',
   catConnection:'Verbindung',catUnfair:'Unfairer Verlust',catDisplay:'Anzeige-Fehler',catOther:'Sonstiges',
@@ -243,7 +243,7 @@ de:{
 tr:{
   lostOnTime:'Süre doldu',
   lostConnection:'Bağlantı koptu',
-  reportBtn:'Sorun bildir',reportTitle:'Ne oldu?',reportPlaceholder:'Neyin yanlış gittiğini anlat...',
+  reportBtn:'Sorun bildir',reportPlayerBtn:'Oyuncuyu bildir',reportPlayerTitle:'Oyuncuyu bildir',reportCheating:'Hile / Hack',reportHateSpeech:'Hakaret / Rahatsız edici',reportSpam:'Spam / Taciz',reportOther:'Diğer',reportDupe:'Bu oyuncuyu zaten bildirdin',reportChatBtn:'Bu mesajı bildir',reportTitle:'Ne oldu?',reportPlaceholder:'Neyin yanlış gittiğini anlat...',
   reportSend:'Raporu gönder',reportCancel:'Kapat',reportSent:'Teşekkürler! Rapor gönderildi.',
   reportLimit:'Günlük sınıra ulaşıldı (günde 3)',reportNeedLogin:'Bildirmek için giriş yap',
   catConnection:'Bağlantı',catUnfair:'Haksız kayıp',catDisplay:'Görüntü hatası',catOther:'Diğer',
@@ -308,7 +308,7 @@ tr:{
 fr:{
   lostOnTime:'Temps écoulé',
   lostConnection:'Connexion perdue',
-  reportBtn:'Signaler un problème',reportTitle:'Que s\'est-il passé ?',reportPlaceholder:'Décris ce qui a mal tourné...',
+  reportBtn:'Signaler un problème',reportPlayerBtn:'Signaler le joueur',reportPlayerTitle:'Signaler le joueur',reportCheating:'Triche / Hack',reportHateSpeech:'Insultes / Offensant',reportSpam:'Spam / Harcèlement',reportOther:'Autre',reportDupe:'Tu as déjà signalé ce joueur',reportChatBtn:'Signaler ce message',reportTitle:'Que s\'est-il passé ?',reportPlaceholder:'Décris ce qui a mal tourné...',
   reportSend:'Envoyer',reportCancel:'Fermer',reportSent:'Merci ! Rapport envoyé.',
   reportLimit:'Limite quotidienne atteinte (3 par jour)',reportNeedLogin:'Connecte-toi pour signaler',
   catConnection:'Connexion',catUnfair:'Défaite injuste',catDisplay:'Bug d\'affichage',catOther:'Autre',

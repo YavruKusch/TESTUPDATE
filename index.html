@@ -1086,6 +1086,7 @@ var WSNET={
   wall:function(key){ this._send({type:'wall',key:key}); },
   giveUp:function(){ this._send({type:'give_up'}); },
   bugReport:function(payload){ var m={type:'bug_report'}; for(var k in payload){ if(Object.prototype.hasOwnProperty.call(payload,k))m[k]=payload[k]; } this._send(m); },
+  playerReport:function(payload){ var m={type:'player_report'}; for(var k in payload){ if(Object.prototype.hasOwnProperty.call(payload,k))m[k]=payload[k]; } this._send(m); },
   timeout:function(){ this._send({type:'timeout'}); },
   skipTurn:function(){ this._send({type:'skip'}); },
   requestSync:function(){ this._send({type:'sync'}); },
@@ -4119,6 +4120,12 @@ function App(){
   const[bugKat,setBugKat]=useState('other');
   const[bugText,setBugText]=useState('');
   const[bugStatus,setBugStatus]=useState(null); // null|'sending'|'ok'|'limit'|'err'|'login'
+  const[repOpen,setRepOpen]=useState(false); // Spieler-Melde-Formular (Endscreen + Chat)
+  const[repReason,setRepReason]=useState('reportCheating');
+  const[repText,setRepText]=useState('');
+  const[repStatus,setRepStatus]=useState(null); // null|'sending'|'ok'|'limit'|'dupe'|'login'
+  const[repSrc,setRepSrc]=useState('end'); // 'end'|'chat' — Melde-Kontext
+  const[repChatTs,setRepChatTs]=useState(null); // ts der gemeldeten Chat-Nachricht (nur src='chat')
   const[dragging,setDragging]=useState(null);
   const[ghostPos,setGhostPos]=useState({x:0,y:0});
   const[previewKey,setPreviewKey]=useState(null);
@@ -4160,7 +4167,7 @@ function App(){
   const xpBeforeMatchRef=useRef(null);
   const pendingXpUpdateRef=useRef(null);
   const S=useRef({});
-  S.current={pA,pB,walls,barrLeft,turn,winner,moveHist,gameMode,lobbyId,onlineRole,rematchA,rematchB,rematchDeclined,oppLeft,gameNum,chaosItem,goldenWalls,hammers,hammerHeld,hammerUsed,hammerMode,chaosMode,dropMode,gaveUp,gameTimeMode,isRanked,rankedMode,rankedMyRating,rankedOppRating,rankedOppKey,playerNames,selectedMap,duelSize,screen,bugOpen};
+  S.current={pA,pB,walls,barrLeft,turn,winner,moveHist,gameMode,lobbyId,onlineRole,rematchA,rematchB,rematchDeclined,oppLeft,gameNum,chaosItem,goldenWalls,hammers,hammerHeld,hammerUsed,hammerMode,chaosMode,dropMode,gaveUp,gameTimeMode,isRanked,rankedMode,rankedMyRating,rankedOppRating,rankedOppKey,playerNames,selectedMap,duelSize,screen,bugOpen,repOpen};
   useEffect(()=>{snapPosRef.current=snapPos;},[snapPos]);
   useEffect(()=>{hammerTargetRef.current=hammerTarget;},[hammerTarget]);
   useEffect(()=>{
@@ -4413,6 +4420,10 @@ function App(){
     if(d&&d.type==='bug_report_ok'){setBugStatus('ok');return;}
     if(d&&d.type==='bug_report_limit'){setBugStatus('limit');return;}
     if(d&&d.type==='error'&&d.grund==='nicht eingeloggt'&&S.current.bugOpen){setBugStatus('login');return;}
+    if(d&&d.type==='player_report_ok'){setRepStatus('ok');return;}
+    if(d&&d.type==='player_report_limit'){setRepStatus('limit');return;}
+    if(d&&d.type==='player_report_dupe'){setRepStatus('dupe');return;}
+    if(d&&d.type==='error'&&d.grund==='nicht eingeloggt'&&S.current.repOpen){setRepStatus('login');return;}
     if(d&&d.type==='elo_update'){
       setEloChange({change:d.change,newRating:d.newRating,won:d.won,oppChange:d.oppChange,oppNewRating:d.oppNewRating});
       // Account-State sofort aktualisieren (kein App-Neustart noetig)
@@ -4470,6 +4481,7 @@ function App(){
       if(d.winner===undefined||d.winner===null){
         setLossReason(null); // laufendes Spiel -> Grund zuruecksetzen (kein stale beim naechsten Spiel)
         setBugOpen(false);setBugStatus(null); // Bug-Report-Formular gehoert nur zum Endscreen
+        setRepOpen(false);setRepStatus(null); // Spieler-Melde-Formular ebenso
         var myRoleP=(typeof d.deineNummer==='number')?(d.deineNummer===0?'A':'B'):S.current.onlineRole;
         var myNumP=myRoleP==='A'?0:1;
         var srvTurnP=(typeof d.amZug==='number')?(d.amZug===0?'A':'B'):S.current.turn;
@@ -9131,6 +9143,69 @@ function App(){
                     </button>
                   )}
                   <button onClick={()=>{setBugOpen(false);setBugStatus(null);setBugText('');}}
+                    style={{flex:1,padding:'9px',borderRadius:10,fontSize:12,fontWeight:800,cursor:'pointer',
+                      background:'var(--bg)',border:'1.5px solid var(--border)',color:'var(--text)',
+                      fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                    {t('reportCancel')}
+                  </button>
+                </div>
+              </div>
+            )}
+            {gameMode==='online'&&!repOpen&&(
+              <button onClick={()=>{setRepOpen(true);setRepStatus(null);setRepSrc('end');setRepChatTs(null);setRepReason('reportCheating');setRepText('');}}
+                style={{background:'none',border:'none',cursor:'pointer',padding:'2px 0 6px',
+                  fontSize:12,fontWeight:700,color:'var(--subtle)',textDecoration:'underline',
+                  fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                {t('reportPlayerBtn')}
+              </button>
+            )}
+            {gameMode==='online'&&repOpen&&(
+              <div style={{padding:'12px 14px',borderRadius:14,background:'var(--card)',
+                border:'1.5px solid var(--border)',textAlign:'left'}}>
+                <div style={{fontSize:12,fontWeight:800,color:'var(--text)',marginBottom:8}}>{t('reportPlayerTitle')}</div>
+                {repStatus!=='ok'&&(
+                  <div>
+                    <div style={{display:'flex',gap:5,flexWrap:'wrap',marginBottom:8}}>
+                      {[['reportCheating',t('reportCheating')],['reportHateSpeech',t('reportHateSpeech')],['reportSpam',t('reportSpam')],['reportOther',t('reportOther')]].map(function(o){
+                        var selR=repReason===o[0];
+                        return <button key={o[0]} onClick={()=>setRepReason(o[0])}
+                          style={{padding:'5px 10px',borderRadius:9,fontSize:11,fontWeight:700,cursor:'pointer',
+                            border:'1.5px solid '+(selR?'#ef4444':'var(--border)'),
+                            background:selR?'rgba(239,68,68,0.12)':'var(--bg)',
+                            color:selR?'#ef4444':'var(--subtle)',fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                          {o[1]}
+                        </button>;
+                      })}
+                    </div>
+                    <textarea value={repText} onChange={e=>setRepText(e.target.value.slice(0,500))}
+                      placeholder={t('reportPlaceholder')} rows={3} maxLength={500}
+                      style={{width:'100%',padding:'9px 11px',borderRadius:10,fontSize:13,resize:'vertical',
+                        background:'var(--bg)',border:'1.5px solid var(--border)',color:'var(--text)',
+                        fontFamily:'system-ui,-apple-system,sans-serif',boxSizing:'border-box',outline:'none',marginBottom:8}}/>
+                  </div>
+                )}
+                {repStatus==='ok'&&<div style={{fontSize:12,fontWeight:700,color:'#16a34a',marginBottom:8}}>{'✓'} {t('reportSent')}</div>}
+                {repStatus==='limit'&&<div style={{fontSize:12,fontWeight:700,color:'#f59e0b',marginBottom:8}}>{t('reportLimit')}</div>}
+                {repStatus==='dupe'&&<div style={{fontSize:12,fontWeight:700,color:'#f59e0b',marginBottom:8}}>{t('reportDupe')}</div>}
+                {repStatus==='login'&&<div style={{fontSize:12,fontWeight:700,color:'#f59e0b',marginBottom:8}}>{t('reportNeedLogin')}</div>}
+                <div style={{display:'flex',gap:7}}>
+                  {repStatus!=='ok'&&(
+                    <button disabled={repStatus==='sending'} onClick={()=>{
+                      if(repStatus==='sending')return;
+                      setRepStatus('sending');
+                      var payloadR={src:repSrc,reason:repReason,text:repText.trim()};
+                      if(repSrc==='chat'&&repChatTs)payloadR.ts=repChatTs;
+                      WSNET.playerReport(payloadR);
+                      setTimeout(function(){setRepStatus(function(stR){return stR==='sending'?null:stR;});},8000);
+                    }}
+                      style={{flex:1,padding:'9px',borderRadius:10,border:'none',fontSize:12,fontWeight:800,
+                        background:repStatus==='sending'?'var(--border)':'#ef4444',
+                        color:'white',cursor:repStatus==='sending'?'default':'pointer',
+                        fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                      {repStatus==='sending'?'...':t('reportSend')}
+                    </button>
+                  )}
+                  <button onClick={()=>{setRepOpen(false);setRepStatus(null);setRepText('');}}
                     style={{flex:1,padding:'9px',borderRadius:10,fontSize:12,fontWeight:800,cursor:'pointer',
                       background:'var(--bg)',border:'1.5px solid var(--border)',color:'var(--text)',
                       fontFamily:'system-ui,-apple-system,sans-serif'}}>
