@@ -78,8 +78,9 @@
     font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.25s;}
   html.dark{background-color:#0a1020;}
   #root{width:100%;min-height:100vh;min-height:100dvh;background:transparent;}
-  /* Werbebalken unten (js/werbung.js): Seite endet darueber, aeltere 100vh-Bildschirme scrollen im Rest */
-  html.ww-werbung-unten #root{min-height:0;height:calc(100dvh - var(--ww-werbung-unten));overflow-y:auto;}
+  /* Werbeplaetze (js/werbung.js): die App liegt nur im freien Bereich. transform macht #root zum Bezugsrahmen fuer
+     position:fixed, so rutschen Leisten und Randknoepfe mit, statt unter der Werbung zu liegen; aeltere 100vh-Bildschirme scrollen im Rest */
+  html.ww-werbung-unten #root,html.ww-werbung-seiten #root{position:fixed;top:0;left:var(--ww-werbung-seite,0px);right:var(--ww-werbung-seite,0px);bottom:var(--ww-werbung-unten,0px);width:auto;min-height:0;overflow-x:hidden;overflow-y:auto;transform:translateZ(0);}
   input,button{-webkit-appearance:none;font-family:inherit;}
   button{transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1);touch-action:manipulation;}
   button:active{transform:scale(0.94);}
@@ -887,7 +888,7 @@
 <script src="js/bot.js?v=1"></script>
 <script src="js/ai.js?v=3"></script>
 <script src="js/sound.js"></script>
-<script src="js/werbung.js?v=2"></script>
+<script src="js/werbung.js?v=3"></script>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useMemo } = React;
 
@@ -1230,7 +1231,21 @@ var LOBBY_CLEAN_TS={t:0};
 // Globale Admin-Config (in Firebase unter ADMIN_CFG_KEY, von allen Clients live gelesen)
 const ADMIN_CFG_KEY='barricade_admin_config';
 const DEFAULT_ADMIN_CFG={features:{online:false,friend:false,bots:true,local:true,twovtwo:false,chaos:false,drop:false,hammer:false,blitz:false,classicTime3:true,classicTime5:true,classicTime8:true,blitzTime5:true,blitzTime8:true,blitzTime10:true,duelBlitz:false,duelStandard:true,ranked:false,rankedClassic:false,rankedDuel:false,rankedChaosEvent:false,showPresence:true,showInGame:true,race:true,duel:true,werbung:false,werbungVollbild:false},announce:'',announceUntil:0,maintenance:false};
-function mergeAdminCfg(cfg){return {features:{...DEFAULT_ADMIN_CFG.features,...(cfg&&cfg.features?cfg.features:{})},announce:cfg&&cfg.announce?cfg.announce:'',announceUntil:cfg&&cfg.announceUntil?cfg.announceUntil:0,maintenance:!!(cfg&&cfg.maintenance),werbungJedes:cfg?cfg.werbungJedes:undefined};}
+// A5 "Schalter pro Gruppe" (Admin-Seite): ein Feature kann per featureGroups auf 'app' oder 'browser' eingeschraenkt
+// sein — der Bool-Wert im Schalter bleibt unveraendert, ein Client ausserhalb der Gruppe sieht ihn aber als AUS.
+// index.html laeuft nie als Capacitor-App, istApp ist hier also immer false.
+function gruppenGefiltert(feats,gruppen,istApp){
+  if(!gruppen)return feats;
+  var out=Object.assign({},feats);
+  Object.keys(gruppen).forEach(function(k){
+    if(gruppen[k]==='app'&&!istApp)out[k]=false;
+    if(gruppen[k]==='browser'&&istApp)out[k]=false;
+  });
+  return out;
+}
+// Revanche: faelliges Vollbild zuerst (js/werbung.js), danach weiter wie immer
+function nachWerbung(fn){if(window.WWWerbung)WWWerbung.weiter(fn);else fn();}
+function mergeAdminCfg(cfg){return {features:gruppenGefiltert({...DEFAULT_ADMIN_CFG.features,...(cfg&&cfg.features?cfg.features:{})},cfg&&cfg.featureGroups,false),announce:cfg&&cfg.announce?cfg.announce:'',announceUntil:cfg&&cfg.announceUntil?cfg.announceUntil:0,maintenance:!!(cfg&&cfg.maintenance),werbungJedes:cfg?cfg.werbungJedes:undefined};}
 // Erklärtexte für Modi-Hilfe (umkreistes ?)
 const MODE_HELP={
   de:{
@@ -7432,7 +7447,7 @@ function App(){
 
 
       {/* BOTTOM NAVIGATION BAR */}
-      <div style={{position:'fixed',bottom:'var(--ww-werbung-unten, 0px)',left:0,right:0,zIndex:250,
+      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:250,
         background:'var(--card)',borderTop:'1px solid var(--border)',
         boxShadow:'0 -2px 16px rgba(0,0,0,0.08)',
         paddingBottom:'env(safe-area-inset-bottom, 0px)',
@@ -9231,14 +9246,14 @@ function App(){
                 iconBg="linear-gradient(135deg,#16a34a,#15803d)"
                 title={t('rematch')} desc={t('rematchDescLocal')||'Same mode, new round'}
                 highlight highlightBg="linear-gradient(135deg,#16a34a,#15803d)"
-                onClick={()=>initGame(gameMode,'A',null,true)}/>
+                onClick={()=>nachWerbung(()=>initGame(gameMode,'A',null,true))}/>
             )}
             {gameMode==='online'&&!isRanked&&!oppLeft&&!otherDeclined&&!myRematch&&(
               <MenuItem icon={<RematchIcon size={18} color="#fff"/>}
                 iconBg="linear-gradient(135deg,#16a34a,#15803d)"
                 title={t('rematch')} desc={t('rematchDescOnline')||'Challenge opponent to rematch'}
                 highlight highlightBg="linear-gradient(135deg,#16a34a,#15803d)"
-                onClick={requestRematch}/>
+                onClick={()=>nachWerbung(requestRematch)}/>
             )}
             {gameMode==='online'&&oppAccountKey&&(!account||oppAccountKey!==account.key)&&(
               <MenuItem icon={<TrophySmIcon size={18} color="#fff"/>}

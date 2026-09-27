@@ -62,12 +62,12 @@
   }
 
   // Vorschau: grauer Vollbild-Platzhalter, sofort wegtippbar (echte Laenge bestimmt Google)
-  function vorschauVollbild(){
+  function vorschauVollbild(o){
     var d = document.createElement('div');
     d.id = 'ww-werbung-vollbild';
     d.style.cssText = 'position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:rgba(90,90,90,0.95);color:#fff;font:600 18px system-ui,sans-serif;';
     d.textContent = 'Vollbild-Anzeige  \u2715';
-    d.onclick = function(){ if (d.parentNode) d.parentNode.removeChild(d); };
+    d.onclick = function(){ if (d.parentNode) d.parentNode.removeChild(d); if (o && o.adBreakDone) o.adBreakDone(); };
     document.body.appendChild(d);
   }
 
@@ -87,6 +87,7 @@
     root.classList[unten ? 'add' : 'remove']('ww-werbung-unten');
     root.classList[seiten ? 'add' : 'remove']('ww-werbung-seiten');
     root.style.setProperty('--ww-werbung-unten', (unten ? UNTEN_H : 0) + 'px');
+    root.style.setProperty('--ww-werbung-seite', (seiten ? 160 : 0) + 'px');
   }
 
   window.WWWerbung = {
@@ -110,6 +111,18 @@
         if (vollbild && ok) (vorschau ? vorschauVollbild : window.adBreak)({ type: 'next', name: 'match_ende' });
       }
       aktualisieren();
+    },
+    // Revanche-Knopf: ist ein Vollbild faellig, erst die Werbung, dann weiter. Online startet die Revanche erst, wenn
+    // beide sie wollen, die Uhr laeuft also noch nicht; der Gegner wartet hoechstens die Werbung ab. Kommt keine Werbung
+    // in Gang (Werbeblocker, Skript fehlt), geht es nach 2 s trotzdem weiter, spaetestens nach 60 s in jedem Fall.
+    weiter: function(fn){
+      if (!faellig || !vollbild || !ok){ fn(); return; }
+      faellig = false;
+      var fertig = false, laeuft = false;
+      function los(){ if (!fertig){ fertig = true; fn(); } }
+      (vorschau ? vorschauVollbild : window.adBreak)({ type: 'next', name: 'revanche', beforeAd: function(){ laeuft = true; }, adBreakDone: los });
+      if (!vorschau) setTimeout(function(){ if (!laeuft) los(); }, 2000);
+      setTimeout(los, 60000);
     },
     // nach dem Ende eines echten Matches; true = beim naechsten Weg ins Menue kommt ein Vollbild-Versuch
     matchEnde: function(){
