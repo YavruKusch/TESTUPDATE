@@ -61,6 +61,16 @@
     delete boxen[name];
   }
 
+  // Vorschau: grauer Vollbild-Platzhalter, sofort wegtippbar (echte Laenge bestimmt Google)
+  function vorschauVollbild(){
+    var d = document.createElement('div');
+    d.id = 'ww-werbung-vollbild';
+    d.style.cssText = 'position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:rgba(90,90,90,0.95);color:#fff;font:600 18px system-ui,sans-serif;';
+    d.textContent = 'Vollbild-Anzeige  \u2715';
+    d.onclick = function(){ if (d.parentNode) d.parentNode.removeChild(d); };
+    document.body.appendChild(d);
+  }
+
   function aktualisieren(){
     var zeigen = an && ok;
     var breit = window.innerWidth >= BREIT;
@@ -86,7 +96,7 @@
       ok = zustimmung === true;
       if (geladen && !ok){ location.reload(); return; }   // Zustimmung zurueckgezogen: Google-Skript wieder loswerden
       an = vorschau || (!!f.werbung && !!PUB);
-      vollbild = an && !!f.werbungVollbild;
+      vollbild = an && (vorschau || !!f.werbungVollbild);
       var n = cfg && cfg.werbungJedes;
       jedes = (typeof n === 'number' && n >= 1 && n <= 50 && Math.floor(n) === n) ? n : STANDARD_JEDES;
       aktualisieren();
@@ -97,7 +107,7 @@
       bild = name;
       if (faellig && !MATCH[name] && name !== 'end'){
         faellig = false;
-        if (vollbild && ok && !vorschau) window.adBreak({ type: 'next', name: 'match_ende' });
+        if (vollbild && ok) (vorschau ? vorschauVollbild : window.adBreak)({ type: 'next', name: 'match_ende' });
       }
       aktualisieren();
     },
