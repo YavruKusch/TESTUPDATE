@@ -888,7 +888,7 @@
 <script src="js/bot.js?v=1"></script>
 <script src="js/ai.js?v=3"></script>
 <script src="js/sound.js"></script>
-<script src="js/werbung.js?v=3"></script>
+<script src="js/werbung.js?v=4"></script>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useMemo } = React;
 
@@ -6835,6 +6835,8 @@ function App(){
       :gameTimeMode==='blitz-8'?'8'+t('secLabel')+' '+t('perTurn')
       :gameTimeMode==='blitz-10'?'10'+t('secLabel')+' '+t('perTurn')
       :t('noTimer');
+    // Handy mit Werbung: oben statt Logo + Schriftzug ein Werbeplatz (js/werbung.js)
+    const kopfWerbung=!!(window.WWWerbung&&WWWerbung.kopfAktiv(adminCfg,cookieConsent==='all'));
     return(
     <div style={{...sPage,position:'relative',zIndex:1,
       paddingBottom:'calc(70px + env(safe-area-inset-bottom, 0px))',
@@ -6934,21 +6936,25 @@ function App(){
         </div>
       )}
       <div style={{textAlign:'center',marginBottom:30,position:'relative',zIndex:1}}>
-        <div style={{marginBottom:14,display:'flex',justifyContent:'center'}}>
-          <div style={{width:78,height:78,borderRadius:22,
-            background:selectedMap==='duel'
-              ?'linear-gradient(140deg,#8b5cf6 0%,#6d28d9 52%,#4c1d95 100%)'
-              :'linear-gradient(140deg,#ef4444 0%,#8b5cf6 52%,#3b82f6 100%)',
-            display:'flex',alignItems:'center',justifyContent:'center',
-            boxShadow:selectedMap==='duel'
-              ?'0 12px 30px rgba(139,92,246,0.42),inset 0 1px 1px rgba(255,255,255,0.35)'
-              :'0 12px 30px rgba(99,102,241,0.32),inset 0 1px 1px rgba(255,255,255,0.35)',
-            transition:'all 0.5s ease'}}>
-            <BrickWallIcon size={42} light/>
+        {kopfWerbung?(
+          <div ref={function(el){if(el&&window.WWWerbung)WWWerbung.kopf(el);}} style={{width:320,maxWidth:'100%',height:100,margin:'42px auto 4px'}}/>
+        ):(<>
+          <div style={{marginBottom:14,display:'flex',justifyContent:'center'}}>
+            <div style={{width:78,height:78,borderRadius:22,
+              background:selectedMap==='duel'
+                ?'linear-gradient(140deg,#8b5cf6 0%,#6d28d9 52%,#4c1d95 100%)'
+                :'linear-gradient(140deg,#ef4444 0%,#8b5cf6 52%,#3b82f6 100%)',
+              display:'flex',alignItems:'center',justifyContent:'center',
+              boxShadow:selectedMap==='duel'
+                ?'0 12px 30px rgba(139,92,246,0.42),inset 0 1px 1px rgba(255,255,255,0.35)'
+                :'0 12px 30px rgba(99,102,241,0.32),inset 0 1px 1px rgba(255,255,255,0.35)',
+              transition:'all 0.5s ease'}}>
+              <BrickWallIcon size={42} light/>
+            </div>
           </div>
-        </div>
-        <div style={{fontSize:32,fontWeight:900,letterSpacing:-1.8,color:'var(--text)',lineHeight:1,cursor:'default',userSelect:'none'}}>{t('title')}</div>
-        <div style={{fontSize:10,fontWeight:800,letterSpacing:3,color:'var(--subtle)',marginTop:8,textTransform:'uppercase',userSelect:'none'}}>{t('subtitle')}</div>
+          <div style={{fontSize:32,fontWeight:900,letterSpacing:-1.8,color:'var(--text)',lineHeight:1,cursor:'default',userSelect:'none'}}>{t('title')}</div>
+          <div style={{fontSize:10,fontWeight:800,letterSpacing:3,color:'var(--subtle)',marginTop:8,textTransform:'uppercase',userSelect:'none'}}>{t('subtitle')}</div>
+        </>)}
         {/* Dynamischer Unter-Slogan */}
         <div style={{
           marginTop:10,

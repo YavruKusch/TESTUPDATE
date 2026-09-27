@@ -6,7 +6,7 @@
 // Kein ?. / ?? (alte Safari), laeuft ohne Babel.
 (function(){
   var PUB = '';                                  // ca-pub-..., kommt mit dem AdSense-Konto
-  var SLOT = { unten: '', seite: '' };           // Anzeigenblock-IDs aus AdSense
+  var SLOT = { unten: '', seite: '', kopf: '' }; // Anzeigenblock-IDs aus AdSense
   var BREIT = 1280;                              // ab dieser Fensterbreite Streifen links + rechts
   var UNTEN_H = 60;                              // reservierte Hoehe unten (px)
   var UNTEN_IM_MATCH = false;                    // im Match unten nichts (Spiel-Leisten liegen dort); am PC nur die Streifen
@@ -123,6 +123,28 @@
       (vorschau ? vorschauVollbild : window.adBreak)({ type: 'next', name: 'revanche', beforeAd: function(){ laeuft = true; }, adBreakDone: los });
       if (!vorschau) setTimeout(function(){ if (!laeuft) los(); }, 2000);
       setTimeout(los, 60000);
+    },
+    // Handy-Menue: statt Logo + Schriftzug ein 320x100-Platz (Tunay-Wahl B). kopfAktiv entscheidet beim Rendern,
+    // kopf(el) fuellt den leeren Platz genau einmal (React ruft den ref bei jedem Rendern erneut auf)
+    kopfAktiv: function(cfg, zustimmung){
+      var f = (cfg && cfg.features) || {};
+      return (vorschau || (!!f.werbung && !!PUB)) && zustimmung === true && window.innerWidth < BREIT;
+    },
+    kopf: function(el){
+      if (!el || el.firstChild || !(vorschau || PUB)) return;
+      if (vorschau){
+        el.style.cssText += 'background:rgba(128,128,128,0.35);border-radius:10px;display:flex;align-items:center;justify-content:center;';
+        el.appendChild(document.createElement('span')).textContent = 'Anzeige';
+        return;
+      }
+      laden();
+      var ins = document.createElement('ins');
+      ins.className = 'adsbygoogle';
+      ins.style.cssText = 'display:inline-block;width:320px;height:100px;max-width:100%;';
+      ins.setAttribute('data-ad-client', PUB);
+      ins.setAttribute('data-ad-slot', SLOT.kopf);
+      el.appendChild(ins);
+      ag().push({});
     },
     // nach dem Ende eines echten Matches; true = beim naechsten Weg ins Menue kommt ein Vollbild-Versuch
     matchEnde: function(){
