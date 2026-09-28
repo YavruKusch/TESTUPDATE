@@ -883,7 +883,7 @@
   },20000);
 </script>
 
-<script src="js/i18n.js?v=116"></script>
+<script src="js/i18n.js?v=117"></script>
 <script src="js/game-logic.js"></script>
 <script src="js/bot.js?v=1"></script>
 <script src="js/ai.js?v=3"></script>
@@ -3933,6 +3933,11 @@ function App(){
   useEffect(()=>{window.__hapticOn=hapticOn;try{localStorage.setItem('ww_haptic',hapticOn?'1':'0');}catch{}},[hapticOn]);
   const[soundOn,setSoundOn]=useState(()=>{try{return localStorage.getItem('ww_sound')!=='0';}catch{return true;}});
   useEffect(()=>{window.__soundOn=soundOn;try{localStorage.setItem('ww_sound',soundOn?'1':'0');}catch{}},[soundOn]);
+  // Wand-Bestaetigung (Tunay 2026-09-28, gegen Versehen-Klicks): vor dem Setzen einer Mauer extra
+  // Haekchen/Kreuz. Standard AUS. Gelesen im Wand-Drag (onEnd unten), nicht als window-Global noetig —
+  // derselbe App-Baustein wie die Einstellungsseite.
+  const[wandBest,setWandBest]=useState(()=>{try{return localStorage.getItem('ww_wandbestaetigen')==='1';}catch{return false;}});
+  useEffect(()=>{window.__wandBest=wandBest;try{if(wandBest)localStorage.setItem('ww_wandbestaetigen','1');else localStorage.removeItem('ww_wandbestaetigen');}catch{}},[wandBest]);
   // ── Account / Login ──
   const[account,setAccount]=useState(null);
   const[pendingGoogleUser,setPendingGoogleUser]=useState(null);
@@ -4568,6 +4573,7 @@ function App(){
   const[ghostPos,setGhostPos]=useState({x:0,y:0});
   const[previewKey,setPreviewKey]=useState(null);
   const[snapPos,setSnapPos]=useState(null);
+  const[pendingWall,setPendingWall]=useState(null); // {key,x,y}: wartet auf Haekchen/Kreuz (Einstellung 'Wand bestaetigen')
   const[replayStep,setReplayStep]=useState(0);
   const[replayHistEntry,setReplayHistEntry]=useState(null);
   const[replayPlaying,setReplayPlaying]=useState(false); // Replay laeuft von selbst
@@ -6624,37 +6630,13 @@ function App(){
         const rel=getRel(x,y-OFFSET);
         if(rel){
           const key=snapWall(rel.x,rel.y,dragging.orient);
-          if(wsSpiel()){
-            // Optimistisch: Wand lokal pruefen+setzen, Server bestaetigt parallel
-            const sc=S.current;
-            if(sc.barrLeft[sc.turn]>0&&!introSperreRef.current){
-              const next=tryWall(key,sc.walls,sc.pA,sc.pB,goalRowOf('A',sc.selectedMap),goalRowOf('B',sc.selectedMap));
-              if(next){
-                // Blitz: bei faktisch abgelaufener Zeit nur senden, nicht optimistisch setzen (kein Zurueckspringen)
-                var _blitzAbgelaufenW=(typeof S.current.gameTimeMode==='string'&&S.current.gameTimeMode.indexOf('blitz-')===0&&wsTurnEndsRef.current&&Date.now()>wsTurnEndsRef.current);
-                if(!_blitzAbgelaufenW){ playSound('wall'); setWalls(next); setBarrLeft({...sc.barrLeft,[sc.turn]:sc.barrLeft[sc.turn]-1}); setTurn(sc.turn==='A'?'B':'A'); }
-                pendingWsRef.current={kind:'wall',key:key,tries:0};
-                WSNET.wall(key);
-              }else setFlash(t('invalidPos'));
-            }
-            setDragging(null);setPreviewKey(null);setSnapPos(null);
+          if(window.__wandBest){
+            // Einstellung 'Wand bestaetigen': Vorschau bleibt stehen, Platzierung wartet auf Haekchen/Kreuz
+            setPendingWall({key,x,y:y-OFFSET});
+            setDragging(null);
             return;
           }
-          const{walls:w,pA:a,pB:b,barrLeft:bl,turn:curT,moveHist:mh}=S.current;
-          if(bl[curT]>0){
-            _hamCtx=S.current.hammerMode?buildHamCtx(S.current.hammers,S.current.hammerHeld,a,b):null;
-            const next=tryWall(key,w,a,b,goalRowOf('A',S.current.selectedMap),goalRowOf('B',S.current.selectedMap));
-            _hamCtx=null;
-            if(next){
-              playSound('wall');
-              setWalls(next);
-              const newBl={...bl,[curT]:bl[curT]-1};setBarrLeft(newBl);
-              const nm=[...mh,{type:'wall',p:curT,k:key}];setMoveHist(nm);
-              const newTurn=curT==='A'?'B':'A';setTurn(newTurn);setFlash('');
-              doSync({pA:a,pB:b,walls:next,barrLeft:newBl,turn:newTurn,winner:null,moves:nm,chaosItem:S.current.chaosItem});
-              setTimeout(()=>{if(gameContainerRef.current)gameContainerRef.current.scrollTop=savedScroll.current;},0);
-            }else setFlash(t('invalidPos'));
-          }
+          placeWallDrag(key);
         }
       }
       setDragging(null);setPreviewKey(null);setSnapPos(null);
@@ -6732,7 +6714,49 @@ function App(){
     if(!e.touches)e.preventDefault(); // nur Maus: kein Text-Select
     savedScroll.current=gameContainerRef.current?gameContainerRef.current.scrollTop:0;
     const x=e.touches?e.touches[0].clientX:e.clientX,y=e.touches?e.touches[0].clientY:e.clientY;
+    setPendingWall(null); // neuer Drag verwirft eine noch offene Bestaetigung
     setDragging({orient,dragPlayer:turn});setGhostPos({x,y});setPreviewKey(null);setSnapPos(null);setFlash('');
+  };
+
+  // Wand wirklich setzen (online optimistisch + WSNET, sonst lokal + doSync). Gemeinsam fuer den
+  // direkten Drag-Weg und die Bestaetigung (Einstellung 'Wand bestaetigen', gegen Versehen-Klicks).
+  const placeWallDrag=(key)=>{
+    if(wsSpiel()){
+      const sc=S.current;
+      if(sc.barrLeft[sc.turn]>0&&!introSperreRef.current){
+        const next=tryWall(key,sc.walls,sc.pA,sc.pB,goalRowOf('A',sc.selectedMap),goalRowOf('B',sc.selectedMap));
+        if(next){
+          // Blitz: bei faktisch abgelaufener Zeit nur senden, nicht optimistisch setzen (kein Zurueckspringen)
+          var _blitzAbgelaufenW=(typeof S.current.gameTimeMode==='string'&&S.current.gameTimeMode.indexOf('blitz-')===0&&wsTurnEndsRef.current&&Date.now()>wsTurnEndsRef.current);
+          if(!_blitzAbgelaufenW){ playSound('wall'); setWalls(next); setBarrLeft({...sc.barrLeft,[sc.turn]:sc.barrLeft[sc.turn]-1}); setTurn(sc.turn==='A'?'B':'A'); }
+          pendingWsRef.current={kind:'wall',key:key,tries:0};
+          WSNET.wall(key);
+        }else setFlash(t('invalidPos'));
+      }
+      return;
+    }
+    const{walls:w,pA:a,pB:b,barrLeft:bl,turn:curT,moveHist:mh}=S.current;
+    if(bl[curT]>0){
+      _hamCtx=S.current.hammerMode?buildHamCtx(S.current.hammers,S.current.hammerHeld,a,b):null;
+      const next=tryWall(key,w,a,b,goalRowOf('A',S.current.selectedMap),goalRowOf('B',S.current.selectedMap));
+      _hamCtx=null;
+      if(next){
+        playSound('wall');
+        setWalls(next);
+        const newBl={...bl,[curT]:bl[curT]-1};setBarrLeft(newBl);
+        const nm=[...mh,{type:'wall',p:curT,k:key}];setMoveHist(nm);
+        const newTurn=curT==='A'?'B':'A';setTurn(newTurn);setFlash('');
+        doSync({pA:a,pB:b,walls:next,barrLeft:newBl,turn:newTurn,winner:null,moves:nm,chaosItem:S.current.chaosItem});
+        setTimeout(()=>{if(gameContainerRef.current)gameContainerRef.current.scrollTop=savedScroll.current;},0);
+      }else setFlash(t('invalidPos'));
+    }
+  };
+  const confirmPendingWall=()=>{
+    if(pendingWall)placeWallDrag(pendingWall.key);
+    setPendingWall(null);setPreviewKey(null);setSnapPos(null);
+  };
+  const cancelPendingWall=()=>{
+    setPendingWall(null);setPreviewKey(null);setSnapPos(null);
   };
 
   const previewValid=useMemo(()=>{
@@ -7345,6 +7369,25 @@ function App(){
                         boxShadow:'0 1px 4px rgba(0,0,0,0.2)'}}/>
                     </div>
                   </button>
+                  {/* Wand-Bestaetigung (Tunay 2026-09-28, gegen Versehen-Klicks) */}
+                  <div style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:1,margin:'16px 0 8px'}}>
+                    {t('wallConfirm').toUpperCase()}
+                  </div>
+                  <button onClick={()=>setWandBest(v=>!v)} style={{
+                    width:'100%',padding:'12px 14px',borderRadius:10,
+                    background:'var(--bg)',border:'1.5px solid var(--border)',cursor:'pointer',
+                    display:'flex',alignItems:'center',justifyContent:'space-between',
+                    fontFamily:'system-ui,-apple-system,sans-serif'}}>
+                    <span style={{fontSize:13,fontWeight:700,color:'var(--text)'}}>{wandBest?(lang==='tr'?'Açık':lang==='fr'?'Activé':lang==='en'?'On':'An'):(lang==='tr'?'Kapalı':lang==='fr'?'Désactivé':lang==='en'?'Off':'Aus')}</span>
+                    <div style={{width:44,height:26,borderRadius:13,
+                      background:wandBest?'#16a34a':'var(--border)',
+                      position:'relative',transition:'background 0.2s'}}>
+                      <div style={{position:'absolute',top:3,left:wandBest?20:3,width:20,height:20,
+                        borderRadius:'50%',background:'white',transition:'left 0.2s',
+                        boxShadow:'0 1px 4px rgba(0,0,0,0.2)'}}/>
+                    </div>
+                  </button>
+                  <div style={{fontSize:11,color:'var(--subtle)',marginTop:6,lineHeight:1.4}}>{t('wallConfirmHint')}</div>
                 </div>
               )}
 
@@ -9630,6 +9673,21 @@ function App(){
         </div>
       )}
 
+      {/* Wand-Bestaetigung (Einstellung 'Wand bestaetigen'): Haekchen setzt exakt die stehen
+          gebliebene Vorschau, Kreuz verwirft sie. */}
+      {pendingWall&&!winner&&(
+        <div style={{position:'fixed',left:pendingWall.x,top:pendingWall.y,transform:'translate(-50%,-50%)',display:'flex',gap:10,zIndex:1001}}>
+          <button onClick={cancelPendingWall} style={{width:44,height:44,borderRadius:22,border:'none',background:'#ef4444',color:'#fff',
+            display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 10px rgba(0,0,0,0.4)'}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+          </button>
+          <button onClick={confirmPendingWall} style={{width:44,height:44,borderRadius:22,border:'none',background:'#22c55e',color:'#fff',
+            display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 10px rgba(0,0,0,0.4)'}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:COLS*CELL+26,marginBottom:11}}>
         <div style={{display:'flex',alignItems:'center',gap:9}}>
@@ -11454,6 +11512,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
   const[previewKey,setPreviewKey]=React.useState(null);
   const[previewValid,setPreviewValid]=React.useState(true);
   const[snapPos,setSnapPos]=React.useState(null);
+  const[pendingWall,setPendingWall]=React.useState(null); // {key,x,y}: wartet auf Haekchen/Kreuz (Einstellung 'Wand bestaetigen')
   const[celebrating,setCelebrating]=React.useState(false);
   const[danceStyle,setDanceStyle]=React.useState('robot');
   const[danceSpeed,setDanceSpeed]=React.useState('slow');
@@ -11876,7 +11935,36 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
   const startDrag=(e,orient)=>{
     if(!canPlace)return;e.preventDefault();
     const pt=e.touches?e.touches[0]:e;
+    setPendingWall(null); // neuer Drag verwirft eine noch offene Bestaetigung
     setDragging({orient});setGhostPos({x:pt.clientX,y:pt.clientY});
+  };
+
+  // Wand wirklich setzen (online per WSNET/Firebase-Sync, sonst lokal). Gemeinsam fuer den direkten
+  // Drag-Weg und die Bestaetigung (Einstellung 'Wand bestaetigen', gegen Versehen-Klicks).
+  const placeWall2Drag=(key)=>{
+    const{walls:w,tokens:tk,barr:bl,turn:tn,isOnline:io}=St.current;
+    const tmm=TEAM_2V2(tn);
+    if(bl[tmm]>0){
+      const next=tryWall2(key,w,tk,ROWS2,COLS2);
+      if(next){
+        playSound('wall');
+        const nextTurn=(io&&useWS)?tv2NextLocal(tn,St.current.removed||{}):NEXT_2V2[tn];
+        if(io&&useWS)wsLastSlotRef.current[nextTurn.charAt(0)]=nextTurn;
+        const newBl={A:bl.A,B:bl.B};newBl[tmm]=bl[tmm]-1;
+        setWalls(next);setBarr(newBl);setFlash('');setTurn(nextTurn);
+        if(io){
+          if(useWS){try{WSNET.wall(key);}catch(e){}}
+          else doSync2v2({tokens:tk,walls:next,barr:newBl,turn:nextTurn,winner:null,reached:St.current.reached});
+        }
+      }else setFlash(t('invalidPos'));
+    }
+  };
+  const confirmPendingWall=()=>{
+    if(pendingWall)placeWall2Drag(pendingWall.key);
+    setPendingWall(null);setPreviewKey(null);setSnapPos(null);
+  };
+  const cancelPendingWall=()=>{
+    setPendingWall(null);setPreviewKey(null);setSnapPos(null);
   };
 
   // ── Drag-Wand ──
@@ -11903,22 +11991,13 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
         const rel=getRel(x,y-OFFSET);
         if(rel&&rel.x>=0&&rel.x<=COLS2*CELL2&&rel.y>=-CELL2&&rel.y<=ROWS2*CELL2+CELL2){
           const key=snapWall2(rel.x,rel.y,dragging.orient,ROWS2,COLS2,CELL2);
-          const{walls:w,tokens:tk,barr:bl,turn:tn,isOnline:io}=St.current;
-          const tmm=TEAM_2V2(tn);
-          if(bl[tmm]>0){
-            const next=tryWall2(key,w,tk,ROWS2,COLS2);
-            if(next){
-              playSound('wall');
-              const nextTurn=(io&&useWS)?tv2NextLocal(tn,St.current.removed||{}):NEXT_2V2[tn];
-              if(io&&useWS)wsLastSlotRef.current[nextTurn.charAt(0)]=nextTurn;
-              const newBl={A:bl.A,B:bl.B};newBl[tmm]=bl[tmm]-1;
-              setWalls(next);setBarr(newBl);setFlash('');setTurn(nextTurn);
-              if(io){
-                if(useWS){try{WSNET.wall(key);}catch(e){}}
-                else doSync2v2({tokens:tk,walls:next,barr:newBl,turn:nextTurn,winner:null,reached:St.current.reached});
-              }
-            }else setFlash(t('invalidPos'));
+          if(window.__wandBest){
+            // Einstellung 'Wand bestaetigen': Vorschau bleibt stehen, Platzierung wartet auf Haekchen/Kreuz
+            setPendingWall({key,x,y:y-OFFSET});
+            setDragging(null);
+            return;
           }
+          placeWall2Drag(key);
         }
       }
       setDragging(null);setPreviewKey(null);setSnapPos(null);
@@ -12516,6 +12595,20 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult}){
         });})}
         {Array.from(walls).map(k=><Wall2 key={k} wkey={k} color={darkMode?'#e2e8f0':'#1e293b'} opacity={1} animate/>)}
         {previewKey&&<Wall2 wkey={previewKey} color={previewValid?'#f59e0b':'#ef4444'} opacity={0.6}/>}
+        {/* Wand-Bestaetigung (Einstellung 'Wand bestaetigen'): Haekchen setzt exakt die stehen
+            gebliebene Vorschau, Kreuz verwirft sie. */}
+        {pendingWall&&!winner&&(
+          <div style={{position:'fixed',left:pendingWall.x,top:pendingWall.y,transform:'translate(-50%,-50%)',display:'flex',gap:10,zIndex:1001}}>
+            <button onClick={cancelPendingWall} style={{width:44,height:44,borderRadius:22,border:'none',background:'#ef4444',color:'#fff',
+              display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 10px rgba(0,0,0,0.4)'}}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+            </button>
+            <button onClick={confirmPendingWall} style={{width:44,height:44,borderRadius:22,border:'none',background:'#22c55e',color:'#fff',
+              display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 10px rgba(0,0,0,0.4)'}}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+          </div>
+        )}
         {ORDER_2V2.map(function(id){
           const pos=tokens[id];const active=turn===id&&!winner;
           if(!pos||removed[id])return null;
