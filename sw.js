@@ -1,5 +1,5 @@
 // Wrong Way PWA Service Worker
-const CACHE = 'wrongway-v230';
+const CACHE = 'wrongway-v231';
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -25,7 +25,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   const url = req.url;
-  if (!url.includes('wrongway.app')) return;
+  // wrongway.app (Spiel + ws.wrongway.app) und hupsy.app (play.hupsy.app, Hupsy-Adresse des Browser-Spiels); alles andere (Firebase, Google) geht ungefiltert durch
+  if (!url.includes('wrongway.app') && !url.includes('hupsy.app')) return;
   // HTML/Navigation immer frisch vom Netz holen (umgeht den Browser-Cache),
   // damit neue Versionen sofort erscheinen. Cache nur als Offline-Fallback.
   const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
