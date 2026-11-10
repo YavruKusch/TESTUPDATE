@@ -42,7 +42,7 @@
   }
   body{min-height:100%;overscroll-behavior:contain;background:#f8f9fa;}
   body.dark{background:#070c16;}
-  a{color:inherit;text-decoration:none;pointer-events:none;}
+  a{color:inherit;text-decoration:none;}
   :not(input):not(textarea){-webkit-touch-callout:none;}
   :root{
     --bg:#f8f9fa;--card:#ffffff;--text:#0f172a;--subtle:#94a3b8;--muted:#64748b;
@@ -92,6 +92,111 @@
   #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;flex-direction:column;gap:16px;font-family:system-ui,-apple-system,sans-serif;}
   #loader .dot{font-size:40px;}
   #loader .txt{color:#94a3b8;font-size:13px;font-weight:600;}
+  /* ===== Neues Design (Stil "Kachel und Mauer"): zentrale Werte, Schriften, Bausteine ===== */
+  @font-face{font-family:'Baloo 2';font-weight:600;font-display:swap;src:url(fonts/Baloo2-600.woff2) format('woff2');}
+  @font-face{font-family:'Baloo 2';font-weight:800;font-display:swap;src:url(fonts/Baloo2-800.woff2) format('woff2');}
+  @font-face{font-family:'Luckiest Guy';font-weight:400;font-display:swap;src:url(fonts/LuckiestGuy.woff2) format('woff2');}
+  :root{
+    --hx-f:'Baloo 2',system-ui,-apple-system,sans-serif;--hx-fd:'Luckiest Guy','Baloo 2',system-ui,sans-serif;
+    --hx-ink:#13254a;--hx-ink2:#5a6a8f;--hx-plate1:#fffaf0;--hx-plate2:#f6e8cb;--hx-line:#1d4699;--hx-kontur:#13254a;
+    --hx-sky1:#5b97ff;--hx-sky2:#3f7df2;--hx-sky3:#2f66d8;--hx-grid:rgba(255,255,255,0.09);--hx-sh:rgba(9,24,64,0.5);
+    --hx-rnd1:#fffaf0;--hx-rnd2:#f1dfb8;--hx-rndl:#b58a45;--hx-rnde:#8a6427;
+    --hx-nav1:#1d47a6;--hx-nav2:#163784;--hx-navl:#0f2a6a;--hx-navt:#a7bcf0;
+    --hx-bf:#24509f;--hx-bfe:#173a80;--hx-ca:#fdeecb;--hx-cb:#e9c88d;--hx-soft:rgba(29,70,153,0.09);
+    --hx-feder:cubic-bezier(0.34,1.56,0.64,1);
+  }
+  body.dark,html.dark{
+    --hx-ink:#f6ecd6;--hx-ink2:#a9b7dc;--hx-plate1:#24407f;--hx-plate2:#1a2f66;--hx-line:#081230;--hx-kontur:#081230;
+    --hx-sky1:#1d3476;--hx-sky2:#122250;--hx-sky3:#0a1535;--hx-grid:rgba(255,255,255,0.045);--hx-sh:rgba(0,0,0,0.6);
+    --hx-rnd1:#2c4a96;--hx-rnd2:#1c3170;--hx-rndl:#081230;--hx-rnde:#081230;
+    --hx-nav1:#142a66;--hx-nav2:#0d1d4a;--hx-navl:#081230;--hx-navt:#8ea2d6;
+    --hx-bf:#0c1a3c;--hx-bfe:#060e24;--hx-ca:#ecd9ae;--hx-cb:#cdab72;--hx-soft:rgba(255,255,255,0.08);
+  }
+  /* Hintergrund: Brett-Raster von oben. Fest, ohne Unschaerfe, kostet keine Bildrate */
+  .hx-bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;pointer-events:none;background:
+    linear-gradient(var(--hx-grid) 2px,transparent 2px) 0 -20px/78px 78px,
+    linear-gradient(90deg,var(--hx-grid) 2px,transparent 2px) 0 0/78px 78px,
+    radial-gradient(120% 70% at 50% 30%,var(--hx-sky1) 0,var(--hx-sky2) 55%,var(--hx-sky3) 100%);}
+  .hx-page{font-family:var(--hx-f);font-weight:600;color:var(--hx-ink);}
+  .hx-page b{font-weight:800;}
+  .hx-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .hx-on{color:#fff;font-weight:800;text-shadow:0 2px 0 rgba(9,24,64,0.6);}
+  /* Platte: Sand mit Kante. Als Knopf sinkt sie beim Druecken in die Kante und federt zurueck */
+  .hx-plate{background:linear-gradient(var(--hx-plate1),var(--hx-plate2));border:3px solid var(--hx-line);border-radius:18px;
+    box-shadow:0 5px 0 var(--hx-line),0 14px 18px -8px var(--hx-sh);color:var(--hx-ink);}
+  .hx-press{cursor:pointer;transition:transform 0.34s var(--hx-feder);}
+  .hx-press:active{transform:translateY(4px);box-shadow:0 1px 0 var(--hx-line);transition-duration:0.07s;}
+  /* Runder Knopf wie ein Spielstein */
+  .hx-rnd{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex:none;padding:0;cursor:pointer;
+    background:radial-gradient(circle at 50% 30%,var(--hx-rnd1),var(--hx-rnd2));border:3px solid var(--hx-rndl);
+    box-shadow:0 4px 0 var(--hx-rnde),0 12px 14px -6px var(--hx-sh);color:var(--hx-ink);transition:transform 0.34s var(--hx-feder);}
+  .hx-rnd:active{transform:translateY(3px);box-shadow:0 1px 0 var(--hx-rnde);transition-duration:0.07s;}
+  .hx-bdg{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;border-radius:10px;background:#ff4d4d;color:#fff;
+    font-size:11px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;padding:0 5px;box-shadow:0 0 0 2px #13254a;}
+  /* Hauptknopf wie eine Mauer: Deckel sinkt auf den Sockel */
+  .hx-btn{position:relative;display:block;width:100%;border:0;padding:0;background:none;cursor:pointer;font-family:var(--hx-fd);}
+  .hx-btn::before{content:"";position:absolute;left:0;right:0;top:9px;bottom:0;border-radius:20px;background:#d98200;border:3px solid #9a5300;box-shadow:0 12px 18px -8px var(--hx-sh);}
+  .hx-btn:active{transform:none;}
+  .hx-face{position:relative;display:flex;align-items:center;justify-content:center;min-height:62px;margin-bottom:9px;padding:5px 12px 0;border-radius:20px;
+    border:3px solid #9a5300;background:linear-gradient(#ffdf5e,#ffc21f);box-shadow:inset 0 4px 0 rgba(255,255,255,0.5);
+    color:#13254a;font-size:34px;line-height:1;letter-spacing:0.02em;text-transform:uppercase;transition:transform 0.34s var(--hx-feder);}
+  .hx-btn:active .hx-face{transform:translateY(6px);transition-duration:0.07s;}
+  /* Menue: erster Bildschirm */
+  .hx-hero{position:relative;z-index:1;width:100%;max-width:430px;flex-shrink:0;display:flex;flex-direction:column;padding:0 16px 14px;
+    min-height:calc(100vh - 84px);min-height:calc(100dvh - var(--ww-werbung-unten, 0px) - 84px - env(safe-area-inset-bottom, 0px));}
+  .hx-top{display:flex;align-items:center;gap:10px;padding-top:calc(env(safe-area-inset-top) + 12px);}
+  .hx-prof{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;text-align:left;min-width:0;max-width:250px;font-family:inherit;}
+  .hx-ava{width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;box-shadow:0 0 0 2.5px var(--hx-line);}
+  .hx-prof b{display:block;font-size:15.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hx-prof small{display:block;font-size:12.5px;line-height:1.2;font-weight:600;color:var(--hx-ink2);}
+  .hx-hint{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding:8px 12px;border-radius:12px;background:rgba(10,26,74,0.42);
+    color:#fff;font-size:12.5px;font-weight:600;line-height:1.3;cursor:pointer;}
+  .hx-logo{text-align:center;margin-top:16px;}
+  .hx-wort{position:relative;z-index:0;display:inline-block;font-family:var(--hx-fd);font-weight:400;font-size:64px;line-height:1;letter-spacing:0.02em;color:#ffc928;}
+  .hx-wort::before{content:attr(data-t);position:absolute;left:0;top:0;z-index:-1;color:var(--hx-kontur);-webkit-text-stroke:9px var(--hx-kontur);text-shadow:0 5px 0 var(--hx-kontur);}
+  .hx-unter{display:block;margin-top:4px;font-size:19px;line-height:1.1;}
+  .hx-pille{display:inline-flex;align-items:center;gap:10px;margin-top:8px;padding:4px 13px;border-radius:20px;background:rgba(10,26,74,0.42);color:#fff;font-size:12px;font-weight:800;}
+  .hx-stage{position:relative;flex:1;min-height:214px;display:flex;align-items:center;justify-content:center;margin:4px 0 12px;}
+  .hx-side{position:absolute;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;line-height:1.1;background:none;border:0;padding:0;cursor:pointer;font-family:inherit;}
+  .hx-side:active{transform:none;}
+  .hx-side:active .hx-rnd{transform:translateY(3px);box-shadow:0 1px 0 var(--hx-rnde);transition-duration:0.07s;}
+  .hx-dio{width:262px;max-width:64vw;perspective:900px;}
+  .hx-brett{padding:8px;border-radius:12px;background:var(--hx-bf);box-shadow:0 6px 0 var(--hx-bfe),0 18px 22px -8px var(--hx-sh);transform:rotateX(40deg);transform-origin:50% 55%;}
+  .hx-cells{position:relative;display:grid;grid-template-columns:repeat(9,1fr);gap:5px;--c:calc((100% - 40px)/9);--s:calc(var(--c) + 5px);}
+  .hx-cells i{display:block;padding-bottom:100%;border-radius:3px;background:var(--hx-ca);}
+  .hx-cells i.hx-d{background:var(--hx-cb);}
+  .hx-pc{position:absolute;width:var(--c);height:var(--c);left:calc(var(--x)*var(--s));top:calc(var(--y)*var(--s));display:flex;align-items:center;justify-content:center;}
+  .hx-pc::after{content:"";width:78%;height:78%;border-radius:50%;box-shadow:0 0 0 2px #13254a,0 3px 0 rgba(19,37,74,0.45);}
+  .hx-blau::after{background:radial-gradient(circle at 35% 28%,#8dbbff,#2f6bff 55%,#1b46c9);}
+  .hx-rot::after{background:radial-gradient(circle at 35% 28%,#ff9b9b,#f04444 55%,#b81f2c);}
+  .hx-wl{position:absolute;border-radius:3px;box-shadow:0 0 0 1.5px #13254a;}
+  .hx-wl.hx-blau{background:#3f7df2;}.hx-wl.hx-rot{background:#f04444;}
+  .hx-wh{left:calc(var(--x)*var(--s));top:calc(var(--y)*var(--s) - 6px);width:calc(2*var(--c) + 5px);height:7px;}
+  .hx-wv{left:calc(var(--x)*var(--s) - 6px);top:calc(var(--y)*var(--s));height:calc(2*var(--c) + 5px);width:7px;}
+  .hx-mode{display:flex;align-items:center;gap:12px;width:100%;padding:9px 14px;margin-bottom:14px;text-align:left;font-family:inherit;}
+  .hx-mode-i{width:42px;height:42px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 0 rgba(255,255,255,0.3),inset 0 -3px 0 rgba(9,24,64,0.22);}
+  .hx-mode-t{flex:1;min-width:0;}
+  .hx-mode-t span{display:block;font-size:10.5px;font-weight:800;letter-spacing:0.14em;line-height:1.2;color:var(--hx-ink2);text-transform:uppercase;}
+  .hx-mode-t b{display:block;font-size:18px;line-height:1.15;}
+  .hx-mode-t small{display:block;font-size:12.5px;line-height:1.2;font-weight:600;color:var(--hx-ink2);}
+  .hx-chev{font-size:24px;font-weight:800;line-height:1;color:var(--hx-ink2);}
+  /* Menue: Liste der Spielmodi unter dem ersten Bildschirm */
+  .hx-list{position:relative;z-index:1;width:100%;max-width:430px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;padding:22px 16px 6px;}
+  .hx-h{font-family:var(--hx-fd);font-weight:400;font-size:28px;line-height:1;letter-spacing:0.03em;text-transform:uppercase;text-align:center;color:#fff;text-shadow:0 3px 0 var(--hx-kontur);margin-bottom:2px;}
+  .hx-zeile{box-shadow:inset 0 3px 0 rgba(255,255,255,0.28),inset 0 -5px 0 rgba(9,24,64,0.22),0 10px 16px -8px var(--hx-sh);}
+  /* Leiste unten: aktiver Reiter ist eine gelbe Kachel, die ueber die Leiste ragt */
+  .hx-nav{position:fixed;left:0;right:0;bottom:0;z-index:250;display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom, 0px);
+    background:linear-gradient(var(--hx-nav1),var(--hx-nav2));box-shadow:0 -3px 0 var(--hx-navl);font-family:var(--hx-f);}
+  .hx-tab{flex:1;position:relative;z-index:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:62px;padding:8px 0;
+    background:none;border:0;cursor:pointer;color:var(--hx-navt);font-size:11.5px;font-weight:800;line-height:1.2;}
+  .hx-tab.hx-an{color:#13254a;cursor:default;}
+  .hx-tab.hx-an:active{transform:none;}
+  .hx-tab.hx-an::before{content:"";position:absolute;left:50%;top:-12px;bottom:8px;width:96px;margin-left:-48px;border-radius:16px;z-index:-1;
+    background:linear-gradient(#ffdf5e,#ffc21f);border:3px solid #9a5300;box-shadow:inset 0 3px 0 rgba(255,255,255,0.5),0 5px 0 #d98200;}
+  .hx-s1{left:0;top:6px;}.hx-s2{left:0;top:92px;}.hx-s3{right:0;top:48px;}
+  /* Niedrige Bildschirme: Brett und Logo kleiner, damit der Spielen-Knopf ueber der Leiste bleibt */
+  @media (max-height:700px){.hx-logo{margin-top:10px;}.hx-wort{font-size:52px;}.hx-stage{min-height:150px;}.hx-dio{width:200px;}.hx-s2{top:76px;}.hx-s3{top:40px;}.hx-side .hx-rnd{width:40px;height:40px;}}
+  @media (prefers-reduced-motion:reduce){.hx-press,.hx-rnd,.hx-face{transition:none;}}
 
   @keyframes wall-enter{
     0%{transform:scale(0);opacity:0;}
@@ -878,7 +983,7 @@
   },20000);
 </script>
 
-<script src="js/i18n.js?v=130"></script>
+<script src="js/i18n.js?v=131"></script>
 <script src="js/game-logic.js"></script>
 <script src="js/bot.js?v=4"></script>
 <script src="js/ai.js?v=11"></script>
@@ -7224,71 +7329,29 @@ function App(){
       :t('noTimer');
     // Handy mit Werbung: oben statt Logo + Schriftzug ein Werbeplatz (js/werbung.js)
     const kopfWerbung=!!(window.WWWerbung&&WWWerbung.kopfAktiv(adminCfg,cookieConsent==='all'));
+    // Menue-Brett (Zierde, 9x9) und Kurzwerte fuer die Profil-Platte
+    const hxFelder=[];
+    for(let hxI=0;hxI<81;hxI++)hxFelder.push(<i key={hxI} className={(Math.floor(hxI/9)+hxI%9)%2?'hx-d':''}/>);
+    const hxRang=account&&account.stats&&account.stats.ranked&&account.stats.ranked.duel&&account.stats.ranked.duel.rating;
+    const hxZuModi=function(){
+      var el=document.getElementById('hx-modi');if(!el||!el.scrollIntoView)return;
+      var ruhig=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({behavior:ruhig?'auto':'smooth',block:'start'});
+    };
     return(
-    <div style={{...sPage,position:'relative',zIndex:1,
-      paddingBottom:'calc(70px + env(safe-area-inset-bottom, 0px))',
+    <div className="hx-page" style={{...sPage,position:'relative',zIndex:1,paddingTop:0,paddingLeft:0,paddingRight:0,fontFamily:'var(--hx-f)',
+      paddingBottom:'calc(84px + env(safe-area-inset-bottom, 0px))',
       animation:navDir==='back'?'slide-in-left 0.32s cubic-bezier(0.25,1,0.5,1) backwards':'none'}}>
-      <MenuBG dark={darkMode}/>
-      <MapAura map={selectedMap} dark={darkMode}/>
-      <button onClick={()=>{setNavDir('fwd');setScreen('friends');}} style={{
-        position:'fixed',top:'calc(env(safe-area-inset-top) + 14px)',right:14,
-        width:40,height:40,borderRadius:'50%',background:'var(--card)',border:'1.5px solid var(--border)',
-        cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',
-        boxShadow:'var(--shadow-soft)',zIndex:100,overflow:'visible'}}>
-        <PeopleIcon size={18} color="var(--text)"/>
-        {(pendingInvite||friendReqCount>0)&&(
-          <div style={{position:'absolute',top:2,right:2,minWidth:14,height:14,borderRadius:7,
-            background:'#ef4444',border:'2px solid var(--card)',
-            display:'flex',alignItems:'center',justifyContent:'center',padding:'0 2px'}}>
-            {friendReqCount>0&&<span style={{fontSize:8,fontWeight:900,color:'#fff',lineHeight:1}}>{friendReqCount>9?'9+':friendReqCount}</span>}
-          </div>
-        )}
-      </button>
-      <button onClick={()=>setShowInbox(true)} style={{
-        position:'fixed',top:'calc(env(safe-area-inset-top) + 14px)',right:62,
-        width:40,height:40,borderRadius:'50%',background:'var(--card)',border:'1.5px solid var(--border)',
-        cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',
-        boxShadow:'var(--shadow-soft)',zIndex:100,overflow:'visible',
-        animation:unreadCount>0?'pulse-inbox 2s ease-in-out infinite':'none'}}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/>
-          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-          <path d="M19 16v6"/><path d="M16 19h6"/>
-        </svg>
-        {unreadCount>0&&(
-          <div style={{position:'absolute',top:2,right:2,minWidth:14,height:14,borderRadius:7,
-            background:'#ef4444',border:'2px solid var(--card)',
-            display:'flex',alignItems:'center',justifyContent:'center',padding:'0 2px'}}>
-            <span style={{fontSize:8,fontWeight:900,color:'#fff',lineHeight:1}}>{unreadCount>9?'9+':unreadCount}</span>
-          </div>
-        )}
-      </button>
-      <button onClick={()=>{setNavDir('fwd');setScreen(account?'profile':'auth');}} style={{
-        position:'fixed',top:'calc(env(safe-area-inset-top) + 14px)',left:14,
-        width:40,height:40,borderRadius:'50%',
-        background:account?account.color:'var(--card)',
-        border:account?'1.5px solid rgba(255,255,255,0.5)':'1.5px solid var(--border)',
-        cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',
-        boxShadow:account?('0 2px 10px '+account.color+'55'):'var(--shadow-soft)',zIndex:100,padding:0,overflow:'hidden'}}>
-        {account
-          ?<span style={{fontSize:17,fontWeight:900,color:'#fff',lineHeight:1}}>{account.name.slice(0,1).toUpperCase()}</span>
-          :<PeopleIcon size={18} color="var(--muted)"/>}
-      </button>
-      {account&&xp!==null&&xpSystemOn&&(
-        <div style={{position:'fixed',top:'calc(env(safe-area-inset-top) + 58px)',left:14,
-          width:40,display:'flex',justifyContent:'center',zIndex:100,pointerEvents:'none'}}>
-          <LevelBadge level={levelAusXp(xp)} size='sm'/>
-        </div>
-      )}
+      <div className="hx-bg"/>
       {adminCfg.announce&&(adminCfg.announceUntil===0||Date.now()<adminCfg.announceUntil)?(
         <div style={{position:'fixed',top:'calc(env(safe-area-inset-top) + 62px)',
           left:0,right:0,display:'flex',justifyContent:'center',
           zIndex:200,pointerEvents:'none',padding:'0 16px'}}>
           <div style={{
             padding:'10px 18px',
-            background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'white',borderRadius:22,
+            background:'#13254a',color:'white',borderRadius:22,
             fontSize:12,fontWeight:700,textAlign:'center',
-            boxShadow:'0 4px 20px rgba(99,102,241,0.4)',
+            boxShadow:'0 4px 0 rgba(9,24,64,0.35)',
             display:'flex',alignItems:'center',gap:7,
             maxWidth:'calc(100vw - 32px)',
             opacity:announceVisible?1:0,
@@ -7299,132 +7362,121 @@ function App(){
           </div>
         </div>
       ):null}
-      {/* Android-Test-Hinweis (Tunay 2026-11-10): nur Browser, alle Geraete, fest ohne Schliessen */}
-      <div style={{position:'relative',zIndex:1,width:280,maxWidth:'100%',marginTop:40,marginBottom:14,borderRadius:14,flexShrink:0,
-        background:'var(--card)',border:'1.5px solid #8b5cf644',boxShadow:'0 4px 14px rgba(99,102,241,0.18)',overflow:'hidden'}}>
-        <div style={{background:'linear-gradient(90deg,#8b5cf6,#3b82f6)',height:3}}/>
-        <div style={{display:'flex',alignItems:'center'}}>
-          <a href="https://www.instagram.com/hupsy.app/" target="_blank" rel="noopener noreferrer" style={{flex:1,display:'flex',alignItems:'center',gap:10,
-            padding:'10px 14px',textDecoration:'none',color:'var(--text)'}}>
-            <span style={{flexShrink:0,display:'flex'}}><MegaphoneIcon size={18}/></span>
-            <span style={{fontSize:12.5,fontWeight:700,lineHeight:1.35}}>{t('androidTestHinweis')} <span style={{color:'#8b5cf6',fontWeight:800,whiteSpace:'nowrap'}}>@hupsy.app {'\u203A'}</span></span>
-          </a>
+      {/* Erster Bildschirm: Aufbau wie die App (Profil, Logo, Brett, Modus, Spielen) */}
+      <div className="hx-hero">
+        <div className="hx-top">
+          <button className="hx-plate hx-prof hx-press" onClick={()=>{setNavDir('fwd');setScreen(account?'profile':'auth');}}>
+            <span className="hx-ava" style={{background:account?account.color:'#8fa3cf'}}>
+              {account?account.name.slice(0,1).toUpperCase():<PeopleIcon size={18} color="#fff"/>}
+            </span>
+            <span style={{minWidth:0}}>
+              <b>{account?account.name:t('guest')}</b>
+              <small>{account?(hxRang?('Ranked '+hxRang):t('profile')):t('login')}</small>
+            </span>
+            {account&&xp!==null&&xpSystemOn&&<LevelBadge level={levelAusXp(xp)} size='sm'/>}
+          </button>
+          <span style={{flex:1}}/>
+          <button className="hx-rnd" onClick={()=>{setOptionsTab('main');setShowOptions(true);}}>
+            <GearIcon size={22} color="currentColor"/>
+            <span className="hx-sr">{t('options')}</span>
+          </button>
         </div>
-      </div>
-      {pendingInvite&&(
-        <div style={{position:'relative',zIndex:1,width:280,marginBottom:14,borderRadius:14,flexShrink:0,
-          background:'var(--card)',border:'1.5px solid #8b5cf644',boxShadow:'0 4px 14px rgba(99,102,241,0.18)',overflow:'hidden'}}>
-          <div style={{background:'linear-gradient(90deg,#8b5cf6,#3b82f6)',height:3}}/>
-          <div style={{padding:'12px 14px'}}>
-            <div style={{fontSize:13,fontWeight:800,color:'var(--text)',marginBottom:4,display:'flex',alignItems:'center',gap:6}}>
-              <GamepadIcon size={15} color="var(--text)"/> <b>{pendingInvite.fromName}</b> {t('friends_incomingInvite')}
+        {/* Android-Test-Hinweis (Tunay 2026-11-10): nur Browser, alle Geraete, fest ohne Schliessen */}
+        <a href="https://www.instagram.com/hupsy.app/" target="_blank" rel="noopener noreferrer" className="hx-hint">
+          <MegaphoneIcon size={16} color="#fff"/>
+          <span>{t('androidTestHinweis')} <b style={{whiteSpace:'nowrap'}}>@hupsy.app {'›'}</b></span>
+        </a>
+        {pendingInvite&&(
+          <div className="hx-plate" style={{marginTop:12,padding:'11px 13px'}}>
+            <div style={{fontSize:14,fontWeight:800,display:'flex',alignItems:'center',gap:6}}>
+              <GamepadIcon size={16} color="currentColor"/> <b>{pendingInvite.fromName}</b> {t('friends_incomingInvite')}
             </div>
-            <div style={{display:'flex',gap:8,marginTop:8}}>
-              <button onClick={doAcceptInvite} style={{flex:1,padding:'9px',borderRadius:9,
-                background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'#fff',border:'none',
-                cursor:'pointer',fontWeight:800,fontSize:13,fontFamily:'system-ui,-apple-system,sans-serif'}}>
+            <div style={{display:'flex',gap:8,marginTop:9}}>
+              <button onClick={doAcceptInvite} style={{flex:1,padding:'9px',borderRadius:11,
+                background:'#ffc21f',color:'#13254a',border:'3px solid #9a5300',
+                cursor:'pointer',fontWeight:800,fontSize:14,fontFamily:'inherit'}}>
                 {t('friends_join')}
               </button>
-              <button onClick={()=>{clearInvite(account.key);setPendingInvite(null);}} style={{flex:1,padding:'9px',borderRadius:9,
-                background:'transparent',border:'1.5px solid var(--border)',color:'var(--subtle)',
-                cursor:'pointer',fontWeight:700,fontSize:13,fontFamily:'system-ui,-apple-system,sans-serif'}}>
+              <button onClick={()=>{clearInvite(account.key);setPendingInvite(null);}} style={{flex:1,padding:'9px',borderRadius:11,
+                background:'transparent',border:'3px solid var(--hx-line)',color:'var(--hx-ink)',
+                cursor:'pointer',fontWeight:800,fontSize:14,fontFamily:'inherit'}}>
                 {t('friends_decline')}
               </button>
             </div>
           </div>
-        </div>
-      )}
-      <div style={{textAlign:'center',marginBottom:30,position:'relative',zIndex:1}}>
-        {kopfWerbung?(
-          <div ref={function(el){if(el&&window.WWWerbung)WWWerbung.kopf(el);}} style={{width:320,maxWidth:'100%',height:100,margin:'42px auto 4px'}}/>
-        ):(<>
-          <div style={{marginBottom:14,display:'flex',justifyContent:'center'}}>
-            <div style={{width:78,height:78,borderRadius:22,
-              background:selectedMap==='duel'
-                ?'linear-gradient(140deg,#8b5cf6 0%,#6d28d9 52%,#4c1d95 100%)'
-                :'linear-gradient(140deg,#ef4444 0%,#8b5cf6 52%,#3b82f6 100%)',
-              display:'flex',alignItems:'center',justifyContent:'center',
-              boxShadow:selectedMap==='duel'
-                ?'0 12px 30px rgba(139,92,246,0.42),inset 0 1px 1px rgba(255,255,255,0.35)'
-                :'0 12px 30px rgba(99,102,241,0.32),inset 0 1px 1px rgba(255,255,255,0.35)',
-              transition:'all 0.5s ease'}}>
-              <BrickWallIcon size={42} light/>
-            </div>
-          </div>
-          <div style={{fontSize:32,fontWeight:900,letterSpacing:-1.8,color:'var(--text)',lineHeight:1,cursor:'default',userSelect:'none'}}>{t('title')}</div>
-          <div style={{fontSize:10,fontWeight:800,letterSpacing:3,color:'var(--subtle)',marginTop:8,textTransform:'uppercase',userSelect:'none'}}>{t('subtitle')}</div>
-        </>)}
-        {/* Dynamischer Unter-Slogan */}
-        <div style={{
-          marginTop:10,
-          display:'inline-block',
-          fontSize:11,fontWeight:900,letterSpacing:1.8,
-          transform:'rotate(-2.5deg)',
-          background:selectedMap==='duel'
-            ?'linear-gradient(90deg,#8b5cf6,#c084fc,#7c3aed,#a855f7,#8b5cf6)'
-            :'linear-gradient(90deg,#3b82f6,#60a5fa,#2563eb,#93c5fd,#3b82f6)',
-          backgroundSize:'200% 200%',
-          WebkitBackgroundClip:'text',
-          WebkitTextFillColor:'transparent',
-          backgroundClip:'text',
-          animation:'slogan-shimmer 2.8s ease-in-out infinite, slogan-wobble 4s ease-in-out infinite',
-          transition:'background 0.5s ease',
-          userSelect:'none'}}>
-          {selectedMap==='duel'?'// 1v1 ARENA MODE //':'// THE ULTIMATE RACE //'}
-        </div>
-        {globalStats.online>0&&adminCfg.features.showPresence&&(
-          <div style={{marginTop:10,display:'inline-flex',alignItems:'center',gap:10,padding:'5px 14px',
-            borderRadius:20,background:'var(--card)',border:'1.5px solid var(--border)'}}>
-            <span style={{display:'flex',alignItems:'center',gap:5,fontSize:12,fontWeight:700,color:'#22c55e'}}>
-              <span style={{width:7,height:7,borderRadius:'50%',background:'#22c55e',display:'inline-block',animation:'pulse 1.5s ease-in-out infinite'}}/>
-              {globalStats.online} online
-            </span>
-            {globalStats.inGame>0&&adminCfg.features.showInGame&&(
-              <span style={{fontSize:12,fontWeight:700,color:'var(--subtle)',display:'inline-flex',alignItems:'center',gap:4}}>· <GamepadIcon size={12} color="var(--subtle)"/> {globalStats.inGame} {t('friends_inGame')||'in einer Runde'}</span>
-            )}
-          </div>
         )}
+        <div className="hx-logo">
+          {kopfWerbung?(
+            <div ref={function(el){if(el&&window.WWWerbung)WWWerbung.kopf(el);}} style={{width:320,maxWidth:'100%',height:100,margin:'0 auto 4px'}}/>
+          ):(<>
+            <div><span className="hx-wort" data-t="HUPSY">HUPSY</span></div>
+            <span className="hx-unter hx-on">Wall Race</span>
+          </>)}
+          {globalStats.online>0&&adminCfg.features.showPresence&&(
+            <div className="hx-pille">
+              <span style={{display:'flex',alignItems:'center',gap:5,color:'#7dffa8'}}>
+                <span style={{width:7,height:7,borderRadius:'50%',background:'#22c55e',display:'inline-block'}}/>
+                {globalStats.online} online
+              </span>
+              {globalStats.inGame>0&&adminCfg.features.showInGame&&(
+                <span style={{display:'inline-flex',alignItems:'center',gap:4}}><GamepadIcon size={12} color="#fff"/> {globalStats.inGame} {t('friends_inGame')||'in einer Runde'}</span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="hx-stage">
+          <button className="hx-side hx-s1" data-e2e="freunde" onClick={()=>{setNavDir('fwd');setScreen('friends');}}>
+            <span className="hx-rnd">
+              <PeopleIcon size={20} color="currentColor"/>
+              {(pendingInvite||friendReqCount>0)&&<span className="hx-bdg">{friendReqCount>0?(friendReqCount>9?'9+':friendReqCount):''}</span>}
+            </span>
+            <span className="hx-on">{t('friends')}</span>
+          </button>
+          <button className="hx-side hx-s2" onClick={openTutorial}>
+            <span className="hx-rnd"><BookIcon size={20} color="currentColor"/></span>
+            <span className="hx-on">{t('hxHelp')}</span>
+          </button>
+          <button className="hx-side hx-s3" onClick={()=>setShowInbox(true)}>
+            <span className="hx-rnd">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                <path d="M19 16v6"/><path d="M16 19h6"/>
+              </svg>
+              {unreadCount>0&&<span className="hx-bdg">{unreadCount>9?'9+':unreadCount}</span>}
+            </span>
+            <span className="hx-on">{t('hxPost')}</span>
+          </button>
+          <div className="hx-dio"><div className="hx-brett"><div className="hx-cells">
+            {hxFelder}
+            <span className="hx-pc hx-rot" style={{'--x':4,'--y':0}}/>
+            <span className="hx-pc hx-blau" style={{'--x':4,'--y':8}}/>
+            <span className="hx-wl hx-wh hx-blau" style={{'--x':3,'--y':6}}/>
+            <span className="hx-wl hx-wv hx-rot" style={{'--x':6,'--y':2}}/>
+          </div></div></div>
+        </div>
+        {/* Modus-Platte: oeffnet die Modus-Einstellungen */}
+        <button onClick={()=>{setNavDir('fwd');setScreen('modeConfig');}} className="hx-plate hx-mode hx-press">
+          <span className="hx-mode-i" style={{background:selectedMap==='duel'?'#8b5cf6':'#3b82f6'}}><MazeIcon size={20}/></span>
+          <span className="hx-mode-t">
+            <span>{t('modeLabel')}</span>
+            <b>{selectedMap==='duel'?t('duel'):t('classic')}</b>
+            <small>{modeLabel}{' · '}{gameBarr} {t('barricadesLabel').toLowerCase()}</small>
+          </span>
+          <span className="hx-chev">{'›'}</span>
+        </button>
+        <button className="hx-btn" onClick={hxZuModi}><span className="hx-face">{t('hxPlay')}</span></button>
       </div>
-
-      {/* Modus-Konfigurations-Button */}
-      <button onClick={()=>{setNavDir('fwd');setScreen('modeConfig');}} className="mi-btn" style={{
-        width:280,padding:'12px 14px',marginBottom:20,position:'relative',zIndex:1,
-        background:'var(--card)',
-        border:'1.5px solid var(--border)',
-        borderLeft:selectedMap==='duel'?'4px solid #8b5cf6':'4px solid #3b82f6',
-        borderRadius:16,cursor:'pointer',display:'flex',alignItems:'center',gap:12,
-        boxShadow:'0 2px 5px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16)',
-        fontFamily:'system-ui,-apple-system,sans-serif'}}>
-        <div style={{width:40,height:40,borderRadius:12,
-          background:selectedMap==='duel'
-            ?'linear-gradient(135deg,#7c3aed,#8b5cf6)'
-            :'linear-gradient(135deg,#2563eb,#3b82f6)',
-          display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,
-          boxShadow:'0 2px 8px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.2)'}}>
-          <MazeIcon size={20}/>
-        </div>
-        <div style={{flex:1,textAlign:'left',minWidth:0}}>
-          <div style={{fontSize:9,fontWeight:800,letterSpacing:1.8,color:'var(--subtle)',textTransform:'uppercase',marginBottom:2}}>{t('modeLabel')}</div>
-          <div style={{fontSize:14,fontWeight:900,color:'var(--text)',letterSpacing:-0.3,lineHeight:1.1}}>
-            {selectedMap==='duel'?t('duel'):t('classic')}
-            <span style={{fontSize:11,fontWeight:700,color:'var(--subtle)',marginLeft:6,letterSpacing:0}}>{modeLabel}</span>
-          </div>
-          <div style={{fontSize:10,fontWeight:700,color:'var(--subtle)',marginTop:2}}>
-            {gameBarr} {t('barricadesLabel').toLowerCase()}
-          </div>
-        </div>
-        <span style={{fontSize:16,color:'var(--subtle)',fontWeight:700}}>›</span>
-      </button>
-
-      <div style={{width:280,position:'relative',zIndex:1}}>
+      {/* Spielmodi: Eintraege, Reihenfolge und Aktionen wie bisher */}
+      <div id="hx-modi" className="hx-list">
+        <div className="hx-h">{t('gameModes')}</div>
         {/* Menue-Reihenfolge (Tunay 2026-09-26, King of the Hill + Ranked umgestellt 2026-10-16): Weltliga (groesser, Flaggen-Mosaik), King of the Hill (orange), Online (lila), Ranked (gelb), Bot (grau), Freunde, danach 2v2 + Lokal */}
-        <div style={{display:'flex',flexDirection:'column',gap:10,marginBottom:18}}>
         {feat('online')&&(
           <button data-wl="menu" onClick={()=>{setNavDir('fwd');setScreen('weltliga');}} className="mi-btn" style={{
             width:'100%',minHeight:116,padding:0,marginBottom:4,position:'relative',overflow:'hidden',
-            background:'#0f172a',border:'none',borderRadius:20,cursor:'pointer',
-            boxShadow:'0 2px 6px rgba(15,23,42,0.18),0 14px 32px rgba(15,23,42,0.24)',
-            fontFamily:'system-ui,-apple-system,sans-serif',textAlign:'left'}}>
+            background:'#0f172a',border:'3px solid var(--hx-line)',borderRadius:20,cursor:'pointer',
+            boxShadow:'0 5px 0 var(--hx-line),0 14px 18px -8px var(--hx-sh)',
+            fontFamily:'inherit',textAlign:'left'}}>
             <div aria-hidden="true" style={{position:'absolute',inset:0,display:'grid',gridTemplateColumns:'repeat(8,1fr)',gridTemplateRows:'repeat(4,1fr)',gap:2,padding:2}}>
               {WL_MOSAIK.map(function(c){return <img key={c} src={'flags/4x3/'+c+'.svg'} alt="" draggable="false" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:3,display:'block'}}/>;})}
             </div>
@@ -7464,35 +7516,31 @@ function App(){
         {feat('bots')&&<MenuFarbe bg="#64748b" icon={<BotIcon size={19}/>}
           title={t('vsBot')} desc={t('vsBotDesc')}
           onClick={()=>{setNavDir('fwd');setScreen('difficulty');}}/>}
-        {feat('friend')&&<MenuItem
+        {feat('friend')&&<MenuItem hx
           icon={<PeopleIcon size={19} color="#fff"/>} iconBg="linear-gradient(135deg,#8b5cf6,#7c3aed)"
           title={t('friendPlay')} desc={t('friendDesc')}
           onClick={()=>{setNavDir('fwd');setScreen('friendPlay');}}/>}
-        {feat('twovtwo')&&<MenuItem
+        {feat('twovtwo')&&<MenuItem hx
           icon={<PeopleIcon size={19} color="#fff"/>} iconBg="linear-gradient(135deg,#ef4444,#8b5cf6)"
           title={'2 vs 2'} desc={t('teamModeDesc')}
           onClick={()=>{setTv2Resume(false);setNavDir('fwd');setScreen('twovtwo');}}/>}
-        {feat('local')&&<MenuItem
+        {feat('local')&&<MenuItem hx
           icon={<PhoneIcon size={19}/>} iconBg="linear-gradient(135deg,#14b8a6,#0d9488)"
           title={t('localPlay')} desc={t('localDesc')}
           onClick={()=>initGame('pvp',undefined,null,false,undefined,false,selectedMap)}/>}
-        </div>
-
         {/* COMMUNITY */}
         <div style={{display:'flex',gap:10,justifyContent:'center',marginTop:6,paddingBottom:4}}>
           <button onClick={()=>window.open('https://discord.gg/XtFzzjpmf','_blank')} style={{
             display:'flex',alignItems:'center',gap:7,padding:'9px 16px',borderRadius:20,
-            background:'var(--card)',border:'1.5px solid var(--border)',cursor:'pointer',
-            boxShadow:'var(--shadow-soft)',fontFamily:'system-ui,-apple-system,sans-serif'}}>
+            cursor:'pointer',fontFamily:'inherit'}} className="hx-plate hx-press">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="#5865F2">
               <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
             </svg>
-            <span style={{fontSize:12,fontWeight:800,color:'var(--text)',letterSpacing:0.2}}>Discord</span>
+            <span style={{fontSize:13,fontWeight:800,color:'var(--hx-ink)',letterSpacing:0.2}}>Discord</span>
           </button>
           <button onClick={()=>window.open('https://www.instagram.com/hupsy.app/','_blank')} style={{
             display:'flex',alignItems:'center',gap:7,padding:'9px 16px',borderRadius:20,
-            background:'var(--card)',border:'1.5px solid var(--border)',cursor:'pointer',
-            boxShadow:'var(--shadow-soft)',fontFamily:'system-ui,-apple-system,sans-serif'}}>
+            cursor:'pointer',fontFamily:'inherit'}} className="hx-plate hx-press">
             <svg viewBox="0 0 24 24" width="17" height="17">
               <defs><linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#f09433"/>
@@ -7503,10 +7551,17 @@ function App(){
               </linearGradient></defs>
               <path fill="url(#igGrad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
             </svg>
-            <span style={{fontSize:12,fontWeight:800,color:'var(--text)',letterSpacing:0.2}}>Instagram</span>
+            <span style={{fontSize:13,fontWeight:800,color:'var(--hx-ink)',letterSpacing:0.2}}>Instagram</span>
           </button>
         </div>
-        <div style={{height:24}}/>
+      {/* Datenschutz-Link */}
+      <button onClick={function(){setNavDir('fwd');setScreen('legal');}} style={{
+        background:'none',border:'none',
+        color:'#fff',cursor:'pointer',fontSize:12,fontWeight:600,
+        fontFamily:'inherit',opacity:0.85,
+        padding:'8px 12px',marginTop:8,marginBottom:'calc(env(safe-area-inset-bottom) + 16px)'}}>
+        {lang==='de'?'Datenschutz & Impressum':lang==='tr'?'Gizlilik & K\u00fcnye':lang==='fr'?'Confidentialit\u00e9 & Mentions':'Privacy & Legal'}
+      </button>
       </div>
       {showOptions&&(
         <div onClick={()=>{setShowOptions(false);setShowLang(false);setOptionsTab('main');}} style={{position:'fixed',inset:0,
@@ -7894,55 +7949,19 @@ function App(){
         </div>
       )}
 
-      {/* Datenschutz-Link */}
-      <button onClick={function(){setNavDir('fwd');setScreen('legal');}} style={{
-        background:'none',border:'none',
-        color:'var(--subtle)',cursor:'pointer',fontSize:11,fontWeight:600,
-        fontFamily:'system-ui,-apple-system,sans-serif',opacity:0.7,
-        padding:'8px 12px',marginTop:8,marginBottom:'calc(env(safe-area-inset-bottom) + 16px)'}}>
-        {lang==='de'?'Datenschutz & Impressum':lang==='tr'?'Gizlilik & K\u00fcnye':lang==='fr'?'Confidentialit\u00e9 & Mentions':'Privacy & Legal'}
-      </button>
-
-
-
-      {/* BOTTOM NAVIGATION BAR */}
-      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:250,
-        background:'var(--card)',borderTop:'1px solid var(--border)',
-        boxShadow:'0 -2px 16px rgba(0,0,0,0.08)',
-        paddingBottom:'env(safe-area-inset-bottom, 0px)',
-        display:'flex',alignItems:'stretch'}}>
-        {/* Home */}
-        <button style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-          gap:2,background:'none',border:'none',cursor:'default',padding:'10px 0',minHeight:54}}>
-          <HomeIcon size={22} color="#8b5cf6"/>
-          <span style={{fontSize:9,fontWeight:900,color:'#8b5cf6',letterSpacing:0.3}}>{'Home'}</span>
+      {/* Leiste unten: Rangliste, Home, Profil. Einstellungen liegen auf dem Zahnrad oben rechts */}
+      <div className="hx-nav">
+        <button className="hx-tab" onClick={()=>{setNavDir('fwd');setScreen('leaderboard');}}>
+          <TrophySmIcon size={22} color="currentColor"/>
+          <span>{t('leaderboardTitle')}</span>
         </button>
-        {/* Leaderboard */}
-        <button onClick={()=>{setNavDir('fwd');setScreen('leaderboard');}}
-          style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-            gap:2,background:'none',border:'none',cursor:'pointer',padding:'10px 0',minHeight:54}}>
-          <TrophySmIcon size={22} color="var(--subtle)"/>
-          <span style={{fontSize:9,fontWeight:700,color:'var(--subtle)',letterSpacing:0.3,textAlign:'center',lineHeight:1.2}}>{t('leaderboardTitle')}</span>
+        <button className="hx-tab hx-an">
+          <HomeIcon size={22} color="currentColor"/>
+          <span>{'Home'}</span>
         </button>
-        {/* Profile */}
-        <button onClick={()=>{setNavDir('fwd');setScreen(account?'profile':'auth');}}
-          style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-            gap:2,background:'none',border:'none',cursor:'pointer',padding:'10px 0',minHeight:54}}>
-          {account
-            ?<div style={{width:26,height:26,borderRadius:'50%',background:account.color,
-                display:'flex',alignItems:'center',justifyContent:'center',
-                boxShadow:'0 2px 6px '+account.color+'66'}}>
-                <span style={{fontSize:11,fontWeight:900,color:'#fff',lineHeight:1}}>{account.name.slice(0,1).toUpperCase()}</span>
-              </div>
-            :<PeopleIcon size={22} color="var(--subtle)"/>}
-          <span style={{fontSize:9,fontWeight:700,color:'var(--subtle)',letterSpacing:0.3}}>{t('profile')}</span>
-        </button>
-        {/* Settings */}
-        <button onClick={()=>{setOptionsTab('main');setShowOptions(true);}}
-          style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-            gap:2,background:'none',border:'none',cursor:'pointer',padding:'10px 0',minHeight:54}}>
-          <GearIcon size={22} color="var(--subtle)"/>
-          <span style={{fontSize:9,fontWeight:700,color:'var(--subtle)',letterSpacing:0.3}}>{t('options')}</span>
+        <button className="hx-tab" onClick={()=>{setNavDir('fwd');setScreen(account?'profile':'auth');}}>
+          <PeopleIcon size={22} color="currentColor"/>
+          <span>{t('profile')}</span>
         </button>
       </div>
 
@@ -11845,29 +11864,29 @@ function RankedWert({r}){
 }
 function MenuFarbe({bg,tx,icon,title,desc,right,onClick}){
   var c=tx||'#fff';
-  return <button onClick={onClick} className="mi-btn" style={{width:'100%',padding:'12px 14px',borderRadius:18,background:bg,border:'none',
-    display:'flex',alignItems:'center',gap:13,cursor:'pointer',textAlign:'left',
-    boxShadow:'0 2px 6px rgba(15,23,42,0.14),0 10px 24px rgba(15,23,42,0.16)',fontFamily:'system-ui,-apple-system,sans-serif'}}>
+  return <button onClick={onClick} className="mi-btn hx-zeile" style={{width:'100%',padding:'12px 14px 15px',borderRadius:18,background:bg,border:'none',
+    display:'flex',alignItems:'center',gap:13,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>
     <div style={{width:40,height:40,borderRadius:13,flexShrink:0,background:'rgba(255,255,255,0.24)',display:'flex',alignItems:'center',justifyContent:'center',color:c}}>{icon}</div>
     <div style={{flex:1,minWidth:0}}>
-      <div style={{fontSize:14,fontWeight:900,lineHeight:1.2,color:c,letterSpacing:-0.1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</div>
-      {desc?<div style={{fontSize:11,fontWeight:600,marginTop:2,color:c,opacity:0.78,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{desc}</div>:null}
+      <div style={{fontSize:16,fontWeight:800,lineHeight:1.2,color:c,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</div>
+      {desc?<div style={{fontSize:12.5,fontWeight:600,marginTop:1,color:c,opacity:0.85,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{desc}</div>:null}
     </div>
     {right||<span style={{fontSize:16,color:c,opacity:0.7,fontWeight:700}}>{'›'}</span>}
   </button>;
 }
-function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightBg,pulse,glowColor}){
+function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightBg,pulse,glowColor,hx}){
+  var P=hx&&!highlight; // hx: Platte im neuen Design (Menue)
   return(
     <div style={{position:'relative'}}>
       <button onClick={onClick} className={highlight?'mi-btn mi-btn-hl':'mi-btn'} style={{
         width:'100%',padding:highlight?'15px 15px':'12px 14px',borderRadius:18,position:'relative',
-        background:highlight?highlightBg:'var(--card)',
-        border:'1.5px solid '+(highlight?'transparent':'var(--border)'),
+        background:highlight?highlightBg:P?'linear-gradient(var(--hx-plate1),var(--hx-plate2))':'var(--card)',
+        border:P?'3px solid var(--hx-line)':'1.5px solid '+(highlight?'transparent':'var(--border)'),
         display:'flex',alignItems:'center',gap:13,cursor:'pointer',
         boxShadow:highlight
           ?('0 2px 6px rgba(15,23,42,0.2),0 16px 38px rgba(15,23,42,0.3),inset 0 1px 0 rgba(255,255,255,0.28)'+(glowColor?(',0 6px 34px '+glowColor+',0 0 60px '+glowColor):''))
-          :'0 2px 6px rgba(15,23,42,0.12),0 14px 32px rgba(15,23,42,0.2),inset 0 1px 0 rgba(255,255,255,0.4)',
-        opacity:off?0.45:1,fontFamily:'system-ui,-apple-system,sans-serif',
+          :P?'0 5px 0 var(--hx-line),0 12px 16px -8px var(--hx-sh)':'0 2px 6px rgba(15,23,42,0.12),0 14px 32px rgba(15,23,42,0.2),inset 0 1px 0 rgba(255,255,255,0.4)',
+        opacity:off?0.45:1,fontFamily:P?'inherit':'system-ui,-apple-system,sans-serif',
         animation:pulse&&!off?'highlightPulse 2.5s ease-in-out infinite':highlight?'highlightGlow 3s ease-in-out infinite':'none',
         overflow:'hidden'}}>
         {highlight&&<div style={{position:'absolute',inset:0,background:'linear-gradient(105deg,transparent 38%,rgba(255,255,255,0.13) 50%,transparent 62%)',
@@ -11883,15 +11902,15 @@ function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightB
           {icon}
         </div>
         <div style={{flex:1,textAlign:'left',minWidth:0}}>
-          <div style={{fontSize:highlight?15:14,fontWeight:900,lineHeight:1.2,
-            color:highlight?'#fff':'var(--text)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',
+          <div style={{fontSize:highlight?15:P?16:14,fontWeight:P?800:900,lineHeight:1.2,
+            color:highlight?'#fff':P?'var(--hx-ink)':'var(--text)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',
             letterSpacing:highlight?-0.4:-0.1}}>{title}</div>
-          {desc?<div style={{fontSize:11,fontWeight:600,marginTop:2,
-            color:highlight?'rgba(255,255,255,0.82)':'var(--subtle)'}}>{desc}</div>:null}
+          {desc?<div style={{fontSize:P?12.5:11,fontWeight:600,marginTop:P?1:2,
+            color:highlight?'rgba(255,255,255,0.82)':P?'var(--hx-ink2)':'var(--subtle)'}}>{desc}</div>:null}
         </div>
         {right?right:null}
         <span style={{fontSize:16,fontWeight:700,flexShrink:0,
-          color:highlight?'rgba(255,255,255,0.7)':'var(--subtle)',marginRight:2}}>›</span>
+          color:highlight?'rgba(255,255,255,0.7)':P?'var(--hx-ink2)':'var(--subtle)',marginRight:2}}>›</span>
       </button>
       {off?<span style={{position:'absolute',top:-6,right:8,fontSize:8,fontWeight:800,
         background:'#ef4444',color:'white',padding:'2px 7px',borderRadius:6,zIndex:2}}>AUS</span>:null}
