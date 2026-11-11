@@ -1,10 +1,10 @@
 // Wrong Way PWA Service Worker
-const CACHE = 'wrongway-v259';
+const CACHE = 'wrongway-v260';
 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(['/', '/index.html', '/js/i18n.js', '/js/game-logic.js', '/js/bot.js', '/js/ai.js', '/js/sound.js', '/js/werbung.js', '/js/vendor/react.production.min.js', '/js/vendor/react-dom.production.min.js', '/js/vendor/babel.min.js', '/js/vendor/qrcode.min.js', '/fonts/Baloo2-600.woff2', '/fonts/Baloo2-800.woff2', '/fonts/LuckiestGuy.woff2']))
+      .then(c => c.addAll(['/', '/index.html', '/js/i18n.js', '/js/game-logic.js', '/js/bot.js', '/js/ai.js', '/js/sound.js', '/js/werbung.js', '/js/vendor/react.production.min.js', '/js/vendor/react-dom.production.min.js', '/js/vendor/babel.min.js', '/js/vendor/qrcode.min.js', '/fonts/Baloo2-600.woff2', '/fonts/Baloo2-800.woff2', '/fonts/LuckiestGuy.woff2', '/hupsy-app.jpg']))
       .then(() => self.skipWaiting())
   );
 });

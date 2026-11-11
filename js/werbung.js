@@ -105,13 +105,16 @@
     },
     // Vollbild erst beim Verlassen des Endbildschirms Richtung Menue: nie mitten in eine Revanche,
     // deren Uhr online schon laeuft
+    // liefert true, wenn dabei ein Vollbild angefragt wurde (der App-Hinweis weicht dann)
     bildschirm: function(name){
+      var lief = false;
       bild = name;
       if (faellig && !MATCH[name] && name !== 'end'){
         faellig = false;
-        if (vollbild && ok) (vorschau ? vorschauVollbild : window.adBreak)({ type: 'next', name: 'match_ende' });
+        if (vollbild && ok){ lief = true; (vorschau ? vorschauVollbild : window.adBreak)({ type: 'next', name: 'match_ende' }); }
       }
       aktualisieren();
+      return lief;
     },
     // Revanche-Knopf: ist ein Vollbild faellig, erst die Werbung, dann weiter. Online startet die Revanche erst, wenn
     // beide sie wollen, die Uhr laeuft also noch nicht; der Gegner wartet hoechstens die Werbung ab. Kommt keine Werbung

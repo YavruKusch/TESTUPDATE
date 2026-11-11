@@ -182,6 +182,26 @@
   .hx-sheet-l{display:flex;flex-direction:column;gap:12px;padding:8px 14px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
   .hx-h{font-family:var(--hx-fd);font-weight:400;font-size:28px;line-height:1;letter-spacing:0.03em;text-transform:uppercase;text-align:center;color:#fff;text-shadow:0 3px 0 var(--hx-kontur);margin-bottom:2px;}
   .hx-zeile{box-shadow:inset 0 3px 0 rgba(255,255,255,0.28),inset 0 -5px 0 rgba(9,24,64,0.22),0 10px 16px -8px var(--hx-sh);}
+  /* App-Hinweis: Karte im Menue + Fenster (nutzt das Spielmodi-Fenster als Huelle); nur transform/opacity bewegen sich */
+  .hx-appk{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:6px 12px 6px 7px;text-align:left;font-family:inherit;}
+  .hx-appk img{width:34px;height:34px;border-radius:10px;flex:none;border:2px solid var(--hx-line);}
+  .hx-appk span:nth-of-type(1){flex:1;min-width:0;}
+  .hx-appk b{display:block;font-size:14.5px;line-height:1.15;}
+  .hx-appk small{display:block;font-size:12px;line-height:1.2;font-weight:600;color:var(--hx-ink2);}
+  .hx-app-l{display:flex;flex-direction:column;gap:14px;padding:6px 18px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  .hx-app-kopf{display:flex;align-items:center;gap:14px;}
+  .hx-app-ico{width:72px;height:72px;border-radius:20px;flex:none;border:3px solid var(--hx-line);box-shadow:0 4px 0 var(--hx-line);}
+  .hx-app-kopf b{display:block;font-family:var(--hx-fd);font-weight:400;font-size:30px;line-height:1;letter-spacing:0.03em;text-transform:uppercase;}
+  .hx-app-kopf span{display:block;font-size:15px;font-weight:800;color:var(--hx-ink2);margin-top:2px;}
+  .hx-app-v{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
+  .hx-app-v li{display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:700;line-height:1.25;}
+  .hx-app-ok{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#13254a;
+    background:linear-gradient(#ffdf5e,#ffc21f);border:2px solid #9a5300;}
+  .hx-app-st{display:flex;flex-direction:column;gap:2px;margin-top:4px;}
+  .hx-app-st a.hx-btn{text-decoration:none;}
+  .hx-fk{min-height:52px;font-size:24px;}
+  .hx-aus{opacity:0.6;cursor:default;}
+  .hx-app-weiter{align-self:center;min-height:44px;padding:8px 14px;background:none;border:0;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;color:var(--hx-ink);text-decoration:underline;}
   /* Leiste unten: aktiver Reiter ist eine gelbe Kachel, die ueber die Leiste ragt */
   .hx-nav{position:fixed;left:0;right:0;bottom:0;z-index:250;display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom, 0px);
     background:linear-gradient(var(--hx-nav1),var(--hx-nav2));box-shadow:0 -3px 0 var(--hx-navl);font-family:var(--hx-f);}
@@ -193,7 +213,7 @@
     background:linear-gradient(#ffdf5e,#ffc21f);border:3px solid #9a5300;box-shadow:inset 0 3px 0 rgba(255,255,255,0.5),0 5px 0 #d98200;}
   .hx-s1{left:0;top:6px;}.hx-s2{left:0;top:92px;}.hx-s3{right:0;top:48px;}
   /* Niedrige Bildschirme: Brett und Logo kleiner, damit der Spielen-Knopf ueber der Leiste bleibt */
-  @media (max-height:700px){.hx-logo{margin-top:10px;}.hx-wort{font-size:52px;}.hx-stage{min-height:150px;}.hx-dio{width:200px;}.hx-s2{top:76px;}.hx-s3{top:40px;}.hx-side .hx-rnd{width:40px;height:40px;}}
+  @media (max-height:700px){.hx-logo{margin-top:10px;}.hx-wort{font-size:52px;}.hx-stage{min-height:116px;margin-bottom:8px;}.hx-dio{width:200px;margin:-18px 0 -16px;}.hx-s2{top:64px;}.hx-s3{top:34px;}.hx-side .hx-rnd{width:40px;height:40px;}.hx-hint{margin-top:8px;padding:6px 10px;}.hx-appk{margin-top:8px;padding:4px 10px 4px 5px;}.hx-appk img{width:28px;height:28px;}.hx-appk small{display:none;}}
   @media (prefers-reduced-motion:reduce){.hx-press,.hx-rnd,.hx-face,.hx-sheet,.hx-scrim{transition:none;}}
 
   @keyframes wall-enter{
@@ -1381,6 +1401,22 @@ function gruppenGefiltert(feats,gruppen,istApp){
 }
 // Revanche: faelliges Vollbild zuerst (js/werbung.js), danach weiter wie immer
 function nachWerbung(fn){if(window.WWWerbung)WWWerbung.weiter(fn);else fn();}
+// App-Hinweis "Hol dir die App": Adresse je Store (leer = "bald" ohne Link); Android bis zum Store-Start ueber den Tester-Weg (Instagram)
+var HX_STORES={android:{url:'',test:'https://www.instagram.com/hupsy.app/'},ios:{url:'',test:''}};
+function hxHeute(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+// hoechstens 1x je Kalendertag und Geraet; ohne nutzbaren Speicher nie von selbst zeigen
+function hxAppFaellig(){try{return localStorage.getItem('ww_apphinweis')!==hxHeute();}catch(e){return false;}}
+function hxAppGezeigt(){try{localStorage.setItem('ww_apphinweis',hxHeute());}catch(e){}}
+// am Handy nur der passende Store, am Rechner beide
+function hxStoreListe(){
+  var ua=navigator.userAgent||'';
+  var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var and=/Android/.test(ua);
+  var l=[];
+  if(!ios)l.push({id:'android',name:'Google Play',s:HX_STORES.android});
+  if(!and)l.push({id:'ios',name:'App Store',s:HX_STORES.ios});
+  return l;
+}
 function mergeAdminCfg(cfg){return {features:gruppenGefiltert({...DEFAULT_ADMIN_CFG.features,...(cfg&&cfg.features?cfg.features:{})},cfg&&cfg.featureGroups,false),announce:cfg&&cfg.announce?cfg.announce:'',announceUntil:cfg&&cfg.announceUntil?cfg.announceUntil:0,maintenance:!!(cfg&&cfg.maintenance),werbungJedes:cfg?cfg.werbungJedes:undefined};}
 // Erklärtexte für Modi-Hilfe (umkreistes ?)
 const MODE_HELP={
@@ -4199,6 +4235,8 @@ function App(){
   const[lang,setLang]=useState(getInitialLang());
   const[showOptions,setShowOptions]=useState(false);
   const[hxModiOffen,setHxModiOffen]=useState(false); // Spielmodi-Fenster der Startseite (SPIELEN)
+  const[hxAppOffen,setHxAppOffen]=useState(false); // Fenster "Hol dir die App" (Karte im Menue oder 1x am Tag nach dem Spiel)
+  const hxVorBildRef=useRef(null);
   const[showInbox,setShowInbox]=useState(false);
   const[broadcasts,setBroadcasts]=useState([]);
   const[warnings,setWarnings]=useState([]); // persoenliche Verwarnungen aus ww_warnings/<uid> (.once beim Login)
@@ -4971,7 +5009,12 @@ function App(){
       if(pending){setXpGainAnim(pending);pendingXpUpdateRef.current=null;}
     }
     // Werbung: Match zaehlen, Plaetze je Bildschirm, Vollbild erst beim Weg ins Menue (js/werbung.js)
-    if(window.WWWerbung){if(screen==='end')WWWerbung.matchEnde();WWWerbung.bildschirm(screen);}
+    var werbungLief=false;
+    if(window.WWWerbung){if(screen==='end')WWWerbung.matchEnde();werbungLief=WWWerbung.bildschirm(screen)===true;}
+    // App-Hinweis: nur beim Weg Endbildschirm -> Menue, nie nach demselben Spiel wie ein Werbe-Vollbild, 1x am Tag
+    var vorBild=hxVorBildRef.current;hxVorBildRef.current=screen;
+    if(screen!=='menu')setHxAppOffen(false);
+    else if(vorBild==='end'&&!werbungLief&&hxAppFaellig()){hxAppGezeigt();setHxAppOffen(true);}
   },[screen]);
   useEffect(()=>{if(window.WWWerbung)WWWerbung.konfig(adminCfg,cookieConsent==='all');},[adminCfg,cookieConsent]);
 
@@ -7365,6 +7408,12 @@ function App(){
           <MegaphoneIcon size={16} color="#fff"/>
           <span>{t('androidTestHinweis')} <b style={{whiteSpace:'nowrap'}}>@hupsy.app {'›'}</b></span>
         </a>
+        {/* Karte "Hol dir die App": oeffnet das Fenster; ersetzt nach dem Store-Start den Android-Test-Hinweis */}
+        <button data-e2e="apphinweis-karte" className="hx-plate hx-press hx-appk" onClick={()=>setHxAppOffen(true)}>
+          <img src="hupsy-app.jpg" alt="" width={34} height={34}/>
+          <span><b>{t('hxAppKarte')}</b><small>{t('hxAppKarteText')}</small></span>
+          <span className="hx-chev">{'›'}</span>
+        </button>
         {pendingInvite&&(
           <div className="hx-plate" style={{marginTop:12,padding:'11px 13px'}}>
             <div style={{fontSize:14,fontWeight:800,display:'flex',alignItems:'center',gap:6}}>
@@ -7907,6 +7956,39 @@ function App(){
         </div>
       )}
 
+      {/* Fenster "Hol dir die App" (Tunay 2026-11-11): Karte im Menue oeffnet es, nach dem Spiel kommt es hoechstens 1x am Tag.
+          Browser-Spieler in die App holen; Coins und Shop selbst bleiben App-only, hier nur Text. Kein Firebase. */}
+      <div id="hx-app" data-e2e="apphinweis" className={"hx-sheetw"+(hxAppOffen?" hx-offen":"")} role="dialog" aria-modal="true" aria-label={t('hxAppKarte')}>
+        <div className="hx-scrim" onClick={()=>setHxAppOffen(false)}/>
+        <div className="hx-sheet">
+          <div className="hx-grip"/>
+          <div className="hx-sheet-k">
+            <div className="hx-h">{t('hxAppKarte')}</div>
+            <button className="hx-rnd hx-zu" onClick={()=>setHxAppOffen(false)} aria-label={t('tutBack')}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+            </button>
+          </div>
+          <div className="hx-app-l">
+            <div className="hx-app-kopf">
+              <img src="hupsy-app.jpg" alt="" width={72} height={72} className="hx-app-ico"/>
+              <div><b>Hupsy</b><span>Wall Race</span></div>
+            </div>
+            <ul className="hx-app-v">
+              {['hxAppV1','hxAppV2','hxAppV3'].map(function(k){return <li key={k}><span className="hx-app-ok">{'✓'}</span>{t(k)}</li>;})}
+            </ul>
+            <div className="hx-app-st">
+              {hxStoreListe().map(function(st){
+                var ziel=st.s.url||st.s.test;
+                var txt=st.s.url?st.name:(st.s.test?t('hxAppTest'):st.name+' · '+t('hxAppBald'));
+                return ziel
+                  ?<a key={st.id} data-e2e={'apphinweis-'+st.id} className="hx-btn" href={ziel} target="_blank" rel="noopener noreferrer"><span className="hx-face hx-fk">{txt}</span></a>
+                  :<span key={st.id} data-e2e={'apphinweis-'+st.id} className="hx-btn hx-aus"><span className="hx-face hx-fk">{txt}</span></span>;
+              })}
+            </div>
+            <button data-e2e="apphinweis-weiter" className="hx-app-weiter" onClick={()=>setHxAppOffen(false)}>{t('hxAppWeiter')}</button>
+          </div>
+        </div>
+      </div>
       {/* Leiste unten: Rangliste, Home, Profil. Einstellungen liegen auf dem Zahnrad oben rechts */}
       <div className="hx-nav">
         <button className="hx-tab" onClick={()=>{setNavDir('fwd');setScreen('leaderboard');}}>
