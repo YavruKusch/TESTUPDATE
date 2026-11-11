@@ -29,55 +29,38 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  html{
-    min-height:100%;
-    background-color:#f8f9fa;
-    background-image:linear-gradient(rgba(15,23,42,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,0.04) 1px,transparent 1px);
-    background-size:40px 40px;
-  }
-  html.dark{
-    background-color:#070c16;
-    background-image:linear-gradient(rgba(148,163,184,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.06) 1px,transparent 1px);
-    background-size:40px 40px;
-  }
-  body{min-height:100%;overscroll-behavior:contain;background:#f8f9fa;}
-  body.dark{background:#070c16;}
+  html{min-height:100%;}
+  body{min-height:100%;overscroll-behavior:contain;background:transparent;}
   a{color:inherit;text-decoration:none;}
   :not(input):not(textarea){-webkit-touch-callout:none;}
   :root{
-    --bg:#f8f9fa;--card:#ffffff;--text:#0f172a;--subtle:#94a3b8;--muted:#64748b;
-    --border:#e2e8f0;--border-soft:#edf0f3;
+    --bg:#f6e8cb;--card:#fffaf0;--text:#13254a;--subtle:#5a6a8f;--muted:#5a6a8f;
+    --border:#d8bf8a;--border-soft:#e7d4a6;
     --grid-bg:#ffffff;--cell-a:#ffffff;--cell-b:#fafbfc;--cell-line:#edf0f3;
     --goal:#f0fdf4;--start:#f0f8ff;
     --score-bg:#ffffff;--score-border:#f0f0f0;
     --dark-card:#1e293b;
     --shadow-card:0 4px 24px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.04);
-    --shadow-soft:0 2px 8px rgba(0,0,0,0.06);
+    --shadow-soft:0 3px 0 rgba(19,37,74,0.2);
     --menu-grid-line:rgba(15,23,42,0.04);
-    --msec-bg:rgba(255,255,255,0.5);--msec-border:rgba(140,160,200,0.22);
+    --msec-bg:rgba(10,26,74,0.26);--msec-border:rgba(255,255,255,0.2);
   }
   body.dark,html.dark{
-    --bg:#070c16;--card:#161e33;--text:#f1f5f9;--subtle:#64748b;--muted:#94a3b8;
-    --border:#252d44;--border-soft:#1f2840;
+    --bg:#1a2f66;--card:#24407f;--text:#f6ecd6;--subtle:#a9b7dc;--muted:#a9b7dc;
+    --border:#081230;--border-soft:#10204c;
     --grid-bg:#161e33;--cell-a:#161e33;--cell-b:#1a2238;--cell-line:#1f2840;
     --goal:#0d2a1c;--start:#0f1a2c;
     --score-bg:#161e33;--score-border:#252d44;
     --dark-card:#0f1729;
     --shadow-card:0 4px 24px rgba(0,0,0,0.4),0 1px 4px rgba(0,0,0,0.3);
-    --shadow-soft:0 2px 8px rgba(0,0,0,0.3);
+    --shadow-soft:0 3px 0 rgba(0,0,0,0.35);
     --menu-grid-line:rgba(148,163,184,0.065);
-    --msec-bg:rgba(255,255,255,0.035);--msec-border:rgba(150,180,235,0.1);
+    --msec-bg:rgba(0,0,0,0.22);--msec-border:rgba(150,180,235,0.12);
   }
-  html{overflow-x:hidden;touch-action:pan-y;background-color:var(--bg);
-    background-image:linear-gradient(var(--menu-grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--menu-grid-line) 1px,transparent 1px);
-    background-size:40px 40px;
+  html{overflow-x:hidden;touch-action:pan-y;background-color:var(--hx-sky2);background-image:linear-gradient(var(--hx-grid) 2px,transparent 2px),linear-gradient(90deg,var(--hx-grid) 2px,transparent 2px),radial-gradient(120% 70% at 50% 30%,var(--hx-sky1) 0,var(--hx-sky2) 55%,var(--hx-sky3) 100%);background-size:78px 78px,78px 78px,100% 100%;background-position:0 -20px,0 0,0 0;
     font-family:system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%;transition:background-color 0.25s;}
-  body{width:100%;overflow:hidden;touch-action:pan-y;
-    background-color:var(--bg);
-    background-image:linear-gradient(var(--menu-grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--menu-grid-line) 1px,transparent 1px);
-    background-size:40px 40px;
+  body{width:100%;overflow:hidden;touch-action:pan-y;background:transparent;
     font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.25s;}
-  html.dark{background-color:#0a1020;}
   #root{width:100%;min-height:100vh;min-height:100dvh;background:transparent;}
   /* Werbeplaetze (js/werbung.js): die App liegt nur im freien Bereich. transform macht #root zum Bezugsrahmen fuer
      position:fixed, so rutschen Leisten und Randknoepfe mit, statt unter der Werbung zu liegen; aeltere 100vh-Bildschirme scrollen im Rest */
@@ -89,9 +72,9 @@
   .mi-btn:active{transform:scale(0.972) !important;box-shadow:0 1px 4px rgba(15,23,42,0.07) !important;}
   .mi-btn-hl:active{transform:scale(0.972) !important;box-shadow:0 2px 9px rgba(15,23,42,0.18) !important;}
   input{font-size:16px !important;}
-  #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;flex-direction:column;gap:16px;font-family:system-ui,-apple-system,sans-serif;}
+  #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:transparent;z-index:9999;flex-direction:column;gap:16px;font-family:system-ui,-apple-system,sans-serif;}
   #loader .dot{font-size:40px;}
-  #loader .txt{color:#94a3b8;font-size:13px;font-weight:600;}
+  #loader .txt{color:#fff;font-size:14px;font-weight:700;text-shadow:0 2px 0 rgba(9,24,64,0.6);}
   /* ===== Neues Design (Stil "Kachel und Mauer"): zentrale Werte, Schriften, Bausteine ===== */
   @font-face{font-family:'Baloo 2';font-weight:600;font-display:swap;src:url(fonts/Baloo2-600.woff2) format('woff2');}
   @font-face{font-family:'Baloo 2';font-weight:800;font-display:swap;src:url(fonts/Baloo2-800.woff2) format('woff2');}
@@ -761,7 +744,7 @@
   /* ===== Design v8: Spielerkarten + VS-Trenner (Preview) ===== */
   .ww-players{display:flex;align-items:stretch;gap:9px;}
   .ww-pcard{flex:1;border-radius:17px;padding:9px 11px;display:flex;align-items:center;gap:11px;position:relative;overflow:hidden;
-    box-shadow:0 7px 20px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.15),inset 0 -3px 7px rgba(0,0,0,0.26);
+    border:3px solid var(--hx-line);box-shadow:0 5px 0 var(--hx-line),0 12px 16px -8px var(--hx-sh),inset 0 3px 0 rgba(255,255,255,0.22),inset 0 -4px 0 rgba(9,24,64,0.2);
     transition:transform 0.3s,box-shadow 0.4s,filter 0.4s;}
   .ww-pcard .ww-sheen2{position:absolute;top:0;bottom:0;width:38%;left:-50%;pointer-events:none;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.28),transparent);}
   .ww-pcard.pA{background:linear-gradient(150deg,#e54d3c,#b41d1d);}
@@ -769,10 +752,8 @@
   .ww-pcard.wlhell .ww-pinfo,.ww-pcard.wlhell .ww-pclock{color:#0f172a;}
   .ww-pcard.wlhell .ww-pwalls{color:#334155;}
   .ww-pcard.wlhell .ww-pclock{background:rgba(15,23,42,0.07);border-color:rgba(15,23,42,0.16);}
-  .ww-pcard.dim{filter:saturate(0.55) brightness(0.82);box-shadow:0 4px 12px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.08);}
-  .ww-pcard.pA.live{box-shadow:0 7px 22px rgba(229,77,60,0.45),inset 0 1px 0 rgba(255,255,255,0.2),inset 0 -3px 7px rgba(0,0,0,0.28);transform:translateY(-1px);}
-  .ww-pcard.pB.live{box-shadow:0 7px 22px rgba(67,133,238,0.45),inset 0 1px 0 rgba(255,255,255,0.2),inset 0 -3px 7px rgba(0,0,0,0.28);transform:translateY(-1px);}
-  .ww-pcard.live .ww-sheen2{animation:ww-sheen 2.8s cubic-bezier(0.4,0,0.2,1) infinite;}
+  .ww-pcard.dim{filter:saturate(0.6) brightness(0.86);}
+  .ww-pcard.pA.live,.ww-pcard.pB.live{box-shadow:0 5px 0 var(--hx-line),0 0 0 3px #ffd34d,0 12px 18px -6px var(--hx-sh),inset 0 3px 0 rgba(255,255,255,0.22),inset 0 -4px 0 rgba(9,24,64,0.2);transform:translateY(-1px);}
   .ww-figslot{width:50px;height:50px;flex-shrink:0;position:relative;border-radius:50%;
     background:radial-gradient(circle at 50% 38%,rgba(0,0,0,0.12),rgba(0,0,0,0.28));
     box-shadow:inset 0 2px 5px rgba(0,0,0,0.4),inset 0 -1px 0 rgba(255,255,255,0.12);
@@ -794,9 +775,8 @@
   .ww-pcard.dim .ww-ptimetop{opacity:0.82;}
   .ww-ptcap{font-size:7px;font-weight:800;letter-spacing:1px;opacity:0.7;}
   .ww-vs{width:36px;flex-shrink:0;border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-    background:linear-gradient(180deg,#f3f6fb,#ffffff);border:1px solid rgba(15,23,42,0.07);box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.9);}
-  body.dark .ww-vs,html.dark .ww-vs{background:linear-gradient(180deg,#1b2438,#141c2d);border:1px solid rgba(255,255,255,0.08);box-shadow:0 6px 16px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.06);}
-  .ww-vt{font-size:11px;font-weight:900;letter-spacing:1px;color:var(--subtle);}
+    background:linear-gradient(var(--hx-plate1),var(--hx-plate2));border:3px solid var(--hx-line);box-shadow:0 4px 0 var(--hx-line);}
+  .ww-vt{font-family:var(--hx-fd);font-size:13px;font-weight:400;letter-spacing:1px;color:var(--hx-ink);}
   .ww-vd{display:flex;flex-direction:column;gap:3px;}
   .ww-vd i{width:3px;height:3px;border-radius:50%;background:var(--subtle);opacity:0.5;}
   @keyframes ww-sheen{0%{left:-50%;}40%{left:130%;}100%{left:130%;}}
@@ -830,20 +810,18 @@
   .ww-bottombar.pos-right{justify-content:space-between;}
   .ww-bottombar.pos-left{flex-direction:row-reverse;justify-content:space-between;}
   .ww-iconbtn{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;
-    border:1px solid var(--border);background:linear-gradient(180deg,#ffffff,#e9edf3);
-    box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.9),inset 0 -2px 5px rgba(0,0,0,0.12);
+    border:3px solid var(--hx-line);background:linear-gradient(var(--hx-plate1),var(--hx-plate2));
+    box-shadow:0 4px 0 var(--hx-line),0 10px 14px -8px var(--hx-sh);
     transition:transform 0.14s cubic-bezier(0.34,1.56,0.64,1);}
   .ww-iconbtn:active{transform:scale(0.92);}
-  .ww-wallctl{border-radius:16px;padding:5px 11px 7px;
-    background:linear-gradient(180deg,#f3f6fb,#ffffff);border:1px solid var(--border);
-    box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.9),inset 0 -2px 5px rgba(0,0,0,0.08);}
-  body.dark .ww-wallctl,html.dark .ww-wallctl{background:linear-gradient(180deg,#1b2438,#141c2d);box-shadow:0 6px 16px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -2px 5px rgba(0,0,0,0.26);}
-  .ww-wallctl .wl{font-size:9px;font-weight:900;letter-spacing:0.8px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:4px;}
+  .ww-wallctl{border-radius:18px;padding:5px 11px 7px;
+    background:linear-gradient(var(--hx-plate1),var(--hx-plate2));border:3px solid var(--hx-line);
+    box-shadow:0 5px 0 var(--hx-line),0 12px 16px -8px var(--hx-sh);}
+  .ww-wallctl .wl{font-size:10px;font-weight:800;letter-spacing:0.8px;color:var(--hx-ink2);display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:4px;}
   .ww-wallctl .tools{display:flex;justify-content:center;align-items:center;gap:9px;}
   .ww-wtool{border-radius:13px;display:flex;align-items:center;justify-content:center;position:relative;touch-action:pan-y;
-    background:linear-gradient(180deg,#eef2f8,#d2d9e4);border:1px solid rgba(0,0,0,0.06);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.7),0 3px 7px rgba(0,0,0,0.18);transition:transform 0.14s,box-shadow 0.2s,opacity 0.2s;}
-  body.dark .ww-wtool,html.dark .ww-wtool{background:linear-gradient(180deg,#27344b,#0e131d);border:1px solid rgba(255,255,255,0.07);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 3px 7px rgba(0,0,0,0.42);}
+    background:linear-gradient(var(--hx-ca),var(--hx-cb));border:2px solid var(--hx-bf);
+    box-shadow:0 3px 0 var(--hx-bfe);transition:transform 0.14s,box-shadow 0.2s,opacity 0.2s;}
   .ww-wtool.armed{touch-action:none;}
   .ww-wtool.armed:active{transform:scale(0.94);}
   @keyframes ww-goalpulse{0%,100%{opacity:0.3;}50%{opacity:0.7;}}
@@ -2094,7 +2072,7 @@ function MailCodeStep(props){
   };
   // "Adresse aendern" ist gesperrt, solange ein Versand laeuft: dessen spaete Antwort wuerfe sonst aus diesem Zustand
   var zumAendern=function(){setVorher(phase);setNeu(email);setMeldung(null);setPhase('change');};
-  var mitAdresse=function(k){var s=t(k).split('{mail}');return <span>{s[0]}<b style={{color:'var(--text)'}}>{email}</b>{s[1]||''}</span>;};
+  var mitAdresse=function(k){var s=t(k).split('{mail}');return <span>{s[0]}<b style={{color:'#fff'}}>{email}</b>{s[1]||''}</span>;};
   // Automatisch beim Betreten: ein noch gueltiger Code wird NICHT neu verschickt (Server meldet nur die Wartezeit)
   React.useEffect(function(){senden(false);},[]);
   React.useEffect(function(){weg.current=false;return function(){weg.current=true;};},[]);
@@ -2103,29 +2081,29 @@ function MailCodeStep(props){
     var id=setTimeout(function(){setJetzt(Date.now());},1000);
     return function(){clearTimeout(id);};
   },[jetzt,bis]);
-  var knopf={width:'100%',padding:'14px',marginTop:16,borderRadius:12,
-    background:busy?'var(--border)':'linear-gradient(135deg,#8b5cf6,#3b82f6)',
-    color:'white',border:'none',cursor:busy?'default':'pointer',
-    fontWeight:800,fontSize:15,fontFamily:'system-ui,-apple-system,sans-serif',
-    boxShadow:'0 4px 14px rgba(99,102,241,0.35)'};
-  var textKnopf={background:'none',border:'none',padding:'8px 4px',cursor:'pointer',color:'var(--subtle)',
-    fontSize:12,fontWeight:600,fontFamily:'system-ui,-apple-system,sans-serif',textDecoration:'underline'};
+  var knopf={width:'100%',padding:'14px',marginTop:18,borderRadius:18,
+    background:busy?'var(--border)':'linear-gradient(#ffdf5e,#ffc21f)',
+    color:'#13254a',border:'3px solid '+(busy?'var(--border)':'#9a5300'),cursor:busy?'default':'pointer',
+    fontWeight:400,fontSize:20,fontFamily:'var(--hx-fd)',letterSpacing:'0.02em',textTransform:'uppercase',
+    boxShadow:busy?'none':'0 6px 0 #d98200,0 14px 18px -8px var(--hx-sh),inset 0 4px 0 rgba(255,255,255,0.5)'};
+  var textKnopf={background:'none',border:'none',padding:'8px 4px',cursor:'pointer',color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',
+    fontSize:13,fontWeight:800,fontFamily:'var(--hx-f)',textDecoration:'underline'};
   var reihe={display:'flex',justifyContent:'center',alignItems:'center',gap:10,marginTop:6,flexWrap:'wrap'};
-  var klein={fontSize:11,color:'var(--subtle)',fontWeight:500,marginTop:6,textAlign:'center',lineHeight:1.5};
-  var erklaer={fontSize:12,color:'var(--subtle)',fontWeight:500,marginTop:6,lineHeight:1.5};
+  var klein={fontSize:12,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',fontWeight:600,marginTop:8,textAlign:'center',lineHeight:1.5};
+  var erklaer={fontSize:13.5,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',fontWeight:600,marginTop:8,lineHeight:1.5};
   var titel=phase==='done'?t('mc_doneTitle'):(phase==='change'?t('mc_change'):t('mc_title'));
   var hinweis=meldung?<div data-mc="meldung" style={{color:meldung.rot?'#ef4444':'#16a34a',fontSize:12,fontWeight:600,marginTop:10,lineHeight:1.5}}>{meldung.text}</div>:null;
   return (
     <div style={{width:'100%',maxWidth:330,position:'relative',zIndex:1}}>
       {phase!=='done'&&<button data-mc="zurueck" onClick={props.onBack} style={props.backStyle}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>}
       <div style={{textAlign:'center',marginBottom:18}}>
-        <div style={{width:64,height:64,borderRadius:'50%',margin:'0 auto 12px',background:phase==='done'?'#16a34a':'linear-gradient(135deg,#8b5cf6,#3b82f6)',
+        <div style={{width:64,height:64,borderRadius:'50%',margin:'0 auto 12px',background:phase==='done'?'#16a34a':'linear-gradient(#3f7df2,#1d47a6)',
           display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 8px 24px rgba(99,102,241,0.3)'}}>
           {phase==='done'
             ?<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="5 12.5 10 17 19 7"/></svg>
             :<PeopleIcon size={30} color="#fff"/>}
         </div>
-        <div data-mc="titel" style={{fontSize:21,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>{titel}</div>
+        <div data-mc="titel" className="hx-h" style={{fontSize:23,marginBottom:0}}>{titel}</div>
         {phase==='code'&&<div data-mc="text" style={erklaer}>{mitAdresse('mc_text')}</div>}
         {phase==='change'&&<div data-mc="text" style={erklaer}>{t('mc_changeText')}</div>}
         {phase==='fallback'&&<div data-mc="text" style={erklaer}>{mitAdresse('mc_fbText')}</div>}
@@ -2144,7 +2122,7 @@ function MailCodeStep(props){
               style={Object.assign({},textKnopf,rest>0?{textDecoration:'none',cursor:'default'}:{})}>
               {rest>0?t('mc_resendIn').replace('{t}',mcZeit(rest)):t('mc_resend')}
             </button>
-            <span style={{color:'var(--subtle)',fontSize:12}}>{'·'}</span>
+            <span style={{color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',fontSize:13}}>{'·'}</span>
             <button data-mc="aendern" onClick={zumAendern} disabled={busy} style={textKnopf}>{t('mc_change')}</button>
           </div>
           <div style={klein}>{t('mc_tip')}</div>
@@ -2589,10 +2567,10 @@ function RankedScreen({account,t,darkMode,goBack,onStart,features,wsRouter}){
   const feat=features||{ranked:true,rankedClassic:true,rankedDuel:true};
 
   const dk=darkMode;
-  const card=dk?'#1e293b':'#fff';
-  const border=dk?'#334155':'#e2e8f0';
-  const txt=dk?'#f1f5f9':'#1e293b';
-  const muted=dk?'#64748b':'#94a3b8';
+  const card='var(--card)';
+  const border='var(--border)';
+  const txt='var(--text)';
+  const muted='var(--subtle)';
 
   const joinQueue=function(mode){
     if(!account)return;
@@ -2767,9 +2745,9 @@ function RankedScreen({account,t,darkMode,goBack,onStart,features,wsRouter}){
 
       <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
         <div style={{textAlign:'center',marginBottom:24,paddingTop:8,position:'relative'}}>
-          <div style={{fontSize:13,fontWeight:800,color:muted,letterSpacing:2,marginBottom:4,display:'flex',alignItems:'center',justifyContent:'center',gap:5}}><SwordsIcon size={13} color={muted}/> RANKED</div>
-          <div style={{fontSize:26,fontWeight:900,color:txt,letterSpacing:-1}}>{t('rankedTitle')}</div>
-          <div style={{fontSize:12,color:muted,marginTop:6}}>{t('rankedSubtitle')}</div>
+          <div style={{fontSize:13,fontWeight:800,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',letterSpacing:2,marginBottom:4,display:'flex',alignItems:'center',justifyContent:'center',gap:5}}><SwordsIcon size={13} color="#fff"/> RANKED</div>
+          <div className="hx-h" style={{fontSize:28,marginBottom:0}}>{t('rankedTitle')}</div>
+          <div className="hx-on" style={{fontSize:13,fontWeight:600,marginTop:6,opacity:0.9}}>{t('rankedSubtitle')}</div>
           <button onClick={function(){setShowRules(true);}} style={{position:'absolute',right:0,top:0,width:28,height:28,borderRadius:'50%',cursor:'pointer',background:dk?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)',border:'1.5px solid '+(dk?'rgba(255,255,255,0.15)':'rgba(0,0,0,0.12)'),color:dk?'#94a3b8':'#64748b',fontSize:13,fontWeight:900,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'system-ui,-apple-system,sans-serif'}}>{'?'}</button>
         </div>
         {!account?(
@@ -2920,10 +2898,10 @@ function WeltligaScreen({account,t,lang,darkMode,goBack,wsRouter,onLogin,onClip}
   React.useEffect(function(){return function(){mountedRef.current=false;if(pendingTimerRef.current)clearTimeout(pendingTimerRef.current);};},[]);
 
   const dk=darkMode;
-  const card=dk?'#1e293b':'#fff';
-  const border=dk?'#334155':'#e2e8f0';
-  const txt=dk?'#f1f5f9':'#1e293b';
-  const muted=dk?'#64748b':'#94a3b8';
+  const card='var(--card)';
+  const border='var(--border)';
+  const txt='var(--text)';
+  const muted='var(--subtle)';
   const gruen='#16a34a';
   var land=wl?wl.land:null;
   var punkte=wl?wlPunkteText(wl.mein,t):'';
@@ -2947,9 +2925,9 @@ function WeltligaScreen({account,t,lang,darkMode,goBack,wsRouter,onLogin,onClip}
 
       <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
         <div style={{textAlign:'center',marginBottom:20,paddingTop:8}}>
-          <div style={{fontSize:13,fontWeight:800,color:muted,letterSpacing:2,marginBottom:4,display:'flex',alignItems:'center',justifyContent:'center',gap:5}}><GlobeIcon size={13} color={muted}/> {t('wl_titel').toUpperCase()}</div>
-          <div style={{fontSize:26,fontWeight:900,color:txt,letterSpacing:-1}}>{t('wl_titel')}</div>
-          <div style={{fontSize:12,color:muted,marginTop:6}}>{t('wl_menuDesc')}</div>
+          <div style={{fontSize:13,fontWeight:800,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',letterSpacing:2,marginBottom:4,display:'flex',alignItems:'center',justifyContent:'center',gap:5}}><GlobeIcon size={13} color="#fff"/> {t('wl_titel').toUpperCase()}</div>
+          <div className="hx-h" style={{fontSize:28,marginBottom:0}}>{t('wl_titel')}</div>
+          <div className="hx-on" style={{fontSize:13,fontWeight:600,marginTop:6,opacity:0.9}}>{t('wl_menuDesc')}</div>
         </div>
         <div data-wl="live" style={{...karte,padding:'10px 14px',fontSize:12,fontWeight:700,color:muted,textAlign:'center',marginBottom:14}}>
           <WlSucheZeile t={t} suche={suche}/>
@@ -3100,19 +3078,19 @@ function WeltligaTabelle({t,lang,darkMode,account}){
     return function(){weg=true;};
   },[land,z]);
   const dk=darkMode;
-  const card=dk?'#161e33':'#ffffff';
-  const txt=dk?'#f1f5f9':'#0f172a';
-  const muted=dk?'#64748b':'#94a3b8';
-  const border=dk?'#252d44':'#e2e8f0';
+  const card='var(--card)';
+  const txt='var(--text)';
+  const muted='var(--subtle)';
+  const border='var(--border)';
   var zeilen=daten?((z==='e'?daten.le:daten.lw)||[]):[];
   var meinName=account?account.name:null;
-  var tabSt=function(an){return {flex:1,padding:'9px 4px',border:'none',cursor:'pointer',fontWeight:700,fontSize:12,fontFamily:'system-ui,-apple-system,sans-serif',borderRadius:8,background:an?txt:'transparent',color:an?(dk?'#0f172a':'#ffffff'):muted};};
+  var tabSt=function(an){return {flex:1,padding:'9px 4px',border:'none',cursor:'pointer',fontWeight:700,fontSize:12,fontFamily:'system-ui,-apple-system,sans-serif',borderRadius:10,background:an?'linear-gradient(#3f7df2,#1d47a6)':'transparent',color:an?'#fff':muted};};
   var zeileSt={display:'flex',alignItems:'center',gap:10,padding:'10px 14px',borderRadius:14,background:card,border:'1.5px solid '+border,width:'100%',boxSizing:'border-box',fontFamily:'system-ui,-apple-system,sans-serif',textAlign:'left'};
   var leer=function(text){return <div style={{textAlign:'center',padding:'32px 16px',background:card,borderRadius:16,border:'1.5px solid '+border,fontSize:13,fontWeight:700,color:muted}}>{text}</div>;};
   return(
     <div data-wl="tab">
       {daten&&daten.wn?(
-        <div data-wl="woche" style={{background:'linear-gradient(135deg,#6d28d9,#a855f7)',borderRadius:16,padding:'14px 16px',marginBottom:10,textAlign:'center',color:'#ffffff',boxShadow:'0 6px 18px rgba(109,40,217,0.35)'}}>
+        <div data-wl="woche" style={{background:'linear-gradient(#3f7df2,#1d47a6)',border:'3px solid #0f2a6a',borderRadius:18,padding:'14px 16px',marginBottom:10,textAlign:'center',color:'#ffffff',boxShadow:'0 5px 0 #0f2a6a,0 12px 16px -8px var(--hx-sh)'}}>
           <div style={{fontSize:26,fontWeight:900,letterSpacing:1.5,textTransform:'uppercase',lineHeight:1.1}}>{wlWocheText(daten.wn,t)}</div>
           <div style={{fontSize:12,fontWeight:700,opacity:0.9,marginTop:4}}>{wlZeitraum(daten.bis,lang)+' · '+wlRestText(daten.bis,jetzt,t)}</div>
         </div>
@@ -3160,10 +3138,10 @@ function WeltligaTabelle({t,lang,darkMode,account}){
           {!spieler?leer(t('leaderboardLoading')):spieler.length===0?leer(t('wl_leer')):(
             <div style={{display:'flex',flexDirection:'column',gap:6}}>
               {spieler.map(function(s,i){var ich=!!meinName&&s[0]===meinName;return(
-                <div key={i} data-wl-spieler={s[0]} style={{...zeileSt,background:ich?(dk?'rgba(139,92,246,0.18)':'rgba(139,92,246,0.08)'):card,border:'1.5px solid '+(ich?'#8b5cf6':border)}}>
+                <div key={i} data-wl-spieler={s[0]} style={{...zeileSt,background:ich?(dk?'rgba(63,125,242,0.28)':'rgba(63,125,242,0.14)'):card,border:'2px solid '+(ich?'#3f7df2':border)}}>
                   <span style={{width:28,textAlign:'center',fontSize:13,fontWeight:800,color:muted}}>{'#'+(i+1)}</span>
                   <span style={{flex:1,minWidth:0,fontSize:14,fontWeight:800,color:txt,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{s[0]}</span>
-                  {ich?<span data-wl="ich" style={{fontSize:9,fontWeight:900,background:'#8b5cf6',color:'#fff',padding:'1px 5px',borderRadius:6,letterSpacing:0.5}}>{t('you').toUpperCase()}</span>:null}
+                  {ich?<span data-wl="ich" style={{fontSize:9,fontWeight:900,background:'#1d47a6',color:'#fff',padding:'1px 5px',borderRadius:6,letterSpacing:0.5}}>{t('you').toUpperCase()}</span>:null}
                   <span style={{fontSize:18,fontWeight:900,color:txt}}>{s[1]}</span>
                 </div>);})}
             </div>
@@ -3180,7 +3158,7 @@ function WeltligaTabelle({t,lang,darkMode,account}){
             </button>);})}
         </div>
       ))}
-      {!land&&daten&&daten.wn?<button data-wl="allewochenknopf" onClick={function(){setWochen(null);setAlle('liste');}} style={{...zeileSt,marginTop:12,justifyContent:'center',cursor:'pointer',color:'#8b5cf6',fontSize:14,fontWeight:900,border:'1.5px solid #8b5cf6'}}>{t('wl_alleWochen')}</button>:null}
+      {!land&&daten&&daten.wn?<button data-wl="allewochenknopf" onClick={function(){setWochen(null);setAlle('liste');}} style={{...zeileSt,marginTop:12,justifyContent:'center',cursor:'pointer',color:'var(--text)',fontSize:14,fontWeight:900,border:'1.5px solid #8b5cf6'}}>{t('wl_alleWochen')}</button>:null}
       </div>)}
     </div>
   );
@@ -3299,10 +3277,10 @@ function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack,xp,coins,xpS
   };
 
   const dk=darkMode;
-  const card=dk?'#1e293b':'#fff';
-  const border=dk?'#334155':'#e2e8f0';
-  const txt=dk?'#f1f5f9':'#1e293b';
-  const muted=dk?'#64748b':'#94a3b8';
+  const card='var(--card)';
+  const border='var(--border)';
+  const txt='var(--text)';
+  const muted='var(--subtle)';
   const inpSt={width:'100%',padding:'12px 14px',borderRadius:10,
     border:'1.5px solid '+border,fontSize:15,background:card,color:txt,
     outline:'none',fontFamily:'system-ui,-apple-system,sans-serif',boxSizing:'border-box'};
@@ -3341,14 +3319,14 @@ function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack,xp,coins,xpS
               </div>
             )}
           </div>
-          <div style={{fontSize:22,fontWeight:900,color:txt,letterSpacing:-0.5}}>{meinLand?<span style={{marginRight:7}}><WlFlagge land={meinLand} h={18}/></span>:null}{account.name}</div>
+          <div className="hx-h" style={{fontSize:26,marginBottom:0,textTransform:'none'}}>{meinLand?<span style={{marginRight:7}}><WlFlagge land={meinLand} h={18}/></span>:null}{account.name}</div>
           {xpSystemOn&&xp!==null&&(
-            <div style={{fontSize:11,color:muted,fontWeight:700,marginTop:3}}>{xp+' XP'}</div>
+            <div className="hx-on" style={{fontSize:12,marginTop:4}}>{xp+' XP'}</div>
           )}
           {coins!==null&&coins>0&&(
             <div style={{display:'inline-flex',alignItems:'center',gap:5,marginTop:5,
               padding:'3px 11px',borderRadius:12,
-              background:'rgba(245,158,11,0.1)',border:'1px solid rgba(245,158,11,0.25)'}}>
+              background:'var(--hx-plate1)',border:'2px solid var(--hx-line)'}}>
               <span style={{fontSize:13,color:'#f59e0b',lineHeight:1}}>{'●'}</span>
               <span style={{fontSize:12,fontWeight:800,color:'#f59e0b'}}>{coins}</span>
             </div>
@@ -3405,7 +3383,7 @@ function ProfileScreen({account,onUpdate,onLogout,t,darkMode,goBack,xp,coins,xpS
               {ncErr&&<div style={{color:'#ef4444',fontSize:12,fontWeight:600,marginTop:6}}>{ncErr}</div>}
               <div style={{display:'flex',gap:8,marginTop:10}}>
                 <button onClick={doNC} disabled={ncBusy} style={{flex:1,padding:'11px',borderRadius:9,
-                  background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'#fff',border:'none',
+                  background:'linear-gradient(#3f7df2,#1d47a6)',color:'#fff',border:'none',
                   cursor:ncBusy?'default':'pointer',fontWeight:800,fontSize:13,
                   fontFamily:'system-ui,-apple-system,sans-serif'}}>{ncBusy?'…':'✓ '+t('save')}</button>
                 <button onClick={()=>{setShowNC(false);setNcInput('');setNcErr('');}} style={{
@@ -3647,11 +3625,11 @@ function LeaderboardScreen({t,darkMode,goBack,account,lang,startTab}){
   const[loading,setLoading]=React.useState(!_lbCache.data);
   const[profModal,setProfModal]=React.useState(null);
   const dk=darkMode;
-  const bg=dk?'#0a1020':'#f8f9fa';
-  const card=dk?'#161e33':'#ffffff';
-  const txt=dk?'#f1f5f9':'#0f172a';
-  const muted=dk?'#64748b':'#94a3b8';
-  const border=dk?'#252d44':'#e2e8f0';
+  const bg='var(--bg)';
+  const card='var(--card)';
+  const txt='var(--text)';
+  const muted='var(--subtle)';
+  const border='var(--border)';
   const gold='#f59e0b',silver='#94a3b8',bronze='#b45309';
 
   // Einmal laden (gesamter Node), danach clientseitig nach Modus filtern/sortieren.
@@ -3712,13 +3690,13 @@ function LeaderboardScreen({t,darkMode,goBack,account,lang,startTab}){
         {/* Header */}
         <div style={{textAlign:'center',marginBottom:20}}>
           <div style={{fontSize:28,marginBottom:6}}>🏆</div>
-          <div style={{fontSize:22,fontWeight:900,color:txt,letterSpacing:-0.5}}>{t('leaderboardTitle')}</div>
-          <div style={{fontSize:12,color:muted,fontWeight:600,marginTop:3}}>{tab==='weltliga'?t('wl_menuDesc'):t('leaderboardSubtitle')}</div>
+          <div className="hx-h" style={{fontSize:26,marginBottom:0}}>{t('leaderboardTitle')}</div>
+          <div className="hx-on" style={{fontSize:13,fontWeight:600,marginTop:5,opacity:0.9}}>{tab==='weltliga'?t('wl_menuDesc'):t('leaderboardSubtitle')}</div>
         </div>
         {/* Reiter Ranked | Weltliga */}
-        <div style={{display:'flex',gap:3,background:dk?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',borderRadius:10,padding:3,border:'1.5px solid '+border,marginBottom:14}}>
+        <div style={{display:'flex',gap:3,background:'linear-gradient(var(--hx-plate1),var(--hx-plate2))',borderRadius:14,padding:4,border:'3px solid var(--hx-line)',boxShadow:'0 4px 0 var(--hx-line)',marginBottom:16}}>
           {['ranked','weltliga'].map(function(k){var an=tab===k;return(
-            <button key={k} data-lb-tab={k} onClick={function(){setTab(k);}} style={{flex:1,padding:'9px 4px',border:'none',cursor:'pointer',fontWeight:800,fontSize:12,fontFamily:'system-ui,-apple-system,sans-serif',borderRadius:8,background:an?'#8b5cf6':'transparent',color:an?'#fff':muted}}>{k==='weltliga'?t('wl_titel'):'Ranked'}</button>);})}
+            <button key={k} data-lb-tab={k} onClick={function(){setTab(k);}} style={{flex:1,padding:'9px 4px',border:'none',cursor:'pointer',fontWeight:800,fontSize:13,fontFamily:'var(--hx-f)',borderRadius:10,background:an?'linear-gradient(#3f7df2,#1d47a6)':'transparent',color:an?'#fff':muted}}>{k==='weltliga'?t('wl_titel'):'Ranked'}</button>);})}
         </div>
         {/* Liste */}
         {tab==='weltliga'?(
@@ -3832,15 +3810,15 @@ function LeaderboardScreen({t,darkMode,goBack,account,lang,startTab}){
         {profModal&&<OppProfileModal data={profModal} onClose={()=>setProfModal(null)} darkMode={darkMode} t={t}/>}
         {/* Refresh (nur Ranked — die Weltliga-Tabelle laedt beim Oeffnen selbst) */}
         {tab!=='weltliga'&&!loading&&(
-          <button onClick={load} style={{width:'100%',marginTop:14,padding:'12px',borderRadius:12,
-            background:'transparent',border:'1.5px solid '+border,color:muted,fontSize:13,fontWeight:700,
-            cursor:'pointer',fontFamily:'system-ui,-apple-system,sans-serif',
+          <button onClick={load} className="hx-press" style={{width:'100%',marginTop:16,padding:'12px',borderRadius:14,
+            background:'linear-gradient(var(--hx-plate1),var(--hx-plate2))',border:'3px solid var(--hx-line)',boxShadow:'0 4px 0 var(--hx-line)',color:'var(--hx-ink)',fontSize:14,fontWeight:800,
+            fontFamily:'var(--hx-f)',
             display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
             ↻ {t('refresh')}
           </button>
         )}
         {/* Hinweis */}
-        {tab!=='weltliga'&&<div style={{textAlign:'center',marginTop:12,fontSize:11,color:muted,fontWeight:600}}>
+        {tab!=='weltliga'&&<div className="hx-on" style={{textAlign:'center',marginTop:14,fontSize:12,fontWeight:600}}>
           {t('rankedMinOneGame')}
         </div>}
       </div>
@@ -3922,10 +3900,10 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
   };
 
   const dk=darkMode;
-  const card=dk?'#1e293b':'#fff';
-  const border=dk?'#334155':'#e2e8f0';
-  const txt=dk?'#f1f5f9':'#1e293b';
-  const muted=dk?'#64748b':'#94a3b8';
+  const card='var(--card)';
+  const border='var(--border)';
+  const txt='var(--text)';
+  const muted='var(--subtle)';
   const walls=gs?new Set(gs.walls||[]):new Set();
   const pA=gs?gs.pA:{r:ROWS-1,c:2};
   const pB=gs?gs.pB:{r:ROWS-1,c:6};
@@ -3970,12 +3948,12 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
         <div style={{textAlign:'center',marginBottom:10,paddingTop:48}}>
           <div style={{display:'inline-flex',alignItems:'center',gap:9,marginBottom:8}}>
             <div style={{width:32,height:32,borderRadius:10,
-              background:'linear-gradient(145deg,#7c3aed,#6366f1 48%,#3b82f6)',
+              background:'linear-gradient(#3f7df2,#1d47a6)',
               display:'flex',alignItems:'center',justifyContent:'center',
               boxShadow:'0 5px 16px rgba(99,102,241,0.5),inset 0 1px 0 rgba(255,255,255,0.4),inset 0 -3px 6px rgba(49,46,129,0.6)'}}>
               <BrickWallIcon size={18} light/>
             </div>
-            <div style={{fontSize:18,fontWeight:900,color:txt,letterSpacing:-0.5}}>{t('title')}</div>
+            <div className="hx-on" style={{fontSize:18,letterSpacing:-0.2}}>{t('title')}</div>
           </div>
           <div style={{display:'flex',justifyContent:'center'}}>
           <div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'4px 12px',
@@ -4040,16 +4018,15 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
         </div>
         {/* Brett (v8) */}
         <div style={{position:'relative',width:COLS*SC+26,margin:'0 auto',borderRadius:24,padding:13,
-          background:dk?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
-          boxShadow:'0 26px 56px rgba(0,0,0,0.5),0 9px 20px rgba(0,0,0,0.38),inset 0 2px 0 rgba(255,255,255,0.28),inset 0 -3px 6px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.2)'}}>
+          background:'var(--hx-bf)',boxShadow:'0 6px 0 var(--hx-bfe),0 18px 24px -8px var(--hx-sh)'}}>
           <div className="ww-edge ww-edge-t" style={{opacity:dk?0.85:0.5}}/>
           <div className="ww-edge ww-edge-b" style={{opacity:dk?0.85:0.5}}/>
           <div className="ww-stud ww-stud-l"/><div className="ww-stud ww-stud-r"/>
           <div style={{position:'relative',width:COLS*SC,height:ROWS*SC,borderRadius:14,overflow:'hidden',
-            background:dk?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
-            boxShadow:dk?'inset 0 0 0 2px #05080f,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)':'inset 0 0 0 2px #b6bfce,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)'}}>
-            <div className="ww-board-tex" style={{mixBlendMode:dk?'screen':'multiply',opacity:dk?0.12:0.4}}/>
-            <div className="ww-board-veins" style={{opacity:dk?0.3:0.45}}/>
+            background:'linear-gradient(170deg,var(--hx-ca),var(--hx-cb))',
+            boxShadow:'inset 0 3px 9px rgba(0,0,0,0.1)'}}>
+            <div className="ww-board-tex" style={{opacity:0}}/>
+            <div className="ww-board-veins" style={{opacity:0}}/>
             <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:dk?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
             <div style={{position:'absolute',top:0,left:0,right:0,height:SC,pointerEvents:'none',zIndex:1,
               background:`linear-gradient(180deg,${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}28 0%,${gs&&gs.map==='duel'?'#ef4444':'#22c55e'}12 60%,transparent 100%)`,
@@ -4060,7 +4037,7 @@ function SpectatorScreen({lobbyId,t,darkMode,goBack,account}){
               boxShadow:'inset 0 0 0 1.5px rgba(59,130,246,0.33),inset 0 -2px 10px rgba(59,130,246,0.2)',
               animation:'ww-goalpulse 3s ease-in-out infinite'}}/>}
             <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
-              backgroundImage:`linear-gradient(${dk?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${dk?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${dk?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
+              backgroundImage:`linear-gradient(rgba(19,37,74,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(19,37,74,0.3) 1px,transparent 1px),radial-gradient(circle at 0 0, rgba(19,37,74,0.45) 1.4px, transparent 2px)`,
               backgroundSize:`${SC}px ${SC}px,${SC}px ${SC}px,${SC}px ${SC}px`}}/>
             {wallEls}
             {gs&&<SpecStone pos={pA} p="A"/>}
@@ -7271,27 +7248,16 @@ function App(){
     // Config noch nicht geladen — Ladescreen
     if(!adminCfgReady){
       return(
-        <div style={{position:'fixed',inset:0,background:'var(--bg)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:20,zIndex:9999}}>
-          <div style={{
-            width:80,height:80,borderRadius:20,
-            background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',
-            display:'flex',alignItems:'center',justifyContent:'center',
-            boxShadow:'0 8px 32px rgba(139,92,246,0.4)',
-            animation:'pulse 1.5s ease-in-out infinite'}}>
-            <BrickWallIcon size={44} light/>
-          </div>
-          <div style={{textAlign:'center'}}>
-            <div style={{fontSize:26,fontWeight:900,letterSpacing:-1,color:'var(--text)'}}>Wrong Way</div>
-            <div style={{fontSize:10,fontWeight:800,color:'var(--subtle)',marginTop:6,letterSpacing:2.5,textTransform:'uppercase'}}>Don't be mad</div>
-          </div>
-          <div style={{display:'flex',gap:8,marginTop:8}}>
+        <div style={{position:'fixed',inset:0,background:'transparent',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:18,zIndex:9999}}>
+          <div className="hx-wort" data-t="HUPSY" style={{fontSize:56}}>HUPSY</div>
+          <div className="hx-on" style={{fontSize:17,marginTop:-6}}>Wall Race</div>
+          <div style={{display:'flex',gap:10,marginTop:10}}>
             {[0,1,2].map(i=>(
               <div key={i} style={{
-                width:8,height:8,borderRadius:'50%',
-                background:'#8b5cf6',
+                width:12,height:12,borderRadius:'50%',
+                background:'#ffc21f',border:'2px solid #13254a',
                 animation:'pulse 1.2s ease-in-out infinite',
-                animationDelay:(i*0.2)+'s',
-                opacity:0.7}}/>
+                animationDelay:(i*0.2)+'s'}}/>
             ))}
           </div>
         </div>
@@ -7933,7 +7899,7 @@ function App(){
       {updateAvailable&&(
         <div style={{position:'fixed',top:'calc(env(safe-area-inset-top) + 8px)',left:'50%',
           transform:'translateX(-50%)',zIndex:500,
-          background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',
+          background:'linear-gradient(#3f7df2,#1d47a6)',
           borderRadius:20,padding:'10px 18px',
           display:'flex',alignItems:'center',gap:10,
           boxShadow:'0 4px 20px rgba(139,92,246,0.4)',
@@ -8004,7 +7970,7 @@ function App(){
             </label>
             <div style={{fontSize:11,color:'var(--subtle)',lineHeight:1.45,marginTop:6,paddingLeft:27}}><AgbSatz t={t} k="agbDsInfo"/></div>
             <button disabled={!agbDlgHaken||agbBusy} onClick={function(){setAgbBusy(true);agbWs(true).then(function(d){setAgbBusy(false);if(d&&d.ok)setAgbOffen(false);}).catch(function(){setAgbBusy(false);});}}
-              style={{width:'100%',padding:'13px',marginTop:16,borderRadius:12,background:(!agbDlgHaken||agbBusy)?'var(--border)':'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'white',border:'none',cursor:(!agbDlgHaken||agbBusy)?'default':'pointer',fontWeight:800,fontSize:14,fontFamily:'system-ui,-apple-system,sans-serif'}}>
+              style={{width:'100%',padding:'13px',marginTop:16,borderRadius:12,background:(!agbDlgHaken||agbBusy)?'var(--border)':'linear-gradient(#3f7df2,#1d47a6)',color:'white',border:'none',cursor:(!agbDlgHaken||agbBusy)?'default':'pointer',fontWeight:800,fontSize:14,fontFamily:'system-ui,-apple-system,sans-serif'}}>
               {agbBusy?'\u2026':t('agbAkzeptieren')}
             </button>
             <button onClick={function(){setAgbOffen(false);doLogout();}}
@@ -8028,12 +7994,12 @@ function App(){
       return(
         <button onClick={()=>setGameTimeMode(val)} style={{
           flex:1,padding:'11px 4px',borderRadius:12,position:'relative',overflow:'hidden',
-          background:sel?'linear-gradient(135deg,#7c3aed,#8b5cf6)':(darkMode?'#1b2740':'var(--card)'),
+          background:sel?'linear-gradient(#3f7df2,#1d47a6)':(darkMode?'#1b2740':'var(--card)'),
           color:sel?'#fff':'var(--text)',
           border:`1.5px solid ${sel?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')}`,
           cursor:'pointer',
           opacity:1,
-          boxShadow:sel?'0 3px 10px rgba(124,58,237,0.35),0 0 22px rgba(124,58,237,0.35),inset 0 1px 0 rgba(255,255,255,0.22)':(darkMode?'0 2px 8px rgba(0,0,0,0.4)':'0 2px 5px rgba(15,23,42,0.1),0 8px 18px rgba(15,23,42,0.14),inset 0 1px 0 rgba(255,255,255,0.5)'),
+          boxShadow:sel?'0 3px 10px rgba(9,24,64,0.35),0 0 22px rgba(9,24,64,0.35),inset 0 1px 0 rgba(255,255,255,0.22)':(darkMode?'0 2px 8px rgba(0,0,0,0.4)':'0 2px 5px rgba(15,23,42,0.1),0 8px 18px rgba(15,23,42,0.14),inset 0 1px 0 rgba(255,255,255,0.5)'),
           fontSize:12,fontWeight:800,letterSpacing:0.3,
           fontFamily:'system-ui,-apple-system,sans-serif'}}>
           {label}
@@ -8056,8 +8022,8 @@ function App(){
       );
     };
     const SectionHeader=({label,icon})=>(
-      <div style={{fontSize:10.5,color:'var(--subtle)',fontWeight:800,letterSpacing:1.5,marginTop:18,marginBottom:9,paddingLeft:2,display:'flex',alignItems:'center',gap:8,textTransform:'uppercase'}}>
-        <div style={{width:3.5,height:13,borderRadius:2,background:'#8b5cf6',flexShrink:0}}/>
+      <div className="hx-on" style={{fontSize:12,letterSpacing:1.5,marginTop:18,marginBottom:9,paddingLeft:2,display:'flex',alignItems:'center',gap:8,textTransform:'uppercase'}}>
+        <div style={{width:4,height:14,borderRadius:2,background:'#ffc21f',flexShrink:0}}/>
         {icon&&<span style={{opacity:0.7,display:'inline-flex'}}>{icon}</span>}
         {label}
       </div>
@@ -8065,23 +8031,9 @@ function App(){
     return(
       <div style={{...sPage,justifyContent:'flex-start',paddingTop:'calc(env(safe-area-inset-top) + 20px)',animation:pageAnim,background:'transparent',position:'relative',zIndex:1}}>
         <MenuBG dark={darkMode}/>
-        <div style={{position:'absolute',top:'calc(env(safe-area-inset-top) + 40px)',left:0,right:0,height:200,zIndex:0,pointerEvents:'none',overflow:'hidden'}}>
-          <DecoStone dark={darkMode} size={48} style={{top:34,left:'7%'}}
-            hi="#c4b5fd" mid="#8b5cf6" lo="#6d28d9" wall="#5b21b6" rim="#c4b5fd"/>
-          <DecoStone dark={darkMode} size={58} style={{top:54,right:'8%'}}
-            hi="#fecaca" mid="#ef4444" lo="#b91c1c" wall={darkMode?'#7f1d1d':'#991b1b'} rim="#fca5a5"/>
-          <DecoStone dark={darkMode} size={40} style={{top:6,right:'27%'}}
-            hi="#bfdbfe" mid="#3b82f6" lo="#1d4ed8" wall={darkMode?'#1e3a8a':'#1e40af'} rim="#93c5fd"/>
-          <DecoCube dark={darkMode} size={26} style={{top:96,left:'4%'}}/>
-          <DecoCube dark={darkMode} size={26} style={{top:80,left:'10%'}}/>
-          <DecoCube dark={darkMode} size={26} style={{top:108,left:'11%'}}/>
-          <DecoCube dark={darkMode} size={24} style={{top:20,right:'20%'}}/>
-          <DecoCube dark={darkMode} size={24} style={{top:8,right:'15%'}}/>
-        </div>
-        <MapAura map={selectedMap} dark={darkMode}/>
         <button onClick={goBack} style={backChevron}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
         <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
-          <ScreenHead icon={<MazeIcon size={28} color="#fff"/>} iconBg="linear-gradient(135deg,#8b5cf6,#3b82f6)"
+          <ScreenHead icon={<MazeIcon size={28} color="#fff"/>} iconBg="linear-gradient(#3f7df2,#1d47a6)"
             title={t('mode')} sub={t('modeConfigSub')}/>
 
           {/* Aktive Auswahl */}
@@ -8089,37 +8041,37 @@ function App(){
             <div style={{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap',justifyContent:'center'}}>
               {selectedMap==='duel'&&(
                 <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'rgba(139,92,246,0.15)',color:'#8b5cf6',display:'flex',alignItems:'center',gap:5}}>
+                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#8b5cf6',display:'flex',alignItems:'center',gap:5}}>
                   <span>⚔</span><span>{t('duel')}</span>
                 </div>
               )}
               {gameTimeMode.indexOf('classic-')===0&&(
                 <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'rgba(59,130,246,0.12)',color:'#3b82f6',display:'flex',alignItems:'center',gap:5}}>
+                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#3b82f6',display:'flex',alignItems:'center',gap:5}}>
                   <ModeGlyph kind="clock" size={12} color="#3b82f6"/><span>{gameTimeMode==='classic-3'?'3':gameTimeMode==='classic-5'?'5':'8'} {t('minLabel')}</span>
                 </div>
               )}
               {gameTimeMode.indexOf('blitz-')===0&&(
                 <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'rgba(245,158,11,0.15)',color:'#d97706',display:'flex',alignItems:'center',gap:5}}>
+                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#d97706',display:'flex',alignItems:'center',gap:5}}>
                   <ModeGlyph kind="bolt" size={12} color="#d97706"/><span>{gameTimeMode==='blitz-5'?'5':gameTimeMode==='blitz-8'?'8':'10'} {t('secLabel')}</span>
                 </div>
               )}
               {chaosMode&&(
                 <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'rgba(139,92,246,0.15)',color:'#8b5cf6',display:'flex',alignItems:'center',gap:5}}>
+                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#8b5cf6',display:'flex',alignItems:'center',gap:5}}>
                   <ModeGlyph kind="swirl" size={12} color="#8b5cf6"/><span>{t('modeChaos')}</span>
                 </div>
               )}
               {dropMode&&(
                 <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'rgba(236,72,153,0.15)',color:'#ec4899',display:'flex',alignItems:'center',gap:5}}>
+                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#ec4899',display:'flex',alignItems:'center',gap:5}}>
                   <ModeGlyph kind="burst" size={12} color="#ec4899"/><span>{t('randomDrop')}</span>
                 </div>
               )}
               {hammerMode&&(
                 <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'rgba(245,158,11,0.15)',color:'#d97706',display:'flex',alignItems:'center',gap:5}}>
+                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#d97706',display:'flex',alignItems:'center',gap:5}}>
                   <ModeGlyph kind="hammer" size={13}/><span>{t('hammerMode')}</span>
                 </div>
               )}
@@ -8127,25 +8079,25 @@ function App(){
           )}
 
           {/* ── Spielfeld ── */}
-          <div style={{fontSize:10,color:'var(--subtle)',fontWeight:800,letterSpacing:1.5,marginTop:6,marginBottom:10,paddingLeft:2,display:'flex',alignItems:'center',gap:6}}>
-            <div style={{width:3,height:11,borderRadius:2,background:'var(--subtle)',opacity:0.5}}/> SPIELFELD
+          <div className="hx-on" style={{fontSize:12,letterSpacing:1.5,marginTop:6,marginBottom:10,paddingLeft:2,display:'flex',alignItems:'center',gap:8}}>
+            <div style={{width:4,height:14,borderRadius:2,background:'#ffc21f'}}/> SPIELFELD
           </div>
           <div style={{display:'flex',gap:8,marginBottom:4}}>
             {feat('duel')&&<button onClick={()=>setSelectedMap('duel')} className="mi-btn" style={{
               flex:1,padding:'14px 10px',borderRadius:14,cursor:'pointer',textAlign:'center',
               background:selectedMap==='duel'
-                ?'linear-gradient(135deg,#7c3aed,#8b5cf6)'
+                ?'linear-gradient(#3f7df2,#1d47a6)'
                 :(darkMode?'#1b2740':'var(--card)'),
               color:selectedMap==='duel'?'#fff':'var(--text)',
               border:'1.5px solid '+(selectedMap==='duel'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
               fontFamily:'system-ui,-apple-system,sans-serif',
               boxShadow:selectedMap==='duel'
-                ?'0 4px 10px rgba(124,58,237,0.28),0 14px 32px rgba(124,58,237,0.32),inset 0 1px 0 rgba(255,255,255,0.25)'
+                ?'0 4px 10px rgba(9,24,64,0.28),0 14px 32px rgba(9,24,64,0.32),inset 0 1px 0 rgba(255,255,255,0.25)'
                 :'0 2px 6px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.45)',
               transition:'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',overflow:'hidden',position:'relative'}}>
               {selectedMap==='duel'&&<div style={{position:'absolute',top:0,left:0,right:0,height:'50%',background:'linear-gradient(180deg,rgba(255,255,255,0.14),transparent)',borderRadius:'14px 14px 0 0',pointerEvents:'none'}}/>}
               {selectedMap!=='duel'&&<div style={{position:'absolute',top:6,right:6,fontSize:8,fontWeight:800,
-                background:'linear-gradient(135deg,#7c3aed,#8b5cf6)',color:'#fff',
+                background:'linear-gradient(#3f7df2,#1d47a6)',color:'#fff',
                 padding:'2px 6px',borderRadius:6}}>STD</div>}
               <div style={{display:'flex',justifyContent:'center',marginBottom:8}}>
                 <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -8207,11 +8159,11 @@ function App(){
                 {feat('duelBlitz')&&(
                   <button onClick={()=>setDuelSize('blitz')} className="mi-btn" style={{
                     flex:1,padding:'12px 8px',borderRadius:13,cursor:'pointer',textAlign:'center',
-                    background:duelSize==='blitz'?'linear-gradient(135deg,#7c3aed,#8b5cf6)':(darkMode?'#1b2740':'var(--card)'),
+                    background:duelSize==='blitz'?'linear-gradient(#3f7df2,#1d47a6)':(darkMode?'#1b2740':'var(--card)'),
                     color:duelSize==='blitz'?'#fff':'var(--text)',
                     border:'1.5px solid '+(duelSize==='blitz'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
                     fontFamily:'system-ui,-apple-system,sans-serif',
-                    boxShadow:duelSize==='blitz'?'0 3px 10px rgba(124,58,237,0.3),0 0 26px rgba(124,58,237,0.4),0 12px 28px rgba(124,58,237,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
+                    boxShadow:duelSize==='blitz'?'0 3px 10px rgba(9,24,64,0.3),0 0 26px rgba(9,24,64,0.4),0 12px 28px rgba(9,24,64,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
                     transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
                     <div style={{fontSize:14,fontWeight:900,marginBottom:2}}>7 × 7</div>
                     <div style={{fontSize:11,fontWeight:800,marginBottom:1}}>{t('duelBlitzName')}</div>
@@ -8221,11 +8173,11 @@ function App(){
                 {feat('duelStandard')&&(
                   <button onClick={()=>setDuelSize('standard')} className="mi-btn" style={{
                     flex:1,padding:'12px 8px',borderRadius:13,cursor:'pointer',textAlign:'center',
-                    background:duelSize==='standard'?'linear-gradient(135deg,#7c3aed,#8b5cf6)':(darkMode?'#1b2740':'var(--card)'),
+                    background:duelSize==='standard'?'linear-gradient(#3f7df2,#1d47a6)':(darkMode?'#1b2740':'var(--card)'),
                     color:duelSize==='standard'?'#fff':'var(--text)',
                     border:'1.5px solid '+(duelSize==='standard'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
                     fontFamily:'system-ui,-apple-system,sans-serif',
-                    boxShadow:duelSize==='standard'?'0 3px 10px rgba(124,58,237,0.3),0 0 26px rgba(124,58,237,0.4),0 12px 28px rgba(124,58,237,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
+                    boxShadow:duelSize==='standard'?'0 3px 10px rgba(9,24,64,0.3),0 0 26px rgba(9,24,64,0.4),0 12px 28px rgba(9,24,64,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
                     transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
                     <div style={{fontSize:14,fontWeight:900,marginBottom:2}}>9 × 9</div>
                     <div style={{fontSize:11,fontWeight:800,marginBottom:1}}>Standard</div>
@@ -8346,14 +8298,14 @@ function App(){
             boxShadow:'var(--card-shadow)'}}>
             <button onClick={()=>setGameBarr(b=>Math.max(8,b-1))}
               style={{width:38,height:38,borderRadius:11,
-                background:darkMode?'rgba(255,255,255,0.05)':'#f3f5fa',border:'1.5px solid var(--border)',
-                cursor:'pointer',fontSize:21,fontWeight:800,color:'#8b5cf6',display:'flex',alignItems:'center',justifyContent:'center',
+                background:'var(--hx-soft)',border:'2px solid var(--hx-line)',
+                cursor:'pointer',fontSize:21,fontWeight:800,color:'var(--hx-ink)',display:'flex',alignItems:'center',justifyContent:'center',
                 fontFamily:'system-ui,-apple-system,sans-serif'}}>−</button>
             <div style={{fontSize:26,fontWeight:900,color:'var(--text)',minWidth:40,textAlign:'center'}}>{gameBarr}</div>
             <button onClick={()=>setGameBarr(b=>Math.min(15,b+1))}
               style={{width:38,height:38,borderRadius:11,
-                background:darkMode?'rgba(255,255,255,0.05)':'#f3f5fa',border:'1.5px solid var(--border)',
-                cursor:'pointer',fontSize:21,fontWeight:800,color:'#8b5cf6',display:'flex',alignItems:'center',justifyContent:'center',
+                background:'var(--hx-soft)',border:'2px solid var(--hx-line)',
+                cursor:'pointer',fontSize:21,fontWeight:800,color:'var(--hx-ink)',display:'flex',alignItems:'center',justifyContent:'center',
                 fontFamily:'system-ui,-apple-system,sans-serif'}}>+</button>
           </div>
 
@@ -8361,30 +8313,28 @@ function App(){
           <button onClick={()=>{setNavDir('fwd');setFlash('');createLobby(false);}}
             className="mi-btn" style={{
             width:'100%',marginTop:22,padding:'16px 18px',borderRadius:20,position:'relative',overflow:'hidden',
-            background:'linear-gradient(135deg,#7c3aed 0%,#8b5cf6 55%,#6d28d9 100%)',
-            border:'none',cursor:'pointer',display:'flex',alignItems:'center',gap:14,
-            boxShadow:'0 4px 14px rgba(124,58,237,0.4),0 0 40px rgba(124,58,237,0.35),0 14px 34px rgba(124,58,237,0.3),inset 0 1px 0 rgba(255,255,255,0.25)',
-            fontFamily:'system-ui,-apple-system,sans-serif',
-            animation:'highlightGlow 3s ease-in-out infinite'}}>
+            background:'linear-gradient(#ffdf5e,#ffc21f)',
+            border:'3px solid #9a5300',cursor:'pointer',display:'flex',alignItems:'center',gap:14,
+            boxShadow:'0 6px 0 #d98200,0 14px 18px -8px var(--hx-sh),inset 0 4px 0 rgba(255,255,255,0.5)',
+            fontFamily:'var(--hx-f)'}}>
             <div style={{position:'absolute',top:0,left:0,right:0,height:'50%',
               background:'linear-gradient(180deg,rgba(255,255,255,0.14),transparent)',borderRadius:'20px 20px 0 0',pointerEvents:'none'}}/>
             <div style={{width:46,height:46,borderRadius:14,flexShrink:0,
-              background:'rgba(255,255,255,0.2)',display:'flex',alignItems:'center',justifyContent:'center',
-              boxShadow:'inset 0 1px 0 rgba(255,255,255,0.25)'}}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+              background:'rgba(19,37,74,0.12)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#13254a"><path d="M8 5v14l11-7z"/></svg>
             </div>
             <div style={{flex:1,textAlign:'left',minWidth:0,zIndex:1}}>
-              <div style={{fontSize:17,fontWeight:900,color:'#fff',letterSpacing:-0.4,lineHeight:1.15}}>
+              <div style={{fontSize:22,fontFamily:'var(--hx-fd)',fontWeight:400,color:'#13254a',letterSpacing:'0.02em',textTransform:'uppercase',lineHeight:1.15}}>
                 {selectedMap==='duel'
                   ?(lang==='de'?'Duell starten':lang==='tr'?'Düello başlat':lang==='fr'?'Démarrer le duel':'Start Duel')
                   :(lang==='de'?'Rennen starten':lang==='tr'?'Yarış başlat':lang==='fr'?'Démarrer la course':'Start Race')}
               </div>
-              <div style={{fontSize:12,fontWeight:600,color:'rgba(255,255,255,0.82)',marginTop:2}}>
+              <div style={{fontSize:13,fontWeight:700,color:'rgba(19,37,74,0.75)',marginTop:2}}>
                 {lang==='de'?'Gegner finden':lang==='tr'?'Rakip bul':lang==='fr'?'Trouver un adversaire':'Find an opponent'}
               </div>
             </div>
             <div style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',opacity:0.18,pointerEvents:'none'}}>
-              <SwordsIcon size={52} color="#fff"/>
+              <SwordsIcon size={52} color="#13254a"/>
             </div>
           </button>
 
@@ -8575,15 +8525,15 @@ function App(){
         <div style={{width:'100%',maxWidth:330,position:'relative',zIndex:1}}>
           <div style={{textAlign:'center',marginBottom:22}}>
             <div style={{width:64,height:64,borderRadius:'50%',margin:'0 auto 12px',
-              background:authMode==='register'?authColor:'linear-gradient(135deg,#8b5cf6,#3b82f6)',
+              background:authMode==='register'?authColor:'linear-gradient(#3f7df2,#1d47a6)',
               display:'flex',alignItems:'center',justifyContent:'center',
               boxShadow:'0 8px 24px rgba(99,102,241,0.3)'}}>
               <PeopleIcon size={30} color="#fff"/>
             </div>
-            <div style={{fontSize:21,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>
+            <div className="hx-h" style={{fontSize:23,marginBottom:0}}>
               {authMode==='register'?t('registerTitle'):t('loginTitle')}
             </div>
-            <div style={{fontSize:12,color:'var(--subtle)',fontWeight:500,marginTop:6}}>{t('loginToTrack')}</div>
+            <div className="hx-on" style={{fontSize:13,fontWeight:600,marginTop:6}}>{t('loginToTrack')}</div>
           </div>
 
           {authMode==='register'&&(
@@ -8597,7 +8547,7 @@ function App(){
 
           {authMode==='register'&&(
             <div style={{marginTop:14}}>
-              <div style={{fontSize:11,color:'var(--subtle)',fontWeight:700,letterSpacing:1,marginBottom:8,paddingLeft:2}}>{t('chooseColor').toUpperCase()}</div>
+              <div className="hx-on" style={{fontSize:12,letterSpacing:1,marginBottom:8,paddingLeft:2}}>{t('chooseColor').toUpperCase()}</div>
               <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'center'}}>
                 {AVATAR_COLORS.map(c=>(
                   <button key={c} onClick={()=>setAuthColor(c)} style={{
@@ -8610,43 +8560,43 @@ function App(){
           )}
 
           {/* Pflicht-Haekchen (Abmahn-Checkliste): ohne Zustimmung keine Registrierung und kein Google-Login; der Server speichert Zeitpunkt + Fassung. appearance: das globale input{-webkit-appearance:none} blendet das Kaestchen sonst aus */}
-          <label style={{display:'flex',alignItems:'flex-start',gap:9,marginTop:14,fontSize:12,color:'var(--subtle)',lineHeight:1.45,cursor:'pointer',textAlign:'left'}}>
+          <label style={{display:'flex',alignItems:'flex-start',gap:9,marginTop:14,fontSize:12.5,fontWeight:700,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',lineHeight:1.45,cursor:'pointer',textAlign:'left'}}>
             <input type="checkbox" checked={agbHaken} onChange={function(e){setAgbHaken(e.target.checked);if(e.target.checked&&authErr===t('agbFehlt'))setAuthErr('');}}
               style={{WebkitAppearance:'checkbox',appearance:'auto',width:18,height:18,margin:0,flexShrink:0,accentColor:'#8b5cf6',cursor:'pointer'}}/>
             <AgbSatz t={t}/>
           </label>
-          <div style={{fontSize:11,color:'var(--subtle)',lineHeight:1.45,marginTop:6,paddingLeft:27,textAlign:'left'}}><AgbSatz t={t} k="agbDsInfo"/></div>
+          <div style={{fontSize:11.5,fontWeight:600,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',lineHeight:1.45,marginTop:6,paddingLeft:27,textAlign:'left'}}><AgbSatz t={t} k="agbDsInfo"/></div>
 
           {authErr&&<div style={{color: authErr===t('mc_relogin')?'#16a34a':'#ef4444',fontSize:12,fontWeight:600,marginTop:12,textAlign:'center',lineHeight:1.5}}>{authErr}</div>}
 
           <button onClick={doAuth} disabled={authBusy} style={{
             width:'100%',padding:'14px',marginTop:18,borderRadius:12,
-            background:authBusy?'var(--border)':'linear-gradient(135deg,#8b5cf6,#3b82f6)',
-            color:'white',border:'none',cursor:authBusy?'default':'pointer',
-            fontWeight:800,fontSize:15,fontFamily:'system-ui,-apple-system,sans-serif',
-            boxShadow:'0 4px 14px rgba(99,102,241,0.35)'}}>
+            background:authBusy?'var(--border)':'linear-gradient(#ffdf5e,#ffc21f)',
+            color:'#13254a',border:'3px solid '+(authBusy?'var(--border)':'#9a5300'),cursor:authBusy?'default':'pointer',borderRadius:18,
+            fontWeight:400,fontSize:22,fontFamily:'var(--hx-fd)',letterSpacing:'0.02em',textTransform:'uppercase',
+            boxShadow:authBusy?'none':'0 6px 0 #d98200,0 14px 18px -8px var(--hx-sh),inset 0 4px 0 rgba(255,255,255,0.5)'}}>
             {authBusy?'…':(authMode==='register'?t('register'):t('login'))}
           </button>
 
           <button onClick={()=>{setAuthMode(authMode==='register'?'login':'register');setAuthErr('');}} style={{
             width:'100%',padding:'12px',marginTop:10,background:'none',border:'none',
-            color:'var(--subtle)',cursor:'pointer',fontSize:13,fontWeight:600,
-            fontFamily:'system-ui,-apple-system,sans-serif'}}>
+            color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',cursor:'pointer',fontSize:14,fontWeight:800,
+            fontFamily:'var(--hx-f)'}}>
             {authMode==='register'?t('haveAccount'):t('needAccount')}
           </button>
 
           {authMode==='login'&&(
             <button onClick={doForgotPw} style={{
               width:'100%',padding:'4px',marginTop:2,background:'none',border:'none',
-              color:'var(--subtle)',cursor:'pointer',fontSize:12,fontWeight:600,
-              fontFamily:'system-ui,-apple-system,sans-serif',textDecoration:'underline'}}>
+              color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',cursor:'pointer',fontSize:13,fontWeight:800,
+              fontFamily:'var(--hx-f)',textDecoration:'underline'}}>
               {t('forgotPw')}
             </button>
           )}
           <div style={{display:'flex',alignItems:'center',gap:10,margin:'14px 0 4px'}}>
-            <div style={{flex:1,height:1,background:'var(--border)'}}/>
-            <span style={{fontSize:11,fontWeight:700,color:'var(--subtle)',letterSpacing:0.5}}>{t('googleOr').toUpperCase()}</span>
-            <div style={{flex:1,height:1,background:'var(--border)'}}/>
+            <div style={{flex:1,height:2,background:'rgba(255,255,255,0.35)'}}/>
+            <span className="hx-on" style={{fontSize:12,letterSpacing:0.5}}>{t('googleOr').toUpperCase()}</span>
+            <div style={{flex:1,height:2,background:'rgba(255,255,255,0.35)'}}/>
           </div>
 
           {/* Google Login — nicht in Instagram-Browser */}
@@ -8705,7 +8655,7 @@ function App(){
                 </div>
                 <button onClick={doGoogleConfirmName} disabled={googleNameBusy} style={{
                   width:'100%',padding:'13px',marginTop:16,borderRadius:12,
-                  background:googleNameBusy?'var(--border)':'linear-gradient(135deg,#8b5cf6,#3b82f6)',
+                  background:googleNameBusy?'var(--border)':'linear-gradient(#3f7df2,#1d47a6)',
                   color:'white',border:'none',cursor:googleNameBusy?'default':'pointer',
                   fontWeight:800,fontSize:15,fontFamily:'system-ui,-apple-system,sans-serif'}}>
                   {googleNameBusy?'…':t('confirm')}
@@ -8772,7 +8722,7 @@ function App(){
         {/* Private Lobby erstellen */}
         <button onClick={()=>createLobby(true)} style={{
           width:'100%',padding:'16px 16px',marginBottom:16,
-          background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'white',border:'none',
+          background:'linear-gradient(#3f7df2,#1d47a6)',color:'white',border:'none',
           borderRadius:14,fontWeight:800,fontSize:14,cursor:'pointer',
           display:'flex',alignItems:'center',gap:10,
           boxShadow:'0 4px 14px rgba(139,92,246,0.35)',
@@ -8911,7 +8861,7 @@ function App(){
                 </div>
                 <button onClick={()=>{setNavDir('fwd');setScreen('difficulty');}} style={{
                   padding:'10px 24px',borderRadius:10,border:'none',cursor:'pointer',fontWeight:800,fontSize:13,
-                  background:'linear-gradient(135deg,#8b5cf6,#6366f1)',color:'#fff',
+                  background:'linear-gradient(#3f7df2,#1d47a6)',color:'#fff',
                   fontFamily:'system-ui,-apple-system,sans-serif'}}>
                   {t('serverFullBtn')}
                 </button>
@@ -8931,7 +8881,7 @@ function App(){
             <span style={{display:'flex'}}><PlusIcon size={18} color="#fff"/></span>
             <span>{t('createLobby')}</span>
           </button>
-          <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginTop:6,textAlign:'center'}}>
+          <div className="hx-on" style={{fontSize:11,fontWeight:600,marginTop:8,textAlign:'center'}}>
             {t('mode')}: {gameTimeMode==='none'?t('noTimer'):gameTimeMode} · {gameBarr} <BrickMini size={10}/>
           </div>
         </div>
@@ -8943,8 +8893,8 @@ function App(){
           <div style={{display:'flex',alignItems:'center',gap:6}}>
             <span style={{display:'inline-block',width:6,height:6,borderRadius:'50%',background:'#16a34a',
               animation:'piece-pulse 1.6s ease-in-out infinite'}}/>
-            <span style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:1.5}}>{t('live')}</span>
-            <span style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:1.5,marginLeft:4}}>· 1 VS 1</span>
+            <span className="hx-on" style={{fontSize:11,letterSpacing:1.5}}>{t('live')}</span>
+            <span className="hx-on" style={{fontSize:11,letterSpacing:1.5,marginLeft:4}}>· 1 VS 1</span>
           </div>
           {lobbies1.length>0&&(
             <div style={{fontSize:10,fontWeight:700,color:'#3b82f6',
@@ -8978,7 +8928,7 @@ function App(){
         {(feat('twovtwo')||khAn)&&(
           <div data-e2e="multi-liste" style={{width:'100%',marginTop:18}}>
             <div style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8,paddingLeft:2,paddingRight:2}}>
-              <span style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:1.5}}>{t('khMulti').toUpperCase()}</span>
+              <span className="hx-on" style={{fontSize:11,letterSpacing:1.5}}>{t('khMulti').toUpperCase()}</span>
               {lobbiesMulti.length>0&&(
                 <div style={{fontSize:10,fontWeight:700,color:'#f97316',background:'rgba(249,115,22,0.12)',padding:'2px 8px',borderRadius:10}}>
                   {lobbiesMulti.length} {t('lobbyCount')}
@@ -9019,9 +8969,9 @@ function App(){
       return(
         <button onClick={()=>setLobbyCfgPrivate(k==='private')} style={{
           width:'100%',padding:'12px 14px',marginBottom:6,
-          background:sel?'var(--text)':'var(--card)',
-          color:sel?'var(--bg)':'var(--text)',
-          border:`1.5px solid ${sel?'var(--text)':'var(--border)'}`,
+          background:sel?'linear-gradient(#3f7df2,#1d47a6)':'var(--card)',
+          color:sel?'#fff':'var(--text)',
+          border:`2px solid ${sel?'#0f2a6a':'var(--border)'}`,
           borderRadius:11,cursor:'pointer',textAlign:'left',
           display:'flex',alignItems:'center',gap:10,
           fontFamily:'system-ui,-apple-system,sans-serif'}}>
@@ -9039,9 +8989,9 @@ function App(){
       return(
         <button onClick={()=>!disabled&&setLobbyCfgMode(k)} disabled={disabled} style={{
           width:'100%',padding:'12px 14px',marginBottom:6,
-          background:sel?'var(--text)':'var(--card)',
-          color:sel?'var(--bg)':'var(--text)',
-          border:`1.5px solid ${sel?'var(--text)':'var(--border)'}`,
+          background:sel?'linear-gradient(#3f7df2,#1d47a6)':'var(--card)',
+          color:sel?'#fff':'var(--text)',
+          border:`2px solid ${sel?'#0f2a6a':'var(--border)'}`,
           borderRadius:11,cursor:disabled?'not-allowed':'pointer',textAlign:'left',
           display:'flex',alignItems:'center',gap:10,opacity:disabled?0.5:1,
           fontFamily:'system-ui,-apple-system,sans-serif'}}>
@@ -9064,23 +9014,21 @@ function App(){
         <MapAura map={selectedMap} dark={darkMode}/>
         <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
           <div style={{textAlign:'center',marginBottom:22}}>
-            <div style={{marginBottom:6,display:'flex',justifyContent:'center'}}><GearIcon size={24} color="var(--text)"/></div>
-            <div style={{fontSize:20,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>{t('lobbySettings')}</div>
+            <div style={{marginBottom:6,display:'flex',justifyContent:'center'}}><GearIcon size={24} color="#fff"/></div>
+            <div className="hx-h" style={{fontSize:22,marginBottom:0}}>{t('lobbySettings')}</div>
           </div>
-          <div style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:1.5,marginBottom:8,paddingLeft:2}}>
+          <div className="hx-on" style={{fontSize:11,fontWeight:800,letterSpacing:1.5,marginBottom:8,paddingLeft:2}}>
             {t('visibility').toUpperCase()}
           </div>
           <VisRow k="public" icon={<GlobeIcon size={20}/>} desc={t('publicDesc')}/>
           <VisRow k="private" icon={<LockIcon size={20}/>} desc={t('privateDesc')}/>
-          <div style={{fontSize:10,color:'var(--subtle)',fontWeight:700,letterSpacing:1.5,marginTop:16,marginBottom:8,paddingLeft:2}}>
+          <div className="hx-on" style={{fontSize:11,fontWeight:800,letterSpacing:1.5,marginTop:16,marginBottom:8,paddingLeft:2}}>
             {t('gameMode').toUpperCase()}
           </div>
           <ModeRow k="classic" icon={<SwordsIcon size={20}/>} desc={t('classicDesc')}/>
           <ModeRow k="ranked" icon={<TrophyIcon size={20}/>} desc={t('rankedDesc')} disabled/>
           {/* Übersicht: diese Lobby wird mit den Einstellungen aus dem Modus-Menü erstellt */}
-          <div style={{marginTop:14,padding:'10px 12px',borderRadius:11,
-            background:selectedMap==='duel'?'rgba(139,92,246,0.1)':'rgba(59,130,246,0.08)',
-            border:'1.5px solid '+(selectedMap==='duel'?'rgba(139,92,246,0.3)':'rgba(59,130,246,0.25)')}}>
+          <div className="hx-plate" style={{marginTop:16,padding:'10px 12px',borderRadius:14,boxShadow:'0 4px 0 var(--hx-line)'}}>
             <div style={{fontSize:9,fontWeight:700,letterSpacing:1,color:'var(--subtle)',marginBottom:5}}>{t('thisLobby')}</div>
             <div style={{display:'flex',gap:5,flexWrap:'wrap',alignItems:'center'}}>
               <span style={{padding:'3px 8px',borderRadius:8,fontSize:10,fontWeight:800,
@@ -9099,12 +9047,11 @@ function App(){
             </div>
             <div style={{fontSize:9,color:'var(--subtle)',marginTop:6}}>Ändern im Menü unter „{t('mode')}"</div>
           </div>
-          <button onClick={()=>createLobby(lobbyCfgPrivate)} style={{
-            width:'100%',padding:'14px 16px',marginTop:22,
-            background:'#3b82f6',color:'white',border:'none',borderRadius:12,
-            fontWeight:800,fontSize:14,cursor:'pointer',
-            boxShadow:'0 4px 14px rgba(59,130,246,0.35)',
-            fontFamily:'system-ui,-apple-system,sans-serif'}}>
+          <button onClick={()=>createLobby(lobbyCfgPrivate)} className="hx-press" style={{
+            width:'100%',padding:'14px 16px',marginTop:24,
+            background:'linear-gradient(#ffdf5e,#ffc21f)',color:'#13254a',border:'3px solid #9a5300',borderRadius:18,
+            fontFamily:'var(--hx-fd)',fontWeight:400,fontSize:22,letterSpacing:'0.02em',textTransform:'uppercase',
+            boxShadow:'0 6px 0 #d98200,0 14px 18px -8px var(--hx-sh),inset 0 4px 0 rgba(255,255,255,0.5)'}}>
             {t('createNow')}
           </button>
           <button onClick={()=>setScreen('online')} style={{...sBack,width:'100%',textAlign:'center'}}>{t('back')}</button>
@@ -9156,7 +9103,7 @@ function App(){
         ):(
         <>
         {/* Titel */}
-        <div style={{fontSize:11,fontWeight:800,color:'var(--subtle)',letterSpacing:2,
+        <div className="hx-on" style={{fontSize:12,letterSpacing:2,
           textTransform:'uppercase',marginBottom:16,textAlign:'center'}}>
           {oppOffline?t('waitingPrivate'):(onlineRole==='A'?(privateCode?t('waitingPrivate'):t('waitingOpponent')):t('connecting'))}
         </div>
@@ -9194,7 +9141,7 @@ function App(){
           </div>
           {/* VS */}
           <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:24,flexShrink:0}}>
-            <span style={{fontSize:12,fontWeight:900,color:'var(--subtle)',letterSpacing:0.5}}>{'VS'}</span>
+            <span className="hx-on" style={{fontSize:13,letterSpacing:0.5}}>{'VS'}</span>
           </div>
           {/* Gegner-Slot */}
           <div style={{flex:1,background:'var(--card)',border:'1.5px dashed var(--border)',
@@ -9228,7 +9175,7 @@ function App(){
         </div>
         {privateCode&&(
           <>
-            <div style={{fontSize:9,fontWeight:800,color:'var(--subtle)',letterSpacing:2.5,
+            <div className="hx-on" style={{fontSize:11,letterSpacing:2.5,
               textTransform:'uppercase',marginBottom:8,textAlign:'center'}}>
               {'Room Code'}
             </div>
@@ -9254,7 +9201,7 @@ function App(){
               width:180,height:180,boxSizing:'border-box',display:'flex',alignItems:'center',justifyContent:'center'}}>
               {qrUrl?<img alt="QR" src={qrUrl} style={{width:160,height:160,display:'block'}}/>:null}
             </div>
-            <div style={{fontSize:10,fontWeight:700,color:'var(--subtle)',letterSpacing:1,marginBottom:18}}>
+            <div className="hx-on" style={{fontSize:11,letterSpacing:1,marginBottom:18}}>
               {t('scanQR')}
             </div>
 
@@ -9364,7 +9311,7 @@ function App(){
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:COLS*CELL+26,marginBottom:10}}>
           <div style={{display:'flex',alignItems:'center',gap:11}}>
             <div style={{width:36,height:36,borderRadius:11,
-              background:'linear-gradient(145deg,#7c3aed,#6366f1 48%,#3b82f6)',
+              background:'linear-gradient(#3f7df2,#1d47a6)',
               display:'flex',alignItems:'center',justifyContent:'center',
               boxShadow:'0 5px 16px rgba(99,102,241,0.5),inset 0 1px 0 rgba(255,255,255,0.4),inset 0 -3px 6px rgba(49,46,129,0.6)'}}>
               <BrickWallIcon size={20} light/>
@@ -9383,9 +9330,9 @@ function App(){
 
         {/* Zeitleiste: bisheriger Fortschrittsbalken + Griff; bedient wird ein unsichtbarer Regler darueber (Tippen, Ziehen, Tasten nativ) */}
         <div style={{position:'relative',width:COLS*CELL+26,height:3,background:'var(--border)',borderRadius:2,margin:'6px 0 16px'}}>
-          <div style={{height:'100%',width:progress+'%',background:'linear-gradient(90deg,#3b82f6,#8b5cf6)',borderRadius:2,transition:'width 0.15s'}}/>
+          <div style={{height:'100%',width:progress+'%',background:'linear-gradient(90deg,#3f7df2,#ffc21f)',borderRadius:2,transition:'width 0.15s'}}/>
           <div style={{position:'absolute',left:progress+'%',top:-4,width:11,height:11,marginLeft:-5.5,borderRadius:'50%',
-            background:'#8b5cf6',boxShadow:'0 1px 4px rgba(0,0,0,0.3)',transition:'left 0.15s',pointerEvents:'none'}}/>
+            background:'#ffc21f',boxShadow:'0 0 0 2px #13254a',transition:'left 0.15s',pointerEvents:'none'}}/>
           <input type="range" min={0} max={rMoves.length} step={1} value={replayStep} aria-label={t('replay')}
             onChange={function(e){zurStelle(+e.target.value);}}
             style={{position:'absolute',left:0,top:-12,width:'100%',height:27,margin:0,opacity:0,cursor:'pointer'}}/>
@@ -9397,19 +9344,18 @@ function App(){
           <span className="ln"/>
         </div>
         <div style={{position:'relative',width:COLS*CELL+26,margin:'0 auto',borderRadius:24,padding:13,
-          background:darkMode?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
-          boxShadow:'0 26px 56px rgba(0,0,0,0.5),0 9px 20px rgba(0,0,0,0.38),inset 0 2px 0 rgba(255,255,255,0.28),inset 0 -3px 6px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.2)'}}>
+          background:'var(--hx-bf)',boxShadow:'0 6px 0 var(--hx-bfe),0 18px 24px -8px var(--hx-sh)'}}>
           <div className="ww-edge ww-edge-t" style={kantenStil((rKarten?RC:KANTE)[rBoardFlip?'B':'A'],darkMode)}/>
           <div className="ww-edge ww-edge-b" style={kantenStil((rKarten?RC:KANTE)[rBoardFlip?'A':'B'],darkMode)}/>
           <div className="ww-stud ww-stud-l"/>
           <div className="ww-stud ww-stud-r"/>
         <div style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,...sGrid,
-          background:darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
+          background:'linear-gradient(170deg,var(--hx-ca),var(--hx-cb))',
           border:'none',
-          boxShadow:darkMode?'inset 0 0 0 2px #05080f,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)':'inset 0 0 0 2px #b6bfce,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)',
+          boxShadow:'inset 0 3px 9px rgba(0,0,0,0.1)',
           transform:rBoardFlip?'scaleY(-1)':'none'}}>
-          <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
-          <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
+          <div className="ww-board-tex" style={{opacity:0}}/>
+          <div className="ww-board-veins" style={{opacity:0}}/>
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
           <div style={{position:'absolute',top:0,left:0,right:0,height:CELL,pointerEvents:'none',zIndex:1,
             background:`linear-gradient(180deg,${rMap==='duel'?RC.A:'#22c55e'}28 0%,${rMap==='duel'?RC.A:'#22c55e'}12 60%,transparent 100%)`,
@@ -9420,7 +9366,7 @@ function App(){
             boxShadow:`inset 0 0 0 1.5px ${RC.B}55,inset 0 -2px 10px ${RC.B}33`,
             animation:'ww-goalpulse 3s ease-in-out infinite'}}/>}
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
-            backgroundImage:`linear-gradient(${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
+            backgroundImage:`linear-gradient(rgba(19,37,74,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(19,37,74,0.3) 1px,transparent 1px),radial-gradient(circle at 0 0, rgba(19,37,74,0.45) 1.4px, transparent 2px)`,
             backgroundSize:`${CELL}px ${CELL}px,${CELL}px ${CELL}px,${CELL}px ${CELL}px`}}/>
           {[...rs.walls].map(function(k){
             var owner=rs.wallOwner[k];
@@ -9523,7 +9469,7 @@ function App(){
               fontFamily:'system-ui,-apple-system,sans-serif',boxShadow:'var(--shadow-soft)'}}>{replayPlaying?'\u275a\u275a':'\u25b6'}</button>
           <button onClick={function(){zurStelle(function(s){return s+1;});}} disabled={replayStep>=rMoves.length}
             style={{flex:1,padding:'12px',borderRadius:12,border:'none',
-              background:replayStep>=rMoves.length?'var(--border)':'linear-gradient(135deg,#3b82f6,#8b5cf6)',
+              background:replayStep>=rMoves.length?'var(--border)':'linear-gradient(#3f7df2,#1d47a6)',
               color:'white',fontSize:18,cursor:replayStep>=rMoves.length?'not-allowed':'pointer',
               opacity:replayStep>=rMoves.length?0.4:1,fontFamily:'system-ui,-apple-system,sans-serif',
               boxShadow:replayStep>=rMoves.length?'none':'0 3px 10px rgba(59,130,246,0.3)'}}>▶|</button>
@@ -9575,22 +9521,22 @@ function App(){
         {/* Winner Card */}
         <div style={{width:'100%',maxWidth:300,position:'relative',zIndex:1}}>
           <div style={{borderRadius:22,overflow:'hidden',
-            boxShadow:winner?`0 16px 48px ${MC[winner]}50,0 4px 16px rgba(0,0,0,0.15)`:'0 8px 24px rgba(0,0,0,0.12)',
-            marginBottom:16,
-            border:winner?`1.5px solid ${MC[winner]}30`:'1.5px solid var(--border)'}}>
+            boxShadow:winner?`0 6px 0 var(--hx-line),0 18px 30px -10px ${MC[winner]}99`:'0 6px 0 var(--hx-line)',
+            marginBottom:20,
+            border:'3px solid var(--hx-line)'}}>
             {/* Animated top stripe */}
             <div style={{height:8,background:winner?`linear-gradient(90deg,${MC[winner]},${MC[winner]}99,${MC[winner]}cc,${MC[winner]})`:'var(--border)',
               backgroundSize:'200% 100%',animation:winner?'rankGlow 2s ease infinite':'none'}}/>
-            <div style={{background:isLoss?'var(--bg)':'var(--card)',padding:'24px 20px',textAlign:'center',position:'relative'}}>
+            <div style={{background:isLoss?'var(--hx-plate2)':'linear-gradient(var(--hx-plate1),var(--hx-plate2))',padding:'24px 20px',textAlign:'center',position:'relative'}}>
               {winner&&!isLoss&&<div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse at 50% 0%, '+MC[winner]+'18 0%, transparent 65%)',pointerEvents:'none'}}/>}
               {/* Icon */}
               <div style={{marginBottom:8,animation:'trophy-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
-                position:'relative',zIndex:1,
+                display:'flex',justifyContent:'center',position:'relative',zIndex:1,
                 filter:winner&&!isLoss?'drop-shadow(0 6px 20px '+MC[winner]+'80)':'none'}}>
                 {winner&&isLoss?<SadIcon size={68}/>:<TrophyIcon size={68}/>}
               </div>
               {/* Result text — BIG */}
-              <div style={{fontSize:40,fontWeight:900,letterSpacing:-1.5,textTransform:'uppercase',lineHeight:1,
+              <div style={{fontSize:44,fontFamily:'var(--hx-fd)',fontWeight:400,letterSpacing:'0.02em',textTransform:'uppercase',lineHeight:1,
                 color:winner?MC[winner]:'var(--subtle)',marginBottom:6,position:'relative',zIndex:1,
                 textShadow:winner&&!isLoss?'0 0 40px '+MC[winner]+'50':'none',
                 animation:winner&&!isLoss?'trophy-pop 0.6s 0.1s cubic-bezier(0.34,1.56,0.64,1) both':'none'}}>
@@ -9899,7 +9845,7 @@ function App(){
             {gameMode==='online'&&!bugOpen&&(
               <button onClick={()=>{setBugOpen(true);setBugStatus(null);}}
                 style={{background:'none',border:'none',cursor:'pointer',padding:'6px 0 2px',
-                  fontSize:12,fontWeight:700,color:'var(--subtle)',textDecoration:'underline',
+                  fontSize:12.5,fontWeight:800,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',textDecoration:'underline',
                   fontFamily:'system-ui,-apple-system,sans-serif'}}>
                 {t('reportBtn')}
               </button>
@@ -9973,7 +9919,7 @@ function App(){
             {gameMode==='online'&&!repOpen&&(
               <button onClick={()=>{setRepOpen(true);setRepStatus(null);setRepSrc('end');setRepChatTs(null);setRepReason('reportCheating');setRepText('');}}
                 style={{background:'none',border:'none',cursor:'pointer',padding:'2px 0 6px',
-                  fontSize:12,fontWeight:700,color:'var(--subtle)',textDecoration:'underline',
+                  fontSize:12.5,fontWeight:800,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',textDecoration:'underline',
                   fontFamily:'system-ui,-apple-system,sans-serif'}}>
                 {t('reportPlayerBtn')}
               </button>
@@ -10164,12 +10110,12 @@ function App(){
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:COLS*CELL+26,marginBottom:11}}>
         <div style={{display:'flex',alignItems:'center',gap:9}}>
           <div style={{width:30,height:30,borderRadius:9,
-            background:'linear-gradient(145deg,#7c3aed,#6366f1 48%,#3b82f6)',
+            background:'linear-gradient(#3f7df2,#1d47a6)',
             display:'flex',alignItems:'center',justifyContent:'center',
             boxShadow:'0 4px 12px rgba(99,102,241,0.5),inset 0 1px 0 rgba(255,255,255,0.4),inset 0 -3px 6px rgba(49,46,129,0.6)'}}>
             <BrickWallIcon size={17} light/>
           </div>
-          <div style={{fontSize:16,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>{t('title')}</div>
+          <div className="hx-on" style={{fontSize:16,letterSpacing:-0.2}}>{t('title')}</div>
         </div>
         {!winner&&(
           <div style={{display:'flex',alignItems:'center',gap:6}}>
@@ -10187,12 +10133,12 @@ function App(){
             <button onClick={handleGiveUp} style={{
               height:40,padding:'0 13px',cursor:'pointer',
               display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2,
-              background:giveUpArmed?'#ef4444':(darkMode?'linear-gradient(180deg,#1b2438,#141c2d)':'linear-gradient(180deg,#f3f6fb,#ffffff)'),
-              color:giveUpArmed?'#fff':'var(--muted)',
-              border:'1px solid '+(giveUpArmed?'#ef4444':'var(--border)'),
-              borderRadius:12,transition:'transform 0.14s cubic-bezier(0.34,1.56,0.64,1)',
-              boxShadow:giveUpArmed?'0 2px 10px rgba(239,68,68,0.35)':(darkMode?'0 5px 14px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.06)':'0 5px 14px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.9)'),
-              fontFamily:'system-ui,-apple-system,sans-serif'}}>
+              background:giveUpArmed?'#ef4444':'linear-gradient(var(--hx-plate1),var(--hx-plate2))',
+              color:giveUpArmed?'#fff':'var(--hx-ink)',
+              border:'3px solid '+(giveUpArmed?'#9b1c1c':'var(--hx-line)'),
+              borderRadius:14,transition:'transform 0.14s cubic-bezier(0.34,1.56,0.64,1)',
+              boxShadow:'0 3px 0 '+(giveUpArmed?'#9b1c1c':'var(--hx-line)'),
+              fontFamily:'var(--hx-f)'}}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-1.5 3.5L16 11H5"/></svg>
               <span style={{fontSize:8,fontWeight:800,letterSpacing:0.3}}>{giveUpArmed?t('sure'):t('giveUp')}</span>
             </button>
@@ -10205,32 +10151,32 @@ function App(){
         <div style={{display:'flex',gap:6,marginBottom:8,width:'100%',maxWidth:360,flexWrap:'wrap'}}>
           {gameTimeMode.indexOf('classic-')===0&&(
             <div style={{padding:'3px 9px',borderRadius:10,fontSize:10,fontWeight:800,letterSpacing:0.4,
-              background:'rgba(59,130,246,0.12)',color:'#3b82f6',display:'flex',alignItems:'center',gap:4}}>
+              background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#3b82f6',display:'flex',alignItems:'center',gap:4}}>
               <ModeGlyph kind="clock" size={11} color="#3b82f6"/><span>{gameTimeMode==='classic-3'?'3':gameTimeMode==='classic-5'?'5':'8'} {t('minLabel')}</span>
             </div>
           )}
           {gameTimeMode.indexOf('blitz-')===0&&(
             <div style={{padding:'3px 9px',borderRadius:10,fontSize:10,fontWeight:800,letterSpacing:0.4,
-              background:'rgba(245,158,11,0.15)',color:'#d97706',display:'flex',alignItems:'center',gap:4}}>
+              background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#d97706',display:'flex',alignItems:'center',gap:4}}>
               <ModeGlyph kind="bolt" size={11} color="#d97706"/><span>{gameTimeMode==='blitz-5'?'5':gameTimeMode==='blitz-8'?'8':'10'} {t('secLabel')}</span>
             </div>
           )}
           {chaosMode&&(
             <div style={{padding:'3px 9px',borderRadius:10,fontSize:10,fontWeight:800,letterSpacing:0.4,
-              background:'rgba(139,92,246,0.15)',color:'#8b5cf6',display:'flex',alignItems:'center',gap:4}}>
+              background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#8b5cf6',display:'flex',alignItems:'center',gap:4}}>
               <ModeGlyph kind="swirl" size={11} color="#8b5cf6"/><span>{t('modeChaos')}</span>
               {chaosItem&&<span style={{width:5,height:5,borderRadius:'50%',background:'#8b5cf6',animation:'piece-pulse 1.4s ease-in-out infinite'}}/>}
             </div>
           )}
           {dropMode&&(
             <div style={{padding:'3px 9px',borderRadius:10,fontSize:10,fontWeight:800,letterSpacing:0.4,
-              background:'rgba(236,72,153,0.15)',color:'#ec4899',display:'flex',alignItems:'center',gap:4}}>
+              background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#ec4899',display:'flex',alignItems:'center',gap:4}}>
               <ModeGlyph kind="burst" size={11} color="#ec4899"/><span>{t('randomDrop')}</span>
             </div>
           )}
           {hammerMode&&(
             <div style={{padding:'3px 9px',borderRadius:10,fontSize:10,fontWeight:800,letterSpacing:0.4,
-              background:'rgba(245,158,11,0.15)',color:'#d97706',display:'flex',alignItems:'center',gap:4}}>
+              background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#d97706',display:'flex',alignItems:'center',gap:4}}>
               <ModeGlyph kind="hammer" size={12}/><span>{t('hammerMode')}</span>
             </div>
           )}
@@ -10336,8 +10282,7 @@ function App(){
 
       {/* Grid */}
       <div key={gameNum} style={{position:'relative',width:COLS*CELL+26,margin:'0 auto',borderRadius:24,padding:13,
-        background:darkMode?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
-        boxShadow:'0 26px 56px rgba(0,0,0,0.5),0 9px 20px rgba(0,0,0,0.38),inset 0 2px 0 rgba(255,255,255,0.28),inset 0 -3px 6px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.2)',
+        background:'var(--hx-bf)',boxShadow:'0 6px 0 var(--hx-bfe),0 18px 24px -8px var(--hx-sh)',
         animation:'game-enter 0.46s cubic-bezier(0.22,1,0.36,1) backwards'}}>
       <div className="ww-edge ww-edge-t" style={kantenStil((wlKarten?MC:KANTE)[gameMode==='online'&&onlineRole==='B'&&selectedMap==='duel'?'B':'A'],darkMode)}/>
       <div className="ww-edge ww-edge-b" style={kantenStil((wlKarten?MC:KANTE)[gameMode==='online'&&onlineRole==='B'&&selectedMap==='duel'?'A':'B'],darkMode)}/>
@@ -10348,12 +10293,12 @@ function App(){
         const gcGoal=selectedMap==='duel'?MC.A:'#22c55e';
         return(
       <div ref={gridRef} style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,touchAction:'auto',...sGrid,
-        background:myBoardSkin?myBoardSkin.bg:(darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)'),
+        background:myBoardSkin?myBoardSkin.bg:'linear-gradient(170deg,var(--hx-ca),var(--hx-cb))',
         border:'none',
-        boxShadow:darkMode?'inset 0 0 0 2px #05080f,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)':'inset 0 0 0 2px #b6bfce,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)',
+        boxShadow:'inset 0 0 0 4px var(--hx-bf),inset 0 3px 9px rgba(0,0,0,0.1),0 6px 0 var(--hx-bfe),0 16px 20px -8px var(--hx-sh)',
         transform:boardFlip?'scaleY(-1)':'none'}}>
-        <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:myBoardSkin?0:(darkMode?0.12:0.4)}}/>
-        <div className="ww-board-veins" style={{opacity:myBoardSkin?0:(darkMode?0.3:0.45)}}/>
+        <div className="ww-board-tex" style={{opacity:0}}/>
+        <div className="ww-board-veins" style={{opacity:0}}/>
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
         <div style={{position:'absolute',top:0,left:0,right:0,height:CELL,pointerEvents:'none',zIndex:1,
           background:`linear-gradient(180deg,${gcGoal}28 0%,${gcGoal}12 60%,transparent 100%)`,
@@ -10364,7 +10309,7 @@ function App(){
           boxShadow:`inset 0 0 0 1.5px ${MC.B}55,inset 0 -2px 10px ${MC.B}33`,
           animation:'ww-goalpulse 3s ease-in-out infinite'}}/>}
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
-          backgroundImage:`linear-gradient(${myBoardSkin?myBoardSkin.line:(darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)')} 1px,transparent 1px),linear-gradient(90deg,${myBoardSkin?myBoardSkin.line:(darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)')} 1px,transparent 1px),radial-gradient(circle at 0 0, ${myBoardSkin?myBoardSkin.line:(darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)')} 1.4px, transparent 2px)`,
+          backgroundImage:`linear-gradient(${myBoardSkin?myBoardSkin.line:'rgba(19,37,74,0.3)'} 1.5px,transparent 1.5px),linear-gradient(90deg,${myBoardSkin?myBoardSkin.line:'rgba(19,37,74,0.3)'} 1.5px,transparent 1.5px),radial-gradient(circle at 0 0, ${myBoardSkin?myBoardSkin.line:'rgba(19,37,74,0.45)'} 1.4px, transparent 2px)`,
           backgroundSize:`${CELL}px ${CELL}px,${CELL}px ${CELL}px,${CELL}px ${CELL}px`}}/>
         {Array.from({length:ROWS},function(_,r){return Array.from({length:COLS},function(_,c){
           const isA=pA.r===r&&pA.c===c,isB=pB.r===r&&pB.c===c;
@@ -10382,7 +10327,7 @@ function App(){
             </div>
           );
         });})}
-        {[...walls].map(k=><Wall key={k} wkey={k} color={darkMode?'#e2e8f0':'#1e293b'} opacity={1} animate golden={goldenWalls.has(k)} steel={hammerMode&&isSteelWall(k)}/>)}
+        {[...walls].map(k=><Wall key={k} wkey={k} color={'#13254a'} opacity={1} animate golden={goldenWalls.has(k)} steel={hammerMode&&isSteelWall(k)}/>)}
         {previewKey&&<Wall wkey={previewKey} color={previewValid?'#f59e0b':'#ef4444'} opacity={0.6}/>}
         {breakingWall&&<BreakingWall wkey={breakingWall} dark={darkMode}/>}
         {hammerDrag&&hammerTarget&&<Wall wkey={hammerTarget} color={'#f59e0b'} opacity={0.9}/>}
@@ -10542,7 +10487,7 @@ function App(){
                   style={{pointerEvents:dragging?'none':'auto',width:orient==='H'?54:36,height:orient==='V'?40:34,
                     cursor:canDrag?'grab':'not-allowed',opacity:canDrag?1:0.4,touchAction:canDrag?'none':'pan-y'}}>
                   <div style={{width:orient==='H'?34:WW,height:orient==='V'?22:WW,
-                    background:canDrag?(darkMode?'#e2e8f0':'#1e293b'):(darkMode?'#475569':'#94a3b8'),
+                    background:canDrag?'#13254a':'#8c9bbd',
                     borderRadius:3,pointerEvents:'none',boxShadow:'inset 0 1px 0 rgba(255,255,255,0.4),0 2px 4px rgba(0,0,0,0.4)'}}/>
                 </div>
               ))}
@@ -10909,10 +10854,10 @@ function ReplayHistoryScreen({t,darkMode,goBack,onWatch}){
   const[list,setList]=useState([]);
   useEffect(()=>{setList(loadReplayHistory());},[]);
   const dk=darkMode;
-  const card=dk?'#1e293b':'#fff';
-  const border=dk?'#334155':'#e2e8f0';
-  const txt=dk?'#f1f5f9':'#0f172a';
-  const muted=dk?'#94a3b8':'#64748b';
+  const card='var(--card)';
+  const border='var(--border)';
+  const txt='var(--text)';
+  const muted='var(--subtle)';
   const fmt=ts=>{
     const d=new Date(ts);
     const pad=n=>String(n).padStart(2,'0');
@@ -10931,9 +10876,9 @@ function ReplayHistoryScreen({t,darkMode,goBack,onWatch}){
         boxShadow:'0 2px 8px rgba(0,0,0,0.08)',zIndex:100,color:txt,fontWeight:700}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
       <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
         <div style={{textAlign:'center',marginBottom:20}}>
-          <div style={{fontSize:21,fontWeight:900,color:txt,letterSpacing:-0.5,
+          <div className="hx-h" style={{fontSize:25,marginBottom:0,
             display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
-            <ReplayIcon size={20} color={txt}/> {t('replays')}
+            <ReplayIcon size={22} color="#fff"/> {t('replays')}
           </div>
           <div style={{fontSize:11,color:muted,fontWeight:600,marginTop:4}}>{t('replayHistSub')||'Replays'}</div>
         </div>
@@ -11396,10 +11341,10 @@ function FriendsScreen({account,t,darkMode,goBack,onInvite,onSpectate,friendLobb
   };
 
   const dk=darkMode;
-  const card=dk?'#1e293b':'#ffffff';
-  const border=dk?'#334155':'#e2e8f0';
-  const text2=dk?'#f1f5f9':'#1e293b';
-  const muted=dk?'#64748b':'#94a3b8';
+  const card='var(--card)';
+  const border='var(--border)';
+  const text2='var(--text)';
+  const muted='var(--subtle)';
 
   const Av=({prof,sz})=>{const s=sz||36;return(
     <div style={{width:s,height:s,borderRadius:'50%',background:prof.color||'#8b5cf6',flexShrink:0,
@@ -11444,7 +11389,7 @@ function FriendsScreen({account,t,darkMode,goBack,onInvite,onSpectate,friendLobb
               </div>
               <div style={{display:'flex',gap:8,marginTop:8}}>
                 <button onClick={onAcceptInvite} style={{flex:1,padding:'9px',borderRadius:9,
-                  background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'#fff',border:'none',
+                  background:'linear-gradient(#3f7df2,#1d47a6)',color:'#fff',border:'none',
                   cursor:'pointer',fontWeight:800,fontSize:13,fontFamily:'system-ui,-apple-system,sans-serif'}}>
                   {t('friends_join')}
                 </button>
@@ -11500,7 +11445,7 @@ function FriendsScreen({account,t,darkMode,goBack,onInvite,onSpectate,friendLobb
                       </div>
                       {f.status==='online'&&!friendLobbyState&&(
                         <button onClick={()=>onInvite(f.key,f.name)} style={{padding:'7px 11px',borderRadius:8,
-                          background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'#fff',border:'none',
+                          background:'linear-gradient(#3f7df2,#1d47a6)',color:'#fff',border:'none',
                           cursor:'pointer',fontSize:12,fontWeight:700,fontFamily:'system-ui,-apple-system,sans-serif',whiteSpace:'nowrap'}}>
                           {t('friends_invite')}
                         </button>
@@ -11561,7 +11506,7 @@ function FriendsScreen({account,t,darkMode,goBack,onInvite,onSpectate,friendLobb
                         fontSize:15,background:card,color:text2,outline:'none',
                         fontFamily:'system-ui,-apple-system,sans-serif'}}/>
                     <button onClick={doAdd} disabled={addBusy} style={{padding:'12px 16px',borderRadius:10,
-                      background:'linear-gradient(135deg,#8b5cf6,#3b82f6)',color:'#fff',border:'none',
+                      background:'linear-gradient(#3f7df2,#1d47a6)',color:'#fff',border:'none',
                       cursor:addBusy?'default':'pointer',fontWeight:800,fontSize:15,
                       fontFamily:'system-ui,-apple-system,sans-serif'}}>{addBusy?'…':'+'}</button>
                   </div>
@@ -11598,10 +11543,10 @@ function FriendsScreen({account,t,darkMode,goBack,onInvite,onSpectate,friendLobb
 }
 function OppProfileModal({data,onClose,darkMode,t}){
   const dk=darkMode;
-  const card=dk?'#161e33':'#fff';
-  const txt=dk?'#f1f5f9':'#0f172a';
-  const muted=dk?'#94a3b8':'#64748b';
-  const border=dk?'#252d44':'#e2e8f0';
+  const card='var(--card)';
+  const txt='var(--text)';
+  const muted='var(--subtle)';
+  const border='var(--border)';
   const tier=data.ranked?rankTier((data.ranked.duel&&data.ranked.duel.rating)||1000):{icon:'–',label:'–'};
   return(
     <div onClick={onClose} style={{position:'fixed',inset:0,zIndex:900,background:'rgba(0,0,0,0.55)',display:'flex',alignItems:'flex-end',justifyContent:'center',padding:'0 0 24px'}}>
@@ -11695,7 +11640,7 @@ function MatchSearch({dark,t,lang}){
   },[]);
   var mm=Math.floor(sec/60),ss=sec%60;
   var clock=mm+':'+(ss<10?'0':'')+ss;
-  var ringCol=dark?'rgba(139,92,246,0.55)':'rgba(124,58,237,0.4)';
+  var ringCol='rgba(255,255,255,0.6)';
   var subText=lang==='de'?'Suche nach einem Gegner':lang==='tr'?'Rakip aranıyor':lang==='fr'?'Recherche d\u2019un adversaire':'Searching for an opponent';
   var titleText=lang==='de'?'Match suchen':lang==='tr'?'Maç aranıyor':lang==='fr'?'Recherche de match':'Finding Match';
   var hint=sec<8?(lang==='de'?'Verbinde mit dem Server\u2026':lang==='tr'?'Sunucuya ba\u011flan\u0131l\u0131yor\u2026':lang==='fr'?'Connexion au serveur\u2026':'Connecting to server\u2026')
@@ -11710,44 +11655,42 @@ function MatchSearch({dark,t,lang}){
       })}
       {/* rotierender Lade-Ring */}
       <div style={{position:'absolute',width:172,height:172,borderRadius:'50%',
-        background:'conic-gradient(from 0deg,transparent 0deg,transparent 250deg,'+(dark?'#8b5cf6':'#7c3aed')+' 340deg,transparent 360deg)',
+        background:'conic-gradient(from 0deg,transparent 0deg,transparent 250deg,#ffc21f 340deg,transparent 360deg)',
         WebkitMask:'radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))',
         mask:'radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))',
         animation:'ms-rotate 2.2s linear infinite'}}/>
       {/* zentraler Herzschlag-Kreis */}
       <div style={{width:128,height:128,borderRadius:'50%',
-        background:'linear-gradient(150deg,#8b5cf6 0%,#7c3aed 55%,#6d28d9 100%)',
+        background:'radial-gradient(circle at 50% 30%,#ffe27a,#ffc21f 60%,#e89a10)',border:'4px solid #9a5300',
         display:'flex',alignItems:'center',justifyContent:'center',
-        boxShadow:'0 10px 34px rgba(124,58,237,0.5),0 0 50px rgba(124,58,237,0.45),inset 0 2px 6px rgba(255,255,255,0.3),inset 0 -6px 12px rgba(0,0,0,0.25)',
+        boxShadow:'0 8px 0 #d98200,0 18px 24px -8px var(--hx-sh)',
         animation:'ms-heartbeat 1.5s ease-in-out infinite'}}>
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#13254a" strokeWidth="2.4" strokeLinecap="round">
           <path d="M5 5l9 9M19 5l-9 9M14 14l5 5M10 14l-5 5"/>
         </svg>
       </div>
     </div>
 
     {/* Timer */}
-    <div style={{fontSize:46,fontWeight:900,letterSpacing:1,color:'var(--text)',fontVariantNumeric:'tabular-nums',lineHeight:1}}>
+    <div className="hx-h" style={{fontSize:50,letterSpacing:1,fontVariantNumeric:'tabular-nums',lineHeight:1,marginBottom:0}}>
       {clock}
     </div>
 
     {/* Titel + Punkte */}
-    <div style={{fontSize:19,fontWeight:900,color:'var(--text)',marginTop:14,letterSpacing:-0.3,display:'inline-flex',alignItems:'center'}}>
+    <div className="hx-on" style={{fontSize:20,marginTop:14,display:'inline-flex',alignItems:'center'}}>
       {titleText}
       <span style={{display:'inline-flex',marginLeft:3}}>
         {[0,1,2].map(function(i){return <span key={i} style={{animation:'ms-dots 1.4s ease-in-out infinite',animationDelay:(i*0.2)+'s'}}>.</span>;})}
       </span>
     </div>
-    <div style={{fontSize:13,fontWeight:600,color:'var(--subtle)',marginTop:6}}>{subText}</div>
+    <div className="hx-on" style={{fontSize:14,fontWeight:600,marginTop:6,opacity:0.9}}>{subText}</div>
 
     {/* Status-Hinweis */}
-    <div style={{marginTop:20,padding:'8px 16px',borderRadius:20,
-      background:dark?'rgba(139,92,246,0.12)':'rgba(124,58,237,0.08)',
-      border:'1px solid '+(dark?'rgba(139,92,246,0.25)':'rgba(124,58,237,0.18)'),
+    <div className="hx-plate" style={{marginTop:22,padding:'7px 16px',borderRadius:20,boxShadow:'0 4px 0 var(--hx-line)',
       display:'inline-flex',alignItems:'center',gap:8}}>
       <span style={{width:7,height:7,borderRadius:'50%',background:'#22c55e',
         boxShadow:'0 0 8px rgba(34,197,94,0.8)',animation:'mbg-gp 1.4s ease-in-out infinite'}}/>
-      <span style={{fontSize:12,fontWeight:700,color:'var(--text)'}}>{hint}</span>
+      <span style={{fontSize:13,fontWeight:800,color:'var(--hx-ink)'}}>{hint}</span>
     </div>
   </div>;
 }
@@ -11761,48 +11704,7 @@ function DecoCube({dark,size,style}){
   </div>;
 }
 function MenuBG({dark}){
-  var gc=dark?'rgba(150,180,235,0.07)':'rgba(20,30,60,0.04)';
-  return <div style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none',overflow:'hidden',
-    background:dark
-      ?'linear-gradient(180deg,#0d1422 0%,#080d18 50%,#03060d 100%)'
-      :'linear-gradient(180deg,#eef1f7 0%,#e4e9f1 55%,#d9e0ec 100%)'}}>
-    <div className="ww-board-tex" style={{mixBlendMode:dark?'screen':'multiply',opacity:dark?0.06:0.14}}/>
-    {/* Violetter Glow oben hinterm Logo */}
-    <div style={{position:'absolute',inset:0,
-      background:dark
-        ?'radial-gradient(90% 38% at 50% 4%,rgba(124,92,246,0.22) 0%,transparent 50%)'
-        :'radial-gradient(115% 50% at 50% 0%,rgba(255,255,255,0.85) 0%,transparent 52%)'}}/>
-    {dark
-      ? <div style={{position:'absolute',left:'-30%',right:'-30%',bottom:0,height:'62%',
-          transform:'perspective(420px) rotateX(62deg)',transformOrigin:'50% 100%',
-          backgroundImage:'linear-gradient('+gc+' 1px,transparent 1px),linear-gradient(90deg,'+gc+' 1px,transparent 1px)',
-          backgroundSize:'40px 40px',
-          maskImage:'linear-gradient(to top,#000 0%,transparent 85%)',
-          WebkitMaskImage:'linear-gradient(to top,#000 0%,transparent 85%)',
-          animation:'mbg-grid-pan 18s linear infinite'}}/>
-      : <div style={{position:'absolute',inset:'-50px 0 0',
-          backgroundImage:'linear-gradient('+gc+' 1px,transparent 1px),linear-gradient(90deg,'+gc+' 1px,transparent 1px)',
-          backgroundSize:'46px 46px',
-          maskImage:'radial-gradient(125% 90% at 50% 25%,#000 40%,transparent 92%)',
-          WebkitMaskImage:'radial-gradient(125% 90% at 50% 25%,#000 40%,transparent 92%)',
-          animation:'mbg-grid-pan 16s linear infinite'}}/>}
-    {/* Ziel-Zone rot oben */}
-    <div style={{position:'absolute',top:0,left:'-10%',right:'-10%',height:'30%',
-      background:dark
-        ?'radial-gradient(ellipse 75% 100% at 50% 0%,rgba(225,70,60,0.18) 0%,transparent 70%)'
-        :'radial-gradient(ellipse 75% 100% at 50% 0%,rgba(225,70,60,0.1) 0%,transparent 70%)',
-      animation:'mbg-gp 6s ease-in-out infinite'}}/>
-    {/* Start-Zone blau unten */}
-    <div style={{position:'absolute',bottom:0,left:'-10%',right:'-10%',height:'30%',
-      background:dark
-        ?'radial-gradient(ellipse 75% 100% at 50% 100%,rgba(50,125,235,0.2) 0%,transparent 70%)'
-        :'radial-gradient(ellipse 75% 100% at 50% 100%,rgba(50,125,235,0.09) 0%,transparent 70%)',
-      animation:'mbg-gp 6s ease-in-out 3s infinite'}}/>
-    <div style={{position:'absolute',inset:0,
-      background:dark
-        ?'linear-gradient(to bottom,rgba(3,6,13,0.4) 0%,transparent 22%,transparent 60%,rgba(2,4,9,0.6) 100%)'
-        :'linear-gradient(to bottom,transparent 58%,rgba(80,100,135,0.1) 100%)'}}/>
-  </div>;
+  return <div className="hx-bg"/>;
 }
 function HammerIcon({size}){
   const s=size||24;
@@ -11845,13 +11747,11 @@ function BreakingWall({wkey,dark,color}){
 const BreakingWallM=React.memo(BreakingWall); // Replay: die zufaellig fliegenden Truemmer aendern sich nicht bei jedem Neuzeichnen
 function ScreenHead({icon,iconBg,title,sub}){
   return(
-    <div style={{textAlign:'center',marginBottom:24,position:'relative',zIndex:1}}>
-      {icon?<div style={{width:66,height:66,borderRadius:20,margin:'0 auto 14px',
-        background:iconBg||'var(--card)',border:iconBg?'none':'1.5px solid var(--border)',
-        display:'flex',alignItems:'center',justifyContent:'center',
-        boxShadow:iconBg?'0 8px 24px rgba(0,0,0,0.22),0 3px 8px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.2)':'var(--shadow-soft)'}}>{icon}</div>:null}
-      <div style={{fontSize:24,fontWeight:900,color:'var(--text)',letterSpacing:-0.8,lineHeight:1.1}}>{title}</div>
-      {sub?<div style={{fontSize:12,color:'var(--subtle)',fontWeight:600,marginTop:6,letterSpacing:0.1}}>{sub}</div>:null}
+    <div style={{textAlign:'center',marginBottom:22,position:'relative',zIndex:1}}>
+      {icon?<div className="hx-plate" style={{width:64,height:64,borderRadius:20,margin:'0 auto 12px',
+        background:iconBg||undefined,display:'flex',alignItems:'center',justifyContent:'center'}}>{icon}</div>:null}
+      <div className="hx-h" style={{fontSize:26,marginBottom:0}}>{title}</div>
+      {sub?<div className="hx-on" style={{fontSize:13,fontWeight:600,marginTop:6,opacity:0.9}}>{sub}</div>:null}
     </div>
   );
 }
@@ -11875,7 +11775,7 @@ function MenuFarbe({bg,tx,icon,title,desc,right,onClick}){
   </button>;
 }
 function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightBg,pulse,glowColor,hx}){
-  var P=hx&&!highlight; // hx: Platte im neuen Design (Menue)
+  var P=!highlight; // Platte im neuen Design (hx bleibt als Name, gilt jetzt fuer alle)
   return(
     <div style={{position:'relative'}}>
       <button onClick={onClick} className={highlight?'mi-btn mi-btn-hl':'mi-btn'} style={{
@@ -11885,7 +11785,7 @@ function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightB
         display:'flex',alignItems:'center',gap:13,cursor:'pointer',
         boxShadow:highlight
           ?('0 2px 6px rgba(15,23,42,0.2),0 16px 38px rgba(15,23,42,0.3),inset 0 1px 0 rgba(255,255,255,0.28)'+(glowColor?(',0 6px 34px '+glowColor+',0 0 60px '+glowColor):''))
-          :P?'0 5px 0 var(--hx-line),0 12px 16px -8px var(--hx-sh)':'0 2px 6px rgba(15,23,42,0.12),0 14px 32px rgba(15,23,42,0.2),inset 0 1px 0 rgba(255,255,255,0.4)',
+          :P?'0 5px 0 var(--hx-line),0 12px 16px -8px var(--hx-sh)':'inset 0 3px 0 rgba(255,255,255,0.28),inset 0 -5px 0 rgba(9,24,64,0.22),0 10px 16px -8px var(--hx-sh)',
         opacity:off?0.45:1,fontFamily:P?'inherit':'system-ui,-apple-system,sans-serif',
         animation:pulse&&!off?'highlightPulse 2.5s ease-in-out infinite':highlight?'highlightGlow 3s ease-in-out infinite':'none',
         overflow:'hidden'}}>
@@ -11920,42 +11820,35 @@ function MenuItem({icon,iconBg,title,desc,onClick,right,off,highlight,highlightB
 function MenuSection({label,children}){
   return(
     <div style={{marginBottom:18}}>
-      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:9,marginBottom:11}}>
-        <span style={{width:4,height:4,background:'#8b5cf6',transform:'rotate(45deg)',opacity:0.75,flexShrink:0}}/>
-        <div style={{fontSize:10.5,fontWeight:800,letterSpacing:1.8,color:'#8b5cf6',textTransform:'uppercase',textAlign:'center'}}>{label}</div>
-        <span style={{width:4,height:4,background:'#8b5cf6',transform:'rotate(45deg)',opacity:0.75,flexShrink:0}}/>
-      </div>
-      <div style={{display:'flex',flexDirection:'column',gap:10,
-        padding:12,borderRadius:24,
-        background:'var(--msec-bg)',
-        border:'1px solid var(--msec-border)',
-        boxShadow:'inset 0 1px 0 rgba(255,255,255,0.06),0 8px 28px rgba(15,23,42,0.08)',
-        WebkitBackdropFilter:'blur(6px)',backdropFilter:'blur(6px)'}}>
+      <div className="hx-on" style={{display:'flex',alignItems:'center',justifyContent:'center',marginBottom:10,
+        fontSize:12,fontWeight:800,letterSpacing:1.6,textTransform:'uppercase',textAlign:'center'}}>{label}</div>
+      <div style={{display:'flex',flexDirection:'column',gap:12,padding:12,borderRadius:24,
+        background:'var(--msec-bg)',border:'2px solid var(--msec-border)'}}>
         {children}
       </div>
     </div>
   );
 }
 function GBtn({onClick,children,dark,blue,outline}){
-  return <button onClick={e=>{if(onClick)onClick(e);}} style={{padding:'13px 16px',
-    background:dark?'#1e293b':blue?'#3b82f6':outline?'var(--card)':'var(--border)',
-    color:dark||blue?'white':'var(--text)',
-    border:`1.5px solid ${outline?'var(--border)':dark?'#1e293b':blue?'#3b82f6':'transparent'}`,
-    borderRadius:12,cursor:'pointer',fontWeight:700,fontSize:13,width:'100%',
-    fontFamily:'system-ui,-apple-system,sans-serif',
-    boxShadow:dark?'0 2px 8px rgba(30,41,59,0.18)':blue?'0 2px 8px rgba(59,130,246,0.25)':'none',
-    transition:'all 0.15s'}}>{children}</button>;
+  var f=dark||blue; // dunkel/blau = gefuellter Knopf in Marinblau, sonst Sand-Platte
+  return <button onClick={e=>{if(onClick)onClick(e);}} className="hx-press" style={{padding:'13px 16px',
+    background:f?(dark?'linear-gradient(#24407f,#1a2f66)':'linear-gradient(#2f6bff,#1d47a6)'):'linear-gradient(var(--hx-plate1),var(--hx-plate2))',
+    color:f?'#fff':'var(--hx-ink)',
+    border:'3px solid '+(f?'#0f2a6a':'var(--hx-line)'),
+    borderRadius:16,fontWeight:800,fontSize:14,width:'100%',
+    fontFamily:'var(--hx-f)',
+    boxShadow:'0 4px 0 '+(f?'#0f2a6a':'var(--hx-line)')+',0 10px 14px -8px var(--hx-sh)'}}>{children}</button>;
 }
-const rBtn=dis=>({padding:'10px 24px',background:dis?'var(--border)':'#1e293b',color:dis?'var(--subtle)':'white',
-  border:'none',borderRadius:10,cursor:dis?'not-allowed':'pointer',fontWeight:700,fontSize:16,
-  fontFamily:'system-ui,-apple-system,sans-serif'});
+const rBtn=dis=>({padding:'10px 24px',background:dis?'var(--border)':'linear-gradient(#2f6bff,#1d47a6)',color:dis?'var(--subtle)':'white',
+  border:'3px solid '+(dis?'var(--border)':'#0f2a6a'),borderRadius:14,cursor:dis?'not-allowed':'pointer',fontWeight:800,fontSize:16,
+  boxShadow:dis?'none':'0 4px 0 #0f2a6a',fontFamily:'var(--hx-f)'});
 const sPage={height:'calc(100dvh - var(--ww-werbung-unten, 0px))',boxSizing:'border-box',background:'transparent',display:'flex',flexDirection:'column',
   alignItems:'center',justifyContent:'flex-start',
   paddingTop:'calc(env(safe-area-inset-top) + 20px)',
   paddingBottom:60,paddingLeft:20,paddingRight:20,
   fontFamily:'system-ui,-apple-system,sans-serif',
   overflowY:'auto',touchAction:'pan-y'};
-const sCont={height:'calc(100dvh - var(--ww-werbung-unten, 0px))',boxSizing:'border-box',background:'var(--bg)',display:'flex',flexDirection:'column',
+const sCont={height:'calc(100dvh - var(--ww-werbung-unten, 0px))',boxSizing:'border-box',background:'transparent',display:'flex',flexDirection:'column',
   alignItems:'center',
   paddingTop:'calc(env(safe-area-inset-top) + 12px)',paddingLeft:8,paddingRight:8,paddingBottom:8,
   fontFamily:'system-ui,-apple-system,sans-serif',userSelect:'none',WebkitUserSelect:'none',
@@ -11964,13 +11857,13 @@ const sCont={height:'calc(100dvh - var(--ww-werbung-unten, 0px))',boxSizing:'bor
 const scrollStretch={minHeight:'calc(100dvh + 1px)',display:'flex',flexDirection:'column',alignItems:'center',width:'100%'};
 const sGrid={background:'var(--grid-bg)',borderRadius:14,overflow:'hidden',
   boxShadow:'var(--shadow-card)',border:'1.5px solid var(--border)'};
-const sBack={background:'none',border:'none',cursor:'pointer',fontSize:13,color:'var(--subtle)',
-  fontWeight:600,padding:'8px 0',fontFamily:'system-ui,-apple-system,sans-serif',marginTop:8};
+const sBack={background:'none',border:'none',cursor:'pointer',fontSize:14,color:'#fff',textShadow:'0 2px 0 rgba(9,24,64,0.6)',
+  fontWeight:800,padding:'8px 0',fontFamily:'var(--hx-f)',marginTop:8};
 const backChevron={position:'fixed',left:'calc(10px + env(safe-area-inset-left, 0px))',top:'calc(env(safe-area-inset-top) + 14px)',zIndex:300,
-  height:36,paddingLeft:10,paddingRight:14,borderRadius:18,display:'flex',alignItems:'center',justifyContent:'center',gap:4,
-  background:'var(--card)',border:'1.5px solid var(--border)',color:'var(--text)',
+  height:38,paddingLeft:11,paddingRight:15,borderRadius:19,display:'flex',alignItems:'center',justifyContent:'center',gap:4,
+  background:'linear-gradient(var(--hx-plate1),var(--hx-plate2))',border:'3px solid var(--hx-line)',color:'var(--hx-ink)',
   fontSize:13,fontWeight:800,lineHeight:1,cursor:'pointer',
-  boxShadow:'0 3px 0 rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.06)',fontFamily:'system-ui,-apple-system,sans-serif'};
+  boxShadow:'0 3px 0 var(--hx-line)',fontFamily:'var(--hx-f)'};
 
 // ── 2v2 (Beta) – eigenständige Komponente mit Online-Lobby ──
 function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUsed,resume}){
@@ -12714,7 +12607,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
                 <PeopleIcon size={32} color="white"/>
               </div>
             </div>
-            <div style={{fontSize:24,fontWeight:900,color:'var(--text)',letterSpacing:-0.8}}>2 vs 2</div>
+            <div className="hx-h" style={{fontSize:26,marginBottom:0}}>2 vs 2</div>
           </div>
           <div style={{background:'var(--card)',borderRadius:16,padding:'14px 16px',border:'1.5px solid var(--border)',marginBottom:16,boxShadow:'var(--shadow-soft)'}}>
             <div style={{display:'flex',justifyContent:'center',marginBottom:10}}>
@@ -12791,8 +12684,8 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
         <button onClick={()=>{if(useWS&&lobbyLoading){wsActiveRef.current=false;try{WSNET.leaveRoom();}catch(e){}wsResetStates();setIsOnline(false);setLobbyLoading(false);}setSub('config');}} style={backChevron}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
         <div style={{width:'100%',maxWidth:320,position:'relative',zIndex:1}}>
           <div style={{textAlign:'center',marginBottom:22}}>
-            <div style={{fontSize:20,fontWeight:900,color:'var(--text)',letterSpacing:-0.5}}>Online 2 vs 2</div>
-            <div style={{fontSize:11,color:'var(--subtle)',marginTop:4}}>{t('tv2OnlineSub')}</div>
+            <div className="hx-h" style={{fontSize:22,marginBottom:0}}>Online 2 vs 2</div>
+            <div className="hx-on" style={{fontSize:12,fontWeight:600,marginTop:4}}>{t('tv2OnlineSub')}</div>
           </div>
 
           {/* Erstellen */}
@@ -12925,7 +12818,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
 
           {/* Code + Teilen */}
           <div style={{textAlign:'center',marginBottom:16}}>
-            <div style={{fontSize:12,color:'var(--subtle)',fontWeight:600,letterSpacing:1,marginBottom:6}}>{t('tv2LobbyCode')}</div>
+            <div className="hx-on" style={{fontSize:13,letterSpacing:1,marginBottom:6}}>{t('tv2LobbyCode')}</div>
             <button onClick={copyCode} style={{
               display:'inline-flex',alignItems:'center',gap:10,
               background:'var(--card)',border:'2px solid var(--border)',borderRadius:14,
@@ -12933,7 +12826,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
               <span style={{fontSize:28,fontWeight:900,letterSpacing:6,color:'var(--text)'}}>{lobbyCode}</span>
               <span style={{fontSize:11,fontWeight:700,color:codeFlash?'#16a34a':'var(--subtle)'}}>{codeFlash?t('tv2Copied'):t('tv2Copy')}</span>
             </button>
-            <div style={{fontSize:10,color:'var(--subtle)',marginTop:8,fontWeight:500}}>{t('shareCode')}</div>
+            <div className="hx-on" style={{fontSize:12,fontWeight:600,marginTop:8}}>{t('shareCode')}</div>
           </div>
 
           <div style={{display:'flex',gap:10,marginBottom:14}}>
@@ -13019,10 +12912,10 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
             )}
           </div>
           {flash?<div style={{textAlign:'center',fontSize:12,color:'#ef4444',fontWeight:700}}>{flash}</div>:null}
-          <button onClick={leaveLobby} style={{width:'100%',padding:'10px',background:'transparent',
-            border:'1.5px solid var(--border)',borderRadius:10,cursor:'pointer',
-            color:'var(--subtle)',fontWeight:600,fontSize:13,
-            fontFamily:'system-ui,-apple-system,sans-serif'}}>{t('leave')}</button>
+          <button onClick={leaveLobby} className="hx-press" style={{width:'100%',padding:'11px',background:'linear-gradient(var(--hx-plate1),var(--hx-plate2))',
+            border:'3px solid var(--hx-line)',borderRadius:14,boxShadow:'0 4px 0 var(--hx-line)',
+            color:'var(--hx-ink)',fontWeight:800,fontSize:14,
+            fontFamily:'var(--hx-f)'}}>{t('leave')}</button>
         </div>
       </div>
     );
@@ -13109,22 +13002,21 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
       </div>
 
       <div style={{position:'relative',width:COLS2*CELL2+26,margin:'0 auto',borderRadius:24,padding:13,
-        background:darkMode?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
-        boxShadow:'0 26px 56px rgba(0,0,0,0.5),0 9px 20px rgba(0,0,0,0.38),inset 0 2px 0 rgba(255,255,255,0.28),inset 0 -3px 6px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.2)'}}>
+        background:'var(--hx-bf)',boxShadow:'0 6px 0 var(--hx-bfe),0 18px 24px -8px var(--hx-sh)'}}>
         <div className="ww-edge ww-edge-t" style={kantenStil(KANTE[boardFlip?'B':'A'],darkMode)}/>
         <div className="ww-edge ww-edge-b" style={kantenStil(KANTE[boardFlip?'A':'B'],darkMode)}/>
         <div className="ww-stud ww-stud-l"/>
         <div className="ww-stud ww-stud-r"/>
       <div ref={gridRef} style={{position:'relative',width:COLS2*CELL2,height:ROWS2*CELL2,touchAction:'auto',...sGrid,
-        background:darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)',
+        background:'linear-gradient(170deg,var(--hx-ca),var(--hx-cb))',
         border:'none',
-        boxShadow:darkMode?'inset 0 0 0 2px #05080f,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)':'inset 0 0 0 2px #b6bfce,inset 0 3px 9px rgba(0,0,0,0.18),inset 0 -3px 9px rgba(0,0,0,0.1)',
+        boxShadow:'inset 0 3px 9px rgba(0,0,0,0.1)',
         transform:boardFlip?'scaleY(-1)':'none'}}>
-        <div className="ww-board-tex" style={{mixBlendMode:darkMode?'screen':'multiply',opacity:darkMode?0.12:0.4}}/>
-        <div className="ww-board-veins" style={{opacity:darkMode?0.3:0.45}}/>
+        <div className="ww-board-tex" style={{opacity:0}}/>
+        <div className="ww-board-veins" style={{opacity:0}}/>
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,background:darkMode?'radial-gradient(120% 65% at 50% -6%,rgba(125,160,220,0.1),transparent 48%)':'radial-gradient(120% 65% at 50% -6%,rgba(255,255,255,0.5),transparent 48%)'}}/>
         <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
-          backgroundImage:`linear-gradient(${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),linear-gradient(90deg,${darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)'} 1px,transparent 1px),radial-gradient(circle at 0 0, ${darkMode?'rgba(255,255,255,0.13)':'rgba(20,28,45,0.16)'} 1.4px, transparent 2px)`,
+          backgroundImage:`linear-gradient(rgba(19,37,74,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(19,37,74,0.3) 1px,transparent 1px),radial-gradient(circle at 0 0, rgba(19,37,74,0.45) 1.4px, transparent 2px)`,
           backgroundSize:`${CELL2}px ${CELL2}px,${CELL2}px ${CELL2}px,${CELL2}px ${CELL2}px`}}/>
         {Array.from({length:ROWS2},function(_,r){return Array.from({length:COLS2},function(_,c){
           const vDot=validDot(r,c);
@@ -13141,7 +13033,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
             </div>
           );
         });})}
-        {Array.from(walls).map(k=><Wall2 key={k} wkey={k} color={darkMode?'#e2e8f0':'#1e293b'} opacity={1} animate/>)}
+        {Array.from(walls).map(k=><Wall2 key={k} wkey={k} color={'#13254a'} opacity={1} animate/>)}
         {previewKey&&<Wall2 wkey={previewKey} color={previewValid?'#f59e0b':'#ef4444'} opacity={0.6}/>}
         {/* Wand-Bestaetigung (Einstellung 'Wand bestaetigen'): Haekchen setzt exakt die stehen
             gebliebene Vorschau, Kreuz verwirft sie. */}
@@ -13747,8 +13639,8 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
                 <CrownIcon size={32} color="#fff"/>
               </div>
             </div>
-            <div style={{fontSize:24,fontWeight:900,color:'var(--text)',letterSpacing:-0.8}}>{t('khTitle')}</div>
-            <div style={{fontSize:11,color:'var(--subtle)',marginTop:4}}>{t('khMenuDesc')}</div>
+            <div className="hx-h" style={{fontSize:26,marginBottom:0}}>{t('khTitle')}</div>
+            <div className="hx-on" style={{fontSize:12,fontWeight:600,marginTop:4}}>{t('khMenuDesc')}</div>
           </div>
           <div style={{background:'var(--card)',borderRadius:16,padding:'14px 16px',border:'1.5px solid var(--border)',marginBottom:14,boxShadow:'var(--shadow-soft)'}}>
             {[t('khRule1'),t('khRule2'),t('khRule3')].map(function(rule,ri){
@@ -13819,13 +13711,13 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
         {connBanner}
         <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
           <div style={{textAlign:'center',marginBottom:16}}>
-            <div style={{fontSize:12,color:'var(--subtle)',fontWeight:600,letterSpacing:1,marginBottom:6}}>{t('tv2LobbyCode')}</div>
+            <div className="hx-on" style={{fontSize:13,letterSpacing:1,marginBottom:6}}>{t('tv2LobbyCode')}</div>
             <button data-e2e="kh-lobbycode" onClick={copyCode} style={{display:'inline-flex',alignItems:'center',gap:10,background:'var(--card)',border:'2px solid var(--border)',borderRadius:14,
               padding:'10px 20px',cursor:'pointer',fontFamily:'system-ui,-apple-system,sans-serif'}}>
               <span style={{fontSize:28,fontWeight:900,letterSpacing:6,color:'var(--text)'}}>{lobbyCode}</span>
               <span style={{fontSize:11,fontWeight:700,color:codeFlash?'#16a34a':'var(--subtle)'}}>{codeFlash?t('tv2Copied'):t('tv2Copy')}</span>
             </button>
-            <div style={{fontSize:10,color:'var(--subtle)',marginTop:8,fontWeight:500}}>{t('shareCode')}</div>
+            <div className="hx-on" style={{fontSize:12,fontWeight:600,marginTop:8}}>{t('shareCode')}</div>
           </div>
           <div style={{background:'var(--card)',borderRadius:16,padding:'12px',border:'1.5px solid var(--border)',marginBottom:14,boxShadow:'var(--shadow-soft)'}}>
             {[0,1,2,3].map(function(i){
@@ -13850,11 +13742,11 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
               {allOn?t('khStart'):(players.length<4?t('khNeed4'):t('tv2NotAllOn'))}
             </button>
           ):(
-            <div style={{textAlign:'center',fontSize:12,color:'var(--subtle)',fontWeight:600,padding:'10px 0'}}>{t('khWaitHost')}</div>
+            <div className="hx-on" style={{textAlign:'center',fontSize:13,fontWeight:700,padding:'10px 0'}}>{t('khWaitHost')}</div>
           )}
           {flash?<div style={{textAlign:'center',fontSize:12,color:'#ef4444',fontWeight:700,marginBottom:8}}>{flash}</div>:null}
-          <button onClick={leaveToStart} style={{width:'100%',padding:'10px',background:'transparent',border:'1.5px solid var(--border)',borderRadius:10,cursor:'pointer',
-            color:'var(--subtle)',fontWeight:600,fontSize:13,fontFamily:'system-ui,-apple-system,sans-serif'}}>{t('leave')}</button>
+          <button onClick={leaveToStart} className="hx-press" style={{width:'100%',padding:'11px',background:'linear-gradient(var(--hx-plate1),var(--hx-plate2))',border:'3px solid var(--hx-line)',borderRadius:14,
+            boxShadow:'0 4px 0 var(--hx-line)',color:'var(--hx-ink)',fontWeight:800,fontSize:14,fontFamily:'var(--hx-f)'}}>{t('leave')}</button>
         </div>
       </div>
     );
@@ -13869,7 +13761,7 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
   const turnName=gs.turn>=0?nameOf(gs.turn):'';
   const myMs=seat>=0?clkOf(seat):0;
   const zrMs=(!over&&gs.turn>=0&&typeof gs.zr==='number')?Math.max(0,gs.zr-(nowMs-recvRef.current)):-1;   // Rest der Zugzeit des Spielers am Zug (der Server schickt zr, Tunay-Wahl 2026-10-16)
-  const boardBg=darkMode?'linear-gradient(170deg,#1c2740,#161e33 52%,#0f1729)':'linear-gradient(170deg,#fcfcfb,#f1f3f6 52%,#e9edf2)';
+  const boardBg='linear-gradient(170deg,var(--hx-ca),var(--hx-cb))';
   const lineCol=darkMode?'rgba(255,255,255,0.08)':'rgba(20,28,45,0.11)';
   const boardW=C*CELLK;
   return(
@@ -13914,10 +13806,9 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
 
       {/* Brett (gedreht, damit man selbst unten sitzt) */}
       <div style={{position:'relative',width:boardW+26,margin:'0 auto',borderRadius:24,padding:13,
-        background:darkMode?'linear-gradient(160deg,#5f6b7e,#2e3748 36%,#141a26)':'linear-gradient(160deg,#ffffff,#ced6e2 36%,#9aa6ba)',
-        boxShadow:'0 26px 56px rgba(0,0,0,0.5),0 9px 20px rgba(0,0,0,0.38),inset 0 2px 0 rgba(255,255,255,0.28),inset 0 -3px 6px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(0,0,0,0.2)'}}>
+        background:'var(--hx-bf)',boxShadow:'0 6px 0 var(--hx-bfe),0 18px 24px -8px var(--hx-sh)'}}>
         <div ref={gridRef} data-e2e="kh-board" data-rot={rot} data-turn={gs.turn} data-v={gs.v} data-seat={seat} data-walls={gs.walls?gs.walls.join(','):''} style={{position:'relative',width:boardW,height:R*CELLK,touchAction:'auto',...sGrid,background:boardBg,border:'none',
-          boxShadow:darkMode?'inset 0 0 0 2px #05080f,inset 0 3px 9px rgba(0,0,0,0.18)':'inset 0 0 0 2px #b6bfce,inset 0 3px 9px rgba(0,0,0,0.18)',
+          boxShadow:'inset 0 3px 9px rgba(0,0,0,0.1)',
           transform:'rotate('+rot+'deg)'}}>
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
             backgroundImage:'linear-gradient('+lineCol+' 1px,transparent 1px),linear-gradient(90deg,'+lineCol+' 1px,transparent 1px)',backgroundSize:CELLK+'px '+CELLK+'px'}}/>
