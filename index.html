@@ -202,6 +202,9 @@
   .hx-fk{min-height:52px;font-size:24px;}
   .hx-aus{opacity:0.6;cursor:default;}
   .hx-app-weiter{align-self:center;min-height:44px;padding:8px 14px;background:none;border:0;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;color:var(--hx-ink);text-decoration:underline;}
+  /* ===== Rechner-Ansicht (ab 1100 px Breite, Tunay 2026-11-12 "wirkt eingeengt", Option 2 wie barricade.gg): Seitenleiste links, breite Mitte,
+     die Spielmodi stehen direkt auf der Seite statt im Fenster. Nur Darstellung; unter 1100 px bleibt alles wie am Handy ===== */
+  .hx-nav .hx-dt-only,.hx-hero .hx-dt-only{display:none;}
   /* Leiste unten: aktiver Reiter ist eine gelbe Kachel, die ueber die Leiste ragt */
   .hx-nav{position:fixed;left:0;right:0;bottom:0;z-index:250;display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom, 0px);
     background:linear-gradient(var(--hx-nav1),var(--hx-nav2));box-shadow:0 -3px 0 var(--hx-navl);font-family:var(--hx-f);}
@@ -215,6 +218,34 @@
   /* Niedrige Bildschirme: Brett und Logo kleiner, damit der Spielen-Knopf ueber der Leiste bleibt */
   @media (max-height:700px){.hx-logo{margin-top:10px;}.hx-wort{font-size:52px;}.hx-stage{min-height:116px;margin-bottom:8px;}.hx-dio{width:200px;margin:-18px 0 -16px;}.hx-s2{top:64px;}.hx-s3{top:34px;}.hx-side .hx-rnd{width:40px;height:40px;}.hx-hint{margin-top:8px;padding:6px 10px;}.hx-appk{margin-top:8px;padding:4px 10px 4px 5px;}.hx-appk img{width:28px;height:28px;}.hx-appk small{display:none;}}
   @media (prefers-reduced-motion:reduce){.hx-press,.hx-rnd,.hx-face,.hx-sheet,.hx-scrim{transition:none;}}
+  @media (min-width:1100px) and (min-height:560px){
+    .hx-hero .hx-dt-only{display:block;}
+    .hx-nav .hx-tab.hx-dt-only{display:flex;}
+    .hx-nav .hx-dtbrand.hx-dt-only{display:flex;}
+    .hx-page{padding-left:244px !important;}
+    .hx-hero{max-width:940px;min-height:0;padding:26px 24px 4px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;}
+    .hx-hero>*{grid-column:1/-1;margin-top:0;}
+    .hx-hero>.hx-top,.hx-hero>.hx-logo,.hx-hero>.hx-stage,.hx-hero>.hx-mode,.hx-hero>.hx-btn{display:none;}
+    .hx-hero>.hx-hint,.hx-hero>.hx-appk{grid-column:auto;margin-top:0;}
+    .hx-dthero{padding:22px 26px 24px;}
+    .hx-dtt{font-family:var(--hx-fd);font-size:46px;line-height:1;letter-spacing:0.02em;text-transform:uppercase;}
+    .hx-dts{margin-top:8px;font-size:17px;color:var(--hx-ink2);}
+    /* relative + z-index 1: der Himmel (.hx-bg, positioniert) malt sonst ueber alles, was nur im Fluss steht */
+    #hx-modi.hx-sheetw{position:relative;left:auto;right:auto;top:auto;bottom:auto;visibility:visible;pointer-events:auto;transition:none;z-index:1;width:100%;max-width:940px;}
+    #hx-modi .hx-scrim,#hx-modi .hx-grip,#hx-modi .hx-sheet-k{display:none;}
+    #hx-modi .hx-sheet{position:static;left:auto;transform:none;width:100%;max-width:none;max-height:none;border:0;border-radius:0;background:none;box-shadow:none;padding:0;transition:none;}
+    #hx-modi .hx-sheet-l{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:8px 24px 40px;overflow:visible;}
+    #hx-modi .hx-sheet-l>*:first-child{grid-column:1/-1;}
+    .hx-nav{left:20px;right:auto;top:20px;bottom:20px;width:206px;flex-direction:column;align-items:stretch;gap:4px;padding:14px 10px;border-radius:22px;
+      box-shadow:0 5px 0 var(--hx-navl),0 14px 18px -8px var(--hx-sh);}
+    .hx-dtbrand{order:0;flex-direction:column;align-items:center;gap:2px;padding:6px 4px 16px;}
+    .hx-dtbrand .hx-wort{font-size:40px;}
+    .hx-dtbrand .hx-on{font-size:13px;}
+    .hx-tab{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;min-height:0;padding:11px 14px;font-size:16.5px;border-radius:14px;}
+    .hx-tab.hx-an::before{left:0;right:0;top:0;bottom:0;width:auto;margin:0;border-radius:14px;}
+    .hx-t-home{order:1;}.hx-t-rang{order:2;}.hx-t-frei{order:3;}.hx-t-post{order:4;}.hx-t-prof{order:5;}.hx-t-hilfe{order:6;margin-top:auto;}.hx-t-opt{order:7;}
+    .hx-tab .hx-bdg-in{position:static;margin-left:auto;box-shadow:none;}
+  }
 
   @keyframes wall-enter{
     0%{transform:scale(0);opacity:0;}
@@ -7405,6 +7436,7 @@ function App(){
             <span className="hx-sr">{t('options')}</span>
           </button>
         </div>
+        <div className="hx-plate hx-dt-only hx-dthero"><div className="hx-dtt">{t('hxDtTitel')}</div><div className="hx-dts">{t('hxDtText')}</div></div>
         {/* Android-Test-Hinweis (Tunay 2026-11-10): nur Browser, alle Geraete, fest ohne Schliessen */}
         <a href="https://www.instagram.com/hupsy.app/" target="_blank" rel="noopener noreferrer" className="hx-hint">
           <MegaphoneIcon size={16} color="#fff"/>
@@ -7993,17 +8025,37 @@ function App(){
       </div>
       {/* Leiste unten: Rangliste, Home, Profil. Einstellungen liegen auf dem Zahnrad oben rechts */}
       <div className="hx-nav">
-        <button className="hx-tab" onClick={()=>{setNavDir('fwd');setScreen('leaderboard');}}>
+        {/* Rechner (ab 1100 px): Seitenleiste links; Marke und die Eintraege Freunde/Post/Hilfe/Optionen gibt es nur dort, Handler wie die Knoepfe der Startseite */}
+        <div className="hx-dt-only hx-dtbrand"><span className="hx-wort" data-t="HUPSY">HUPSY</span><span className="hx-on">Wall Race</span></div>
+        <button className="hx-tab hx-t-rang" onClick={()=>{setNavDir('fwd');setScreen('leaderboard');}}>
           <TrophySmIcon size={22} color="currentColor"/>
           <span>{t('leaderboardTitle')}</span>
         </button>
-        <button className="hx-tab hx-an">
+        <button className="hx-tab hx-an hx-t-home">
           <HomeIcon size={22} color="currentColor"/>
           <span>{'Home'}</span>
         </button>
-        <button className="hx-tab" onClick={()=>{setNavDir('fwd');setScreen(account?'profile':'auth');}}>
+        <button className="hx-tab hx-t-prof" onClick={()=>{setNavDir('fwd');setScreen(account?'profile':'auth');}}>
           <PeopleIcon size={22} color="currentColor"/>
           <span>{t('profile')}</span>
+        </button>
+        <button className="hx-tab hx-dt-only hx-t-frei" onClick={()=>{setNavDir('fwd');setScreen('friends');}}>
+          <PeopleIcon size={22} color="currentColor"/>
+          <span>{t('friends')}</span>
+          {(pendingInvite||friendReqCount>0)&&<span className="hx-bdg hx-bdg-in">{friendReqCount>0?(friendReqCount>9?'9+':friendReqCount):''}</span>}
+        </button>
+        <button className="hx-tab hx-dt-only hx-t-post" onClick={()=>setShowInbox(true)}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="M19 16v6"/><path d="M16 19h6"/></svg>
+          <span>{t('hxPost')}</span>
+          {unreadCount>0&&<span className="hx-bdg hx-bdg-in">{unreadCount>9?'9+':unreadCount}</span>}
+        </button>
+        <button className="hx-tab hx-dt-only hx-t-hilfe" onClick={openTutorial}>
+          <BookIcon size={22} color="currentColor"/>
+          <span>{t('hxHelp')}</span>
+        </button>
+        <button className="hx-tab hx-dt-only hx-t-opt" onClick={()=>{setOptionsTab('main');setShowOptions(true);}}>
+          <GearIcon size={22} color="currentColor"/>
+          <span>{t('options')}</span>
         </button>
       </div>
 
