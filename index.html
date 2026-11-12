@@ -225,7 +225,12 @@
     .hx-page{padding-left:244px !important;}
     .hx-hero{max-width:940px;min-height:0;padding:26px 24px 4px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;}
     .hx-hero>*{grid-column:1/-1;margin-top:0;}
-    .hx-hero>.hx-top,.hx-hero>.hx-logo,.hx-hero>.hx-stage,.hx-hero>.hx-mode,.hx-hero>.hx-btn{display:none;}
+    .hx-hero>.hx-top,.hx-hero>.hx-logo,.hx-hero>.hx-stage,.hx-hero>.hx-btn{display:none;}
+    /* Modus-Platte bleibt: sie oeffnet die Spiel-Einstellungen (Dauer, Mauern, Extras); direkt unter der Kopf-Platte */
+    .hx-hero>.hx-dthero{order:0;}
+    .hx-hero>.hx-mode{order:1;margin:0;width:100%;}
+    .hx-hero>.hx-hint,.hx-hero>.hx-appk{order:2;}
+    .hx-hero>*{order:2;}
     .hx-hero>.hx-hint,.hx-hero>.hx-appk{grid-column:auto;margin-top:0;}
     .hx-dthero{padding:22px 26px 24px;}
     .hx-dtt{font-family:var(--hx-fd);font-size:46px;line-height:1;letter-spacing:0.02em;text-transform:uppercase;}
