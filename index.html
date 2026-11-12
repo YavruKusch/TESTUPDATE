@@ -165,14 +165,14 @@
   .hx-chev{font-size:24px;font-weight:800;line-height:1;color:var(--hx-ink2);}
   /* Menue: Liste der Spielmodi unter dem ersten Bildschirm */
   .hx-list{position:relative;z-index:1;width:100%;max-width:430px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;padding:22px 16px 6px;}
-  /* Spielmodi-Fenster: faehrt von unten hoch (nur transform und opacity), Abdunkelung dahinter ohne Unschaerfe */
+  /* Spielmodi-Fenster: faehrt von unten hoch (nur transform und opacity), Abdunkelung dahinter ohne Unschaerfe. Kurve OHNE Ueberschwingen: das Fenster sitzt am unteren Rand, eine Feder liesse einen Spalt darunter aufklaffen (gemessen 33-49 px) */
   .hx-sheetw{position:fixed;left:0;right:0;top:0;bottom:0;z-index:520;visibility:hidden;pointer-events:none;transition:visibility 0s linear 0.4s;font-family:var(--hx-f);}
   .hx-sheetw.hx-offen{visibility:visible;pointer-events:auto;transition-delay:0s;}
   .hx-scrim{position:absolute;left:0;right:0;top:0;bottom:0;background:rgba(6,16,46,0.58);opacity:0;transition:opacity 0.3s ease;}
   .hx-offen .hx-scrim{opacity:1;}
   .hx-sheet{position:absolute;left:50%;bottom:0;width:100%;max-width:430px;max-height:86vh;max-height:86dvh;display:flex;flex-direction:column;
     border-radius:28px 28px 0 0;border:3px solid var(--hx-line);border-bottom:0;background:linear-gradient(var(--hx-plate1),var(--hx-plate2));color:var(--hx-ink);
-    box-shadow:0 -10px 0 -4px rgba(255,255,255,0.12),0 -14px 30px -10px var(--hx-sh);transform:translate(-50%,104%);transition:transform 0.42s var(--hx-feder);
+    box-shadow:0 -10px 0 -4px rgba(255,255,255,0.12),0 -14px 30px -10px var(--hx-sh);transform:translate(-50%,104%);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);
     padding-bottom:env(safe-area-inset-bottom,0px);}
   .hx-offen .hx-sheet{transform:translate(-50%,0);}
   .hx-grip{width:44px;height:5px;border-radius:3px;background:var(--hx-ink2);opacity:0.4;margin:9px auto 0;flex:none;}
@@ -5017,6 +5017,8 @@ function App(){
     else if(vorBild==='end'&&!werbungLief&&hxAppFaellig()){hxAppGezeigt();setHxAppOffen(true);}
   },[screen]);
   useEffect(()=>{if(window.WWWerbung)WWWerbung.konfig(adminCfg,cookieConsent==='all');},[adminCfg,cookieConsent]);
+  // Seitensprache folgt der App-Sprache: sonst macht die Grossschreibung der Titel im Tuerkischen aus i ein I statt İ (und Vorleser sprechen falsch)
+  useEffect(()=>{try{document.documentElement.setAttribute('lang',lang);}catch(e){}},[lang]);
 
   // Audio-Context nach Tab-Wechsel/Hintergrund wieder aufwecken
   useEffect(()=>{
@@ -8497,8 +8499,8 @@ function App(){
         </button>
         <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
           <div style={{textAlign:'center',marginBottom:18,paddingTop:8}}>
-            <div style={{fontSize:17,fontWeight:900,color:'var(--text)'}}>Wrong Way</div>
-            <div style={{fontSize:11,color:'var(--subtle)',fontWeight:600,marginTop:2}}>{ll==='de'?'Rechtliches':ll==='tr'?'Yasal':'Legal'}</div>
+            <div className="hx-h" style={{fontSize:26}}>Wrong Way</div>
+            <div className="hx-on" style={{fontSize:13,marginTop:4}}>{ll==='de'?'Rechtliches':ll==='tr'?'Yasal':'Legal'}</div>
           </div>
           <div style={{display:'flex',gap:3,background:'var(--bg)',borderRadius:10,padding:3,border:'1.5px solid var(--border)',marginBottom:14}}>
             <button onClick={function(){setLegalTab('impressum');}} style={tabSt('impressum')}>{ll==='de'?'Impressum':ll==='tr'?'K\u00fcnye':ll==='fr'?'Mentions':'Imprint'}</button>
@@ -8510,11 +8512,11 @@ function App(){
               <div key={i} style={{fontSize:i===0?14:12,fontWeight:i===0?900:500,color:i===0?'var(--text)':'var(--subtle)',marginBottom:i===0?10:6,lineHeight:1.6,borderBottom:i===0?'1px solid var(--border)':'none',paddingBottom:i===0?10:0}}>{line}</div>
             );})}
           </div>
-          <div style={{textAlign:'center',marginTop:10,fontSize:10,color:'var(--subtle)',fontWeight:600}}>
+          <div className="hx-on" style={{textAlign:'center',marginTop:10,fontSize:11}}>
             {'\u00a9'} {new Date().getFullYear()} Wrong Way
           </div>
           <div style={{textAlign:'center',marginTop:10}}>
-            <button onClick={function(){try{localStorage.removeItem('ww_cookie_consent2');}catch(e){}setCookieConsent(null);goBack();}} style={{background:'none',border:'1px solid var(--border)',color:'var(--subtle)',cursor:'pointer',fontSize:11,fontWeight:600,fontFamily:'system-ui,-apple-system,sans-serif',padding:'8px 16px',borderRadius:8}}>
+            <button onClick={function(){try{localStorage.removeItem('ww_cookie_consent2');}catch(e){}setCookieConsent(null);goBack();}} className="hx-on" style={{background:'none',border:'2px solid rgba(255,255,255,0.75)',cursor:'pointer',fontSize:12,fontFamily:'system-ui,-apple-system,sans-serif',padding:'8px 16px',borderRadius:8}}>
               {t('cookieReset')}
             </button>
           </div>
