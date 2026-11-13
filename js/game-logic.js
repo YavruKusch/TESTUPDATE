@@ -100,6 +100,16 @@ function snapWall2(x,y,orient,R,C,CL){
   if(orient==='H'){const r=Math.min(Math.max(Math.round(y/CL-0.5),0),R-2),c=Math.min(Math.max(Math.floor(x/CL),0),C-2);return 'H-'+r+'-'+c;}
   const c=Math.min(Math.max(Math.round(x/CL-0.5),0),C-2),r=Math.min(Math.max(Math.floor(y/CL),0),R-2);return 'V-'+r+'-'+c;
 }
+// PC (Maus): welche Mauer sitzt unter dem Zeiger? x,y = Zeiger relativ zum Brett (bei gedrehtem Brett schon umgerechnet), CL = Feldgroesse,
+// R/C = Zeilen/Spalten. Die Mauer liegt auf der naechsten Rille (zwei Felder lang, auf die naechste Kreuzung zentriert); in der Feldmitte
+// (weiter als zone*CL von jeder Rille) gibt es null, dort bleibt der Klick fuer die Figur. Aussenkanten des Bretts sind keine Rille.
+function grooveWall(x,y,CL,R,C,zone){
+  const fx=x/CL,fy=y/CL,gx=Math.round(fx),gy=Math.round(fy);
+  const dx=(gx>=1&&gx<=C-1)?Math.abs(fx-gx):Infinity,dy=(gy>=1&&gy<=R-1)?Math.abs(fy-gy):Infinity;
+  if(Math.min(dx,dy)>(zone||0.25))return null;
+  if(dx<dy)return 'V-'+Math.min(Math.max(gy-1,0),R-2)+'-'+(gx-1);
+  return 'H-'+(gy-1)+'-'+Math.min(Math.max(gx-1,0),C-2);
+}
 function wallPos2(key,CL){
   const a=key.split('-');const type=a[0],r=+a[1],c=+a[2];
   return type==='H'?{left:c*CL,top:(r+1)*CL-WW2/2,width:2*CL,height:WW2}:{left:(c+1)*CL-WW2/2,top:r*CL,width:WW2,height:2*CL};

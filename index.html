@@ -181,6 +181,36 @@
   .hx-zu{width:40px;height:40px;}
   .hx-sheet-l{display:flex;flex-direction:column;gap:12px;padding:8px 14px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
   .hx-h{font-family:var(--hx-fd);font-weight:400;font-size:28px;line-height:1;letter-spacing:0.03em;text-transform:uppercase;text-align:center;color:#fff;text-shadow:0 3px 0 var(--hx-kontur);margin-bottom:2px;}
+  /* Modus-Einstellungen (Stil A): Gruppen auf Sand-Platten, Auswahl = blauer Verlauf mit Haekchen, Extras als Schalter-Zeilen; am Rechner zwei Spalten */
+  .hx-cfgw{width:100%;max-width:430px;}
+  .hx-cfg{display:flex;flex-direction:column;gap:14px;}
+  .hx-cfg-c{display:contents;}
+  .hx-cg{padding:12px 14px 16px;}
+  .hx-cg-k{display:flex;align-items:center;gap:9px;margin-bottom:12px;font-family:var(--hx-fd);font-size:18px;line-height:1.1;letter-spacing:0.04em;text-transform:uppercase;color:var(--hx-ink);}
+  .hx-cg-k i{width:5px;height:18px;border-radius:3px;background:#ffc21f;box-shadow:0 0 0 1.5px var(--hx-line);flex:none;}
+  .hx-cg-s{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:13.5px;font-weight:800;color:var(--hx-ink2);}
+  .hx-opts{display:flex;gap:9px;}
+  .hx-opt{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:11px 6px;border-radius:14px;text-align:center;font-family:var(--hx-f);color:var(--hx-ink);
+    background:linear-gradient(var(--hx-plate1),var(--hx-plate2));border:3px solid var(--hx-line);box-shadow:0 4px 0 var(--hx-line);cursor:pointer;transition:transform 0.34s var(--hx-feder);}
+  .hx-opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--hx-line);transition-duration:0.07s;}
+  .hx-opt b{font-size:16px;line-height:1.1;font-weight:800;}
+  .hx-opt small{font-size:12.5px;line-height:1.15;font-weight:600;color:var(--hx-ink2);}
+  .hx-opt.on{background:linear-gradient(#3f7df2,#1d47a6);color:#fff;box-shadow:0 4px 0 var(--hx-line),inset 0 3px 0 rgba(255,255,255,0.28);}
+  .hx-opt.on small{color:rgba(255,255,255,0.88);}
+  .hx-opt.on::after{content:"\2713";position:absolute;top:-9px;right:-7px;width:21px;height:21px;border-radius:50%;background:#ffc21f;color:#13254a;border:2.5px solid var(--hx-line);font-size:12px;font-weight:800;line-height:16px;text-align:center;}
+  .hx-tg{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:14px;text-align:left;font-family:var(--hx-f);color:var(--hx-ink);
+    background:linear-gradient(var(--hx-plate1),var(--hx-plate2));border:3px solid var(--hx-line);box-shadow:0 4px 0 var(--hx-line);cursor:pointer;transition:transform 0.34s var(--hx-feder);}
+  .hx-tgd:active{transform:translateY(3px);box-shadow:0 1px 0 var(--hx-line);transition-duration:0.07s;}
+  .hx-tgb{flex-direction:column;align-items:stretch;}
+  .hx-tg-i{width:42px;height:42px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--hx-soft);box-shadow:inset 0 2px 0 rgba(255,255,255,0.3),inset 0 -3px 0 rgba(9,24,64,0.15);}
+  .hx-tg-t{flex:1;min-width:0;}
+  .hx-tg-t b{display:block;font-size:15.5px;line-height:1.15;font-weight:800;}
+  .hx-tg-t small{display:block;font-size:12.5px;line-height:1.2;font-weight:600;color:var(--hx-ink2);}
+  .hx-sw{width:48px;height:28px;border-radius:14px;flex:none;position:relative;background:var(--hx-soft);box-shadow:inset 0 0 0 2.5px var(--hx-line);transition:background 0.2s;}
+  .hx-sw::after{content:"";position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;background:var(--hx-line);transition:transform 0.34s var(--hx-feder),background 0.2s;}
+  .hx-tg.on .hx-sw{background:#3f7df2;}
+  .hx-tg.on .hx-sw::after{transform:translateX(20px);background:#fff;}
+  @media (min-width:1100px) and (hover:hover){.hx-cfgw{max-width:800px;}.hx-cfg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:18px;}.hx-cfg-c{display:flex;flex-direction:column;gap:18px;min-width:0;}.hx-cfg-go{max-width:460px;margin:0 auto;}}
   .hx-zeile{box-shadow:inset 0 3px 0 rgba(255,255,255,0.28),inset 0 -5px 0 rgba(9,24,64,0.22),0 10px 16px -8px var(--hx-sh);}
   /* App-Hinweis: Karte im Menue + Fenster (nutzt das Spielmodi-Fenster als Huelle); nur transform/opacity bewegen sich */
   .hx-appk{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:6px 12px 6px 7px;text-align:left;font-family:inherit;}
@@ -890,6 +920,8 @@
     box-shadow:0 5px 0 var(--hx-line),0 12px 16px -8px var(--hx-sh);}
   .ww-wallctl .wl{font-size:10px;font-weight:800;letter-spacing:0.8px;color:var(--hx-ink2);display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:4px;}
   .ww-wallctl .tools{display:flex;justify-content:center;align-items:center;gap:9px;}
+  .ww-wallctl .wl-klick{display:none;}
+  @media (hover:hover) and (pointer:fine){.ww-wallctl .wl-klick{display:inline;}}
   .ww-wtool{border-radius:13px;display:flex;align-items:center;justify-content:center;position:relative;touch-action:pan-y;
     background:linear-gradient(var(--hx-ca),var(--hx-cb));border:2px solid var(--hx-bf);
     box-shadow:0 3px 0 var(--hx-bfe);transition:transform 0.14s,box-shadow 0.2s,opacity 0.2s;}
@@ -1032,7 +1064,7 @@
   },20000);
 </script>
 
-<script src="js/i18n.js?v=131"></script>
+<script src="js/i18n.js?v=132"></script>
 <script src="js/game-logic.js"></script>
 <script src="js/bot.js?v=4"></script>
 <script src="js/ai.js?v=11"></script>
@@ -1041,7 +1073,11 @@
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useMemo } = React;
 
-let COLS=9,ROWS=13;const WW=8,BARR=10;
+let COLS=9,ROWS=13,WW=8;const BARR=10;
+// PC (breites Fenster + Maus): das Brett waechst mit der Fensterhoehe statt bei 40-50 px stehen zu bleiben (Tunay 2026-11-13 "wirkt eingeengt"); Handy und Tablet unveraendert.
+// 320 px Luft fuer Kopf, Spielerkarten, Ziel-Leisten und die Mauer-Leiste unten; die Mauer-Dicke waechst mit (WW).
+const PC_BREIT=window.innerWidth>=1100&&!!window.matchMedia&&window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+function pcFeld(zeilen,alt,max){return PC_BREIT?Math.max(alt,Math.min(max,Math.floor((window.innerHeight-320)/zeilen))):alt;}
 let CELL=Math.max(34,Math.min(40,Math.floor((window.innerWidth-46)/COLS)));
 // Feldgröße je Modus setzen. Classic bleibt 9x13. Duell: Blitz 7x7, Standard 9x9.
 function applyBoardSize(map,duelSize){
@@ -1053,6 +1089,7 @@ function applyBoardSize(map,duelSize){
     COLS=9;ROWS=13;
     CELL=Math.max(34,Math.min(40,Math.floor((window.innerWidth-46)/COLS)));
   }
+  CELL=pcFeld(ROWS,CELL,72);WW=Math.max(8,Math.round(CELL*0.15));
 }
 // Startpositionen je nach Map (dynamisch aus aktueller Feldgröße)
 function startPos(map){
@@ -1404,8 +1441,9 @@ try{ window.addEventListener('offline',function(){ WSNET._offline(); }); window.
 try{ window.addEventListener('pageshow',function(e){ if(e.persisted){ try{ WSNET._dbg('bfcache-restore -> reload'); }catch(e2){} location.reload(); } }); }catch(e){}
 
 // ── 2v2 (Beta) ─────────────────────────────────────────────
-const COLS2=9,ROWS2=9,WW2=8,BARR2=10,MIN_PATHS_2V2=2;
-const CELL2=Math.max(28,Math.min(40,Math.floor((window.innerWidth-42)/COLS2)));
+const COLS2=9,ROWS2=9,BARR2=10,MIN_PATHS_2V2=2;
+const CELL2=pcFeld(ROWS2,Math.max(28,Math.min(40,Math.floor((window.innerWidth-42)/COLS2))),72);
+let WW2=Math.max(8,Math.round(CELL2*0.15)); // Mauer-Dicke des 2v2- und King-of-the-Hill-Bretts
 // Team A=Rot startet UNTEN (Reihe 8, Spalten 3/5) -> Ziel Reihe 0.
 // Team B=Blau startet OBEN (Reihe 0, Spalten 3/5) -> Ziel Reihe 8. Wie 1v1-Race zu zweit.
 const INIT_2V2={A1:{r:ROWS2-1,c:3},A2:{r:ROWS2-1,c:5},B1:{r:0,c:3},B2:{r:0,c:5}};
@@ -4949,6 +4987,7 @@ function App(){
   const[repChatTs,setRepChatTs]=useState(null); // ts der gemeldeten Chat-Nachricht (nur src='chat')
   const[banInfo,setBanInfo]=useState(null); // {reason,until} vom Server-'banned' — rendert den Vollbild-Bann-Screen
   const[dragging,setDragging]=useState(null);
+  const rilleMaus=useRef(false); // PC: letzter Zeiger war eine echte Maus (Tippen am Handy setzt per Klick nie eine Mauer)
   const[ghostPos,setGhostPos]=useState({x:0,y:0});
   const[previewKey,setPreviewKey]=useState(null);
   const[snapPos,setSnapPos]=useState(null);
@@ -7214,6 +7253,37 @@ function App(){
   const cancelPendingWall=()=>{
     setPendingWall(null);setPreviewKey(null);setSnapPos(null);
   };
+  // PC: Mauer per Klick auf die Linie (statt von unten hochzuziehen). Vorschau beim Ueberfahren, Klick setzt, Feldmitte bleibt zum Ziehen der Figur.
+  const rilleKey=(e)=>{
+    if(!rilleMaus.current||!canDrag||dragging||hammerDrag||pendingWall||!gridRef.current)return null;
+    const rect=gridRef.current.getBoundingClientRect();
+    const flip=gameMode==='online'&&onlineRole==='B'&&selectedMap==='duel';
+    let ry=e.clientY-rect.top;if(flip)ry=ROWS*CELL-ry;
+    return grooveWall(e.clientX-rect.left,ry,CELL,ROWS,COLS);
+  };
+  const rilleBewegt=(e)=>{
+    rilleMaus.current=e.pointerType==='mouse';
+    if(!rilleMaus.current||dragging||pendingWall)return;
+    const k=rilleKey(e);
+    if(k!==previewKey)setPreviewKey(k);
+  };
+  const rilleKlick=(e)=>{
+    const k=rilleKey(e);
+    if(!k)return;
+    e.stopPropagation(); // nicht zusaetzlich als Zug der Figur zaehlen
+    savedScroll.current=gameContainerRef.current?gameContainerRef.current.scrollTop:0;
+    if(window.__wandBest&&wandGueltig(k)){
+      // Einstellung 'Wand bestaetigen': Vorschau bleibt stehen, Haekchen setzt sie (Knopf sitzt ueber der Wand)
+      const rect=gridRef.current.getBoundingClientRect(),wp=wallPos(k);
+      const flip=gameMode==='online'&&onlineRole==='B'&&selectedMap==='duel';
+      const top=flip?(ROWS*CELL-wp.top-wp.height):wp.top;
+      setPendingWall({key:k,x:rect.left+wp.left+wp.width/2,y:rect.top+top+wp.height/2-CELL-46});
+      return;
+    }
+    placeWallDrag(k);setPreviewKey(null);
+  };
+  // Zug vorbei (oder Zeit/Gegner): die Vorschau unter dem stehenden Mauszeiger verschwindet mit
+  useEffect(()=>{if(!canDrag&&!dragging&&!pendingWall)setPreviewKey(null);},[canDrag]);
 
   const previewValid=useMemo(()=>{
     if(!previewKey)return false;
@@ -8121,327 +8191,153 @@ function App(){
 
   // ── MODE CONFIG ─────────────────────────────────────────
   if(screen==='modeConfig'){
+    // Stil A (Sand-Platten): jede Gruppe liegt auf einer Platte, Auswahl = blauer Verlauf mit Haekchen (nie blau auf blau), Extras als Schalter-Zeilen
+    const Opt=({on,onClick,children,style})=>(
+      <button onClick={onClick} className={'hx-opt'+(on?' on':'')} aria-pressed={!!on} style={style}>{children}</button>
+    );
     const TimeBtn=({val,label,disabled})=>{
       if(disabled)return null; // Vom Admin deaktiviert → vollständig verbergen
-      const sel=gameTimeMode===val;
-      return(
-        <button onClick={()=>setGameTimeMode(val)} style={{
-          flex:1,padding:'11px 4px',borderRadius:12,position:'relative',overflow:'hidden',
-          background:sel?'linear-gradient(#3f7df2,#1d47a6)':(darkMode?'#1b2740':'var(--card)'),
-          color:sel?'#fff':'var(--text)',
-          border:`1.5px solid ${sel?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')}`,
-          cursor:'pointer',
-          opacity:1,
-          boxShadow:sel?'0 3px 10px rgba(9,24,64,0.35),0 0 22px rgba(9,24,64,0.35),inset 0 1px 0 rgba(255,255,255,0.22)':(darkMode?'0 2px 8px rgba(0,0,0,0.4)':'0 2px 5px rgba(15,23,42,0.1),0 8px 18px rgba(15,23,42,0.14),inset 0 1px 0 rgba(255,255,255,0.5)'),
-          fontSize:12,fontWeight:800,letterSpacing:0.3,
-          fontFamily:'system-ui,-apple-system,sans-serif'}}>
-          {label}
-        </button>
-      );
+      return <Opt on={gameTimeMode===val} onClick={()=>setGameTimeMode(val)}><b>{label}</b></Opt>;
     };
-    const DropBtn=({val,label})=>{
-      const sel=dropMode===val;
-      return(
-        <button onClick={()=>{const n=dropMode===val?false:val;setDropMode(n);if(n)setHammerMode(false);}} style={{
-          flex:1,padding:'8px 2px',borderRadius:9,
-          background:sel?'#ec4899':'var(--card)',
-          color:sel?'white':'var(--text)',
-          border:`1.5px solid ${sel?'#ec4899':'var(--border)'}`,
-          boxShadow:sel?'0 3px 12px rgba(236,72,153,0.4)':'0 2px 5px rgba(15,23,42,0.1),0 6px 14px rgba(15,23,42,0.12),inset 0 1px 0 rgba(255,255,255,0.5)',
-          cursor:'pointer',fontSize:10,fontWeight:800,letterSpacing:0.2,
-          fontFamily:'system-ui,-apple-system,sans-serif'}}>
-          {label}
-        </button>
-      );
-    };
-    const SectionHeader=({label,icon})=>(
-      <div className="hx-on" style={{fontSize:12,letterSpacing:1.5,marginTop:18,marginBottom:9,paddingLeft:2,display:'flex',alignItems:'center',gap:8,textTransform:'uppercase'}}>
-        <div style={{width:4,height:14,borderRadius:2,background:'#ffc21f',flexShrink:0}}/>
-        {icon&&<span style={{opacity:0.7,display:'inline-flex'}}>{icon}</span>}
-        {label}
+    const DropBtn=({val,label})=><Opt on={dropMode===val} onClick={()=>{const n=dropMode===val?false:val;setDropMode(n);if(n)setHammerMode(false);}}><b style={{fontSize:14}}>{label}</b></Opt>;
+    const Hilfe=({k})=><HelpDot onClick={()=>setHelpKey(k)} style={{width:28,height:28,fontSize:15,fontFamily:'var(--hx-f)',color:'var(--hx-ink)',background:'var(--hx-plate1)',border:'2.5px solid var(--hx-line)',boxShadow:'0 2px 0 var(--hx-line)'}}/>;
+    const Gruppe=({label,hilfe,children,ord})=>(
+      <div className="hx-plate hx-cg" style={{order:ord}}>
+        <div className="hx-cg-k"><i/><span>{label}</span>{hilfe?<span style={{marginLeft:'auto'}}><Hilfe k={hilfe}/></span>:null}</div>
+        {children}
       </div>
     );
+    const Schalter=({on,onClick,icon,title,desc,hilfe})=>(
+      <div role="switch" aria-checked={!!on} tabIndex={0} onClick={onClick} className={'hx-tg hx-tgd'+(on?' on':'')}
+        onKeyDown={e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();onClick();}}}>
+        <span className="hx-tg-i">{icon}</span>
+        <span className="hx-tg-t"><b>{title}</b><small>{desc}</small></span>
+        <Hilfe k={hilfe}/>
+        <span className="hx-sw"/>
+      </div>
+    );
+    const zeitText=gameTimeMode.indexOf('classic-')===0?gameTimeMode.slice(8)+' '+t('minLabel'):gameTimeMode.indexOf('blitz-')===0?gameTimeMode.slice(6)+' '+t('secLabel'):t('noTimer');
+    const kurz=[selectedMap==='duel'?t('duel')+' '+(duelSize==='blitz'?'7×7':'9×9'):t('classic'),zeitText,gameBarr+' '+t('barricadesLabel')]
+      .concat(chaosMode?[t('modeChaos')]:[]).concat(dropMode?[t('randomDrop')]:[]).concat(hammerMode?[t('hammerMode')]:[]).join(' · ');
     return(
       <div style={{...sPage,justifyContent:'flex-start',paddingTop:'calc(env(safe-area-inset-top) + 20px)',animation:pageAnim,background:'transparent',position:'relative',zIndex:1}}>
         <MenuBG dark={darkMode}/>
         <button onClick={goBack} style={backChevron}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>{t('tutBack')}</button>
-        <div style={{width:'100%',maxWidth:340,position:'relative',zIndex:1}}>
+        <div className="hx-cfgw" style={{position:'relative',zIndex:1,fontFamily:'var(--hx-f)',fontWeight:600,color:'var(--hx-ink)'}}>
           <ScreenHead icon={<MazeIcon size={28} color="#fff"/>} iconBg="linear-gradient(#3f7df2,#1d47a6)"
             title={t('mode')} sub={t('modeConfigSub')}/>
+          <div style={{textAlign:'center',margin:'-8px 0 16px'}}><span className="hx-pille" style={{margin:0,maxWidth:'100%',whiteSpace:'normal',justifyContent:'center'}}>{kurz}</span></div>
 
-          {/* Aktive Auswahl */}
-          {(gameTimeMode!=='none'||chaosMode||dropMode||hammerMode||selectedMap==='duel')&&(
-            <div style={{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap',justifyContent:'center'}}>
-              {selectedMap==='duel'&&(
-                <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#8b5cf6',display:'flex',alignItems:'center',gap:5}}>
-                  <span>⚔</span><span>{t('duel')}</span>
-                </div>
-              )}
-              {gameTimeMode.indexOf('classic-')===0&&(
-                <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#3b82f6',display:'flex',alignItems:'center',gap:5}}>
-                  <ModeGlyph kind="clock" size={12} color="#3b82f6"/><span>{gameTimeMode==='classic-3'?'3':gameTimeMode==='classic-5'?'5':'8'} {t('minLabel')}</span>
-                </div>
-              )}
-              {gameTimeMode.indexOf('blitz-')===0&&(
-                <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#d97706',display:'flex',alignItems:'center',gap:5}}>
-                  <ModeGlyph kind="bolt" size={12} color="#d97706"/><span>{gameTimeMode==='blitz-5'?'5':gameTimeMode==='blitz-8'?'8':'10'} {t('secLabel')}</span>
-                </div>
-              )}
-              {chaosMode&&(
-                <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#8b5cf6',display:'flex',alignItems:'center',gap:5}}>
-                  <ModeGlyph kind="swirl" size={12} color="#8b5cf6"/><span>{t('modeChaos')}</span>
-                </div>
-              )}
-              {dropMode&&(
-                <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#ec4899',display:'flex',alignItems:'center',gap:5}}>
-                  <ModeGlyph kind="burst" size={12} color="#ec4899"/><span>{t('randomDrop')}</span>
-                </div>
-              )}
-              {hammerMode&&(
-                <div style={{padding:'4px 10px',borderRadius:11,fontSize:11,fontWeight:800,
-                  background:'var(--hx-plate1)',border:'2px solid var(--hx-line)',color:'#d97706',display:'flex',alignItems:'center',gap:5}}>
-                  <ModeGlyph kind="hammer" size={13}/><span>{t('hammerMode')}</span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── Spielfeld ── */}
-          <div className="hx-on" style={{fontSize:12,letterSpacing:1.5,marginTop:6,marginBottom:10,paddingLeft:2,display:'flex',alignItems:'center',gap:8}}>
-            <div style={{width:4,height:14,borderRadius:2,background:'#ffc21f'}}/> SPIELFELD
-          </div>
-          <div style={{display:'flex',gap:8,marginBottom:4}}>
-            {feat('duel')&&<button onClick={()=>setSelectedMap('duel')} className="mi-btn" style={{
-              flex:1,padding:'14px 10px',borderRadius:14,cursor:'pointer',textAlign:'center',
-              background:selectedMap==='duel'
-                ?'linear-gradient(#3f7df2,#1d47a6)'
-                :(darkMode?'#1b2740':'var(--card)'),
-              color:selectedMap==='duel'?'#fff':'var(--text)',
-              border:'1.5px solid '+(selectedMap==='duel'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
-              fontFamily:'system-ui,-apple-system,sans-serif',
-              boxShadow:selectedMap==='duel'
-                ?'0 4px 10px rgba(9,24,64,0.28),0 14px 32px rgba(9,24,64,0.32),inset 0 1px 0 rgba(255,255,255,0.25)'
-                :'0 2px 6px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.45)',
-              transition:'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',overflow:'hidden',position:'relative'}}>
-              {selectedMap==='duel'&&<div style={{position:'absolute',top:0,left:0,right:0,height:'50%',background:'linear-gradient(180deg,rgba(255,255,255,0.14),transparent)',borderRadius:'14px 14px 0 0',pointerEvents:'none'}}/>}
-              {selectedMap!=='duel'&&<div style={{position:'absolute',top:6,right:6,fontSize:8,fontWeight:800,
-                background:'linear-gradient(#3f7df2,#1d47a6)',color:'#fff',
-                padding:'2px 6px',borderRadius:6}}>STD</div>}
-              <div style={{display:'flex',justifyContent:'center',marginBottom:8}}>
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="1" y="1" width="34" height="34" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.25"/>
-                  <rect x="1" y="1" width="34" height="5" rx="3" fill="#16a34a" opacity="0.7"/>
-                  <rect x="1" y="30" width="34" height="5" rx="3" fill="#16a34a" opacity="0.7"/>
-                  <circle cx="18" cy="7" r="3.5" fill={selectedMap==='duel'?'#fff':'#ef4444'} opacity="0.9"/>
-                  <circle cx="18" cy="29" r="3.5" fill={selectedMap==='duel'?'rgba(255,255,255,0.6)':'#3b82f6'} opacity="0.9"/>
-                  <line x1="18" y1="12" x2="18" y2="16" stroke="currentColor" strokeWidth="1.5" opacity="0.5"/>
-                  <line x1="18" y1="24" x2="18" y2="20" stroke="currentColor" strokeWidth="1.5" opacity="0.5"/>
-                  <polygon points="14,17 22,17 18,21" fill="currentColor" opacity="0.55"/>
-                  <polygon points="14,19 22,19 18,15" fill="currentColor" opacity="0.55"/>
-                </svg>
+          <div className="hx-cfg">
+          <div className="hx-cfg-c">
+            {/* ── Spielfeld ── */}
+            <Gruppe ord={1} label={t('cfgField')}>
+              <div className="hx-opts">
+                {feat('duel')&&<Opt on={selectedMap==='duel'} onClick={()=>setSelectedMap('duel')} style={{padding:'12px 6px'}}>
+                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="1" width="34" height="34" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.3"/>
+                    <rect x="1" y="1" width="34" height="5" rx="3" fill="#16a34a" opacity="0.85"/>
+                    <rect x="1" y="30" width="34" height="5" rx="3" fill="#16a34a" opacity="0.85"/>
+                    <circle cx="18" cy="7" r="3.5" fill="#ef4444"/>
+                    <circle cx="18" cy="29" r="3.5" fill="#3b82f6"/>
+                    <line x1="18" y1="12" x2="18" y2="16" stroke="currentColor" strokeWidth="1.5" opacity="0.5"/>
+                    <line x1="18" y1="24" x2="18" y2="20" stroke="currentColor" strokeWidth="1.5" opacity="0.5"/>
+                    <polygon points="14,17 22,17 18,21" fill="currentColor" opacity="0.55"/>
+                    <polygon points="14,19 22,19 18,15" fill="currentColor" opacity="0.55"/>
+                  </svg>
+                  <b>{t('duel')}</b><small>1 vs 1</small>
+                </Opt>}
+                {feat('race')&&<Opt on={selectedMap==='classic'} onClick={()=>setSelectedMap('classic')} style={{padding:'12px 6px'}}>
+                  <svg width="44" height="36" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="40" height="30" rx="3" fill="currentColor" opacity="0.1"/>
+                    <rect x="2" y="2" width="40" height="5" rx="3" fill="#16a34a" opacity="0.85"/>
+                    {[8,14,20,26].map(y=><line key={y} x1="2" y1={y} x2="42" y2={y} stroke="currentColor" strokeWidth="0.5" opacity="0.25"/>)}
+                    {[9,17,25,34].map(x=><line key={x} x1={x} y1="7" x2={x} y2="32" stroke="currentColor" strokeWidth="0.5" opacity="0.25"/>)}
+                    <rect x="9" y="13.5" width="8" height="2.5" rx="1.2" fill="currentColor" opacity="0.65"/>
+                    <rect x="25" y="19.5" width="10" height="2.5" rx="1.2" fill="currentColor" opacity="0.65"/>
+                    <circle cx="13" cy="29" r="4" fill="#ef4444"/>
+                    <circle cx="31" cy="29" r="4" fill="#3b82f6"/>
+                  </svg>
+                  <b>{t('classic')}</b><small>{t('classicDesc')||'Race to top'}</small>
+                </Opt>}
               </div>
-              <div style={{fontSize:12,fontWeight:900,letterSpacing:-0.2}}>{t('duel')}</div>
-              <div style={{fontSize:9,fontWeight:700,opacity:0.65,marginTop:2}}>1v1 Arena</div>
-            </button>}
-            {feat('race')&&<button onClick={()=>setSelectedMap('classic')} className="mi-btn" style={{
-              flex:1,padding:'14px 10px',borderRadius:14,cursor:'pointer',textAlign:'center',
-              background:selectedMap==='classic'
-                ?'linear-gradient(135deg,#2563eb,#8b5cf6)'
-                :(darkMode?'#1b2740':'var(--card)'),
-              color:selectedMap==='classic'?'#fff':'var(--text)',
-              border:'1.5px solid '+(selectedMap==='classic'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
-              fontFamily:'system-ui,-apple-system,sans-serif',
-              boxShadow:selectedMap==='classic'
-                ?'0 4px 10px rgba(37,99,235,0.28),0 14px 32px rgba(37,99,235,0.32),inset 0 1px 0 rgba(255,255,255,0.25)'
-                :'0 2px 6px rgba(15,23,42,0.1),0 12px 28px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.45)',
-              transition:'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',overflow:'hidden',position:'relative'}}>
-              {selectedMap==='classic'&&<div style={{position:'absolute',top:0,left:0,right:0,height:'50%',background:'linear-gradient(180deg,rgba(255,255,255,0.14),transparent)',borderRadius:'14px 14px 0 0',pointerEvents:'none'}}/>}
-              <div style={{display:'flex',justifyContent:'center',marginBottom:8}}>
-                <svg width="44" height="34" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="2" y="2" width="40" height="30" rx="3" fill="currentColor" opacity="0.08"/>
-                  <rect x="2" y="2" width="40" height="5" rx="3" fill="#16a34a" opacity="0.8"/>
-                  {[8,14,20,26].map(y=><line key={y} x1="2" y1={y} x2="42" y2={y} stroke="currentColor" strokeWidth="0.5" opacity="0.18"/>)}
-                  {[9,17,25,34].map(x=><line key={x} x1={x} y1="7" x2={x} y2="32" stroke="currentColor" strokeWidth="0.5" opacity="0.18"/>)}
-                  <rect x="9" y="13.5" width="8" height="2.5" rx="1.2" fill="currentColor" opacity="0.6"/>
-                  <rect x="25" y="19.5" width="10" height="2.5" rx="1.2" fill="currentColor" opacity="0.6"/>
-                  <circle cx="13" cy="29" r="4" fill={selectedMap==='classic'?'#fff':'#ef4444'} opacity="0.9"/>
-                  <circle cx="31" cy="29" r="4" fill={selectedMap==='classic'?'rgba(255,255,255,0.6)':'#3b82f6'} opacity="0.9"/>
-                  <polyline points="13,24 13,11" stroke={selectedMap==='classic'?'rgba(255,255,255,0.5)':'#ef4444'} strokeWidth="1.5" opacity="0.5" strokeDasharray="2,2"/>
-                  <polyline points="31,24 31,11" stroke={selectedMap==='classic'?'rgba(255,255,255,0.5)':'#3b82f6'} strokeWidth="1.5" opacity="0.5" strokeDasharray="2,2"/>
-                </svg>
-              </div>
-              <div style={{fontSize:12,fontWeight:900,letterSpacing:-0.2}}>{t('classic')}</div>
-              <div style={{fontSize:9,fontWeight:700,opacity:0.65,marginTop:2}}>{t('classicDesc')||'Race to top'}</div>
-            </button>}
-          </div>
-          {selectedMap==='duel'&&(
-            <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,marginBottom:8,paddingLeft:2,lineHeight:1.5}}>
-              {t('duelDesc')}
-            </div>
-          )}
-          {/* Duell-Feldgröße */}
-          {selectedMap==='duel'&&(
-            <div style={{marginBottom:14}}>
-              <SectionHeader icon={<span style={{fontSize:11}}>⚔</span>} label={t('duelFieldSize')}/>
-              <div style={{display:'flex',gap:8}}>
-                {feat('duelBlitz')&&(
-                  <button onClick={()=>setDuelSize('blitz')} className="mi-btn" style={{
-                    flex:1,padding:'12px 8px',borderRadius:13,cursor:'pointer',textAlign:'center',
-                    background:duelSize==='blitz'?'linear-gradient(#3f7df2,#1d47a6)':(darkMode?'#1b2740':'var(--card)'),
-                    color:duelSize==='blitz'?'#fff':'var(--text)',
-                    border:'1.5px solid '+(duelSize==='blitz'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
-                    fontFamily:'system-ui,-apple-system,sans-serif',
-                    boxShadow:duelSize==='blitz'?'0 3px 10px rgba(9,24,64,0.3),0 0 26px rgba(9,24,64,0.4),0 12px 28px rgba(9,24,64,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
-                    transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
-                    <div style={{fontSize:14,fontWeight:900,marginBottom:2}}>7 × 7</div>
-                    <div style={{fontSize:11,fontWeight:800,marginBottom:1}}>{t('duelBlitzName')}</div>
-                    <div style={{fontSize:9,fontWeight:700,opacity:0.65}}>{t('duelBlitzSpeed')}</div>
-                  </button>
-                )}
-                {feat('duelStandard')&&(
-                  <button onClick={()=>setDuelSize('standard')} className="mi-btn" style={{
-                    flex:1,padding:'12px 8px',borderRadius:13,cursor:'pointer',textAlign:'center',
-                    background:duelSize==='standard'?'linear-gradient(#3f7df2,#1d47a6)':(darkMode?'#1b2740':'var(--card)'),
-                    color:duelSize==='standard'?'#fff':'var(--text)',
-                    border:'1.5px solid '+(duelSize==='standard'?'transparent':(darkMode?'rgba(160,185,235,0.22)':'#d6dded')),
-                    fontFamily:'system-ui,-apple-system,sans-serif',
-                    boxShadow:duelSize==='standard'?'0 3px 10px rgba(9,24,64,0.3),0 0 26px rgba(9,24,64,0.4),0 12px 28px rgba(9,24,64,0.25),inset 0 1px 0 rgba(255,255,255,0.22)':'0 2px 6px rgba(15,23,42,0.1),0 10px 24px rgba(15,23,42,0.16),inset 0 1px 0 rgba(255,255,255,0.4)',
-                    transition:'all 0.22s cubic-bezier(0.34,1.4,0.64,1)'}}>
-                    <div style={{fontSize:14,fontWeight:900,marginBottom:2}}>9 × 9</div>
-                    <div style={{fontSize:11,fontWeight:800,marginBottom:1}}>Standard</div>
-                    <div style={{fontSize:9,fontWeight:700,opacity:0.65}}>{t('duelTactical')}</div>
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
+              {selectedMap==='duel'&&<div style={{fontSize:13,fontWeight:600,color:'var(--hx-ink2)',marginTop:10,lineHeight:1.35}}>{t('duelDesc')}</div>}
+            </Gruppe>
 
-          {/* Classic */}
-          <SectionHeader icon={<SwordsIcon size={12} color="#64748b"/>} label={'TIMER · ' + t('totalTime').toUpperCase()}/>
-          <div style={{display:'flex',gap:6,alignItems:'center'}}>
-            <TimeBtn val="none" label={t('noTimer')}/>
-            <TimeBtn val="classic-3" label={'3 '+t('minLabel')} disabled={!feat('classicTime3')}/>
-            <TimeBtn val="classic-5" label={'5 '+t('minLabel')} disabled={!feat('classicTime5')}/>
-            <HelpDot onClick={()=>setHelpKey('classic')}/>
-          </div>
-
-          {/* Blitz */}
-          {feat('blitz')&&(
-          <div style={{opacity:feat('blitz')?1:0.45,position:'relative'}}>
-            <SectionHeader icon={<ModeGlyph kind="bolt" size={12} color="#64748b"/>} label={t('modeBlitz').toUpperCase() + ' · ' + t('perTurn').toUpperCase()}/>
-            <div style={{display:'flex',gap:6,alignItems:'center'}}>
-              <TimeBtn val="blitz-5" label={'5 '+t('secLabel')} disabled={(!feat('blitz')||!feat('blitzTime5'))}/>
-              <TimeBtn val="blitz-8" label={'8 '+t('secLabel')} disabled={(!feat('blitz')||!feat('blitzTime8'))}/>
-              <TimeBtn val="blitz-10" label={'10 '+t('secLabel')} disabled={(!feat('blitz')||!feat('blitzTime10'))}/>
-              <HelpDot onClick={()=>setHelpKey('blitz')}/>
-            </div>
-          </div>
-          )}
-
-          {/* Chaos */}
-          {(feat('chaos')||feat('drop'))&&(
-          <div style={{position:'relative'}}>
-            <SectionHeader icon={<ModeGlyph kind="swirl" size={12} color="#64748b"/>} label={t('modeChaos').toUpperCase()}/>
-            <div style={{display:'flex',gap:8,alignItems:'stretch'}}>
-              {feat('chaos')&&(
-              <button onClick={()=>{if(!chaosMode)setHammerMode(false);setChaosMode(!chaosMode);}} style={{
-                flex:1,padding:'11px 7px',opacity:feat('chaos')?1:0.45,
-                position:'relative',
-                background:chaosMode?'#8b5cf6':'var(--card)',
-                color:chaosMode?'white':'var(--text)',
-                border:`1.5px solid ${chaosMode?'#8b5cf6':'var(--border)'}`,
-                borderRadius:11,cursor:'pointer',textAlign:'center',
-                fontSize:12,fontWeight:800,letterSpacing:0.2,
-                fontFamily:'system-ui,-apple-system,sans-serif',
-                boxShadow:chaosMode?'0 3px 12px rgba(139,92,246,0.4),0 0 20px rgba(139,92,246,0.3)':'var(--card-shadow)',
-                transition:'all 0.2s'}}>
-                <HelpDot onClick={()=>setHelpKey('chaos')} style={{position:'absolute',top:5,right:5}}/>
-                <div style={{marginBottom:3,display:'flex',justifyContent:'center',height:20,alignItems:'center'}}>{chaosMode?<CheckIcon size={18} color="currentColor"/>:<CrateIcon size={20}/>}</div>
-                <div>{t('chaosBarrDrop')}</div>
-                <div style={{fontSize:9,fontWeight:600,opacity:0.75,marginTop:3,lineHeight:1.25}}>
-                  {t('chaosBarrDropDesc')}
+            {/* ── Duell-Feldgröße ── */}
+            {selectedMap==='duel'&&(
+              <Gruppe ord={2} label={t('duelFieldSize')}>
+                <div className="hx-opts">
+                  {feat('duelBlitz')&&<Opt on={duelSize==='blitz'} onClick={()=>setDuelSize('blitz')}><b style={{fontSize:20}}>{'7 × 7'}</b><b style={{fontSize:14}}>{t('duelBlitzName')}</b><small>{t('duelBlitzSpeed')}</small></Opt>}
+                  {feat('duelStandard')&&<Opt on={duelSize==='standard'} onClick={()=>setDuelSize('standard')}><b style={{fontSize:20}}>{'9 × 9'}</b><b style={{fontSize:14}}>{t('cfgStd')}</b><small>{t('duelTactical')}</small></Opt>}
                 </div>
-              </button>
-              )}
-              {feat('drop')&&(
-              <div style={{flex:1,padding:'11px 7px',display:'flex',flexDirection:'column',opacity:feat('drop')?1:0.45,
-                position:'relative',
-                background:dropMode?'rgba(236,72,153,0.10)':'var(--card)',
-                border:`1.5px solid ${dropMode?'#ec4899':'var(--border)'}`,
-                borderRadius:11,textAlign:'center',transition:'all 0.2s',
-                boxShadow:dropMode?'0 3px 12px rgba(236,72,153,0.35),0 0 20px rgba(236,72,153,0.25)':'var(--card-shadow)'}}>
-                <HelpDot onClick={()=>setHelpKey('random')} style={{position:'absolute',top:5,right:5}}/>
-                <div style={{marginBottom:3,display:'flex',justifyContent:'center',height:20,alignItems:'center'}}>{dropMode?<CheckIcon size={18} color="#ec4899"/>:<ModeGlyph kind="burst" size={18} color="#ec4899"/>}</div>
-                <div style={{fontSize:12,fontWeight:800,color:dropMode?'#ec4899':'var(--text)'}}>{t('randomDrop')}</div>
-                <div style={{fontSize:9,fontWeight:600,color:'var(--subtle)',marginTop:3,marginBottom:7,lineHeight:1.25}}>{t('randomDropDesc')}</div>
-                <div style={{display:'flex',gap:4,marginTop:'auto'}}>
-                  <DropBtn val="rare" label={t('dropRare')}/>
-                  <DropBtn val="often" label={t('dropOften')}/>
-                  <DropBtn val="veryoften" label={t('dropVeryOften')}/>
-                </div>
-              </div>
-              )}
-            </div>
-          </div>
-          )}
-
-          {feat('hammer')&&(
-          <div style={{marginTop:8,position:'relative'}}>
-            <button onClick={()=>{if(!hammerMode){setChaosMode(false);setDropMode(false);}setHammerMode(!hammerMode);}} style={{
-              width:'100%',padding:'11px 12px',position:'relative',
-              background:hammerMode?'#f59e0b':'var(--card)',
-              color:hammerMode?'white':'var(--text)',
-              border:`1.5px solid ${hammerMode?'#f59e0b':'var(--border)'}`,
-              borderRadius:11,cursor:'pointer',textAlign:'left',
-              display:'flex',alignItems:'center',gap:10,
-              fontFamily:'system-ui,-apple-system,sans-serif',
-              boxShadow:hammerMode?'0 3px 12px rgba(245,158,11,0.4),0 0 20px rgba(245,158,11,0.3)':'var(--card-shadow)',transition:'all 0.2s'}}>
-              <HelpDot onClick={()=>setHelpKey('hammer')} style={{position:'absolute',top:5,right:5}}/>
-              <span style={{display:'flex',width:24,justifyContent:'center'}}>{hammerMode?<CheckIcon size={20} color="currentColor"/>:<HammerIcon size={22}/>}</span>
-              <span>
-                <div style={{fontSize:13,fontWeight:800}}>{t('hammerMode')}</div>
-                <div style={{fontSize:9,fontWeight:600,opacity:0.8,marginTop:2,lineHeight:1.25}}>{t('hammerDesc')}</div>
-              </span>
-            </button>
-            {hammerMode&&(
-              <div style={{display:'flex',gap:6,marginTop:6}}>
-                {[{v:1,l:t('hammerOnce')},{v:2,l:t('hammerTwice')}].map(o=>{
-                  const sel=hammerDrops===o.v;
-                  return <button key={o.v} onClick={()=>setHammerDrops(o.v)} style={{
-                    flex:1,padding:'8px 4px',borderRadius:9,
-                    background:sel?'#f59e0b':'var(--card)',color:sel?'white':'var(--text)',
-                    border:`1.5px solid ${sel?'#f59e0b':'var(--border)'}`,
-                    cursor:'pointer',fontSize:11,fontWeight:800,letterSpacing:0.2,
-                    fontFamily:'system-ui,-apple-system,sans-serif'}}>{o.l}</button>;
-                })}
-              </div>
+              </Gruppe>
             )}
-          </div>
-          )}
 
-          {/* Barricades */}
-          <SectionHeader icon={<BrickMini size={11}/>} label={t('barricadesLabel')}/>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:16,
-            padding:'10px 14px',background:'var(--card)',border:'1.5px solid var(--border)',borderRadius:14,
-            boxShadow:'var(--card-shadow)'}}>
-            <button onClick={()=>setGameBarr(b=>Math.max(8,b-1))}
-              style={{width:38,height:38,borderRadius:11,
-                background:'var(--hx-soft)',border:'2px solid var(--hx-line)',
-                cursor:'pointer',fontSize:21,fontWeight:800,color:'var(--hx-ink)',display:'flex',alignItems:'center',justifyContent:'center',
-                fontFamily:'system-ui,-apple-system,sans-serif'}}>−</button>
-            <div style={{fontSize:26,fontWeight:900,color:'var(--text)',minWidth:40,textAlign:'center'}}>{gameBarr}</div>
-            <button onClick={()=>setGameBarr(b=>Math.min(15,b+1))}
-              style={{width:38,height:38,borderRadius:11,
-                background:'var(--hx-soft)',border:'2px solid var(--hx-line)',
-                cursor:'pointer',fontSize:21,fontWeight:800,color:'var(--hx-ink)',display:'flex',alignItems:'center',justifyContent:'center',
-                fontFamily:'system-ui,-apple-system,sans-serif'}}>+</button>
+            {/* ── Barrikaden ── */}
+            <Gruppe ord={5} label={t('barricadesLabel')}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:22}}>
+                <button onClick={()=>setGameBarr(b=>Math.max(8,b-1))} className="hx-rnd" aria-label="-" style={{fontSize:28,fontWeight:800,fontFamily:'var(--hx-f)',lineHeight:1,paddingBottom:3}}>{'−'}</button>
+                <div style={{fontFamily:'var(--hx-fd)',fontSize:44,lineHeight:1,minWidth:64,textAlign:'center',color:'var(--hx-ink)'}}>{gameBarr}</div>
+                <button onClick={()=>setGameBarr(b=>Math.min(15,b+1))} className="hx-rnd" aria-label="+" style={{fontSize:28,fontWeight:800,fontFamily:'var(--hx-f)',lineHeight:1,paddingBottom:3}}>+</button>
+              </div>
+            </Gruppe>
           </div>
 
+          <div className="hx-cfg-c">
+            {/* ── Timer: Gesamtzeit und Blitz pro Zug ── */}
+            <Gruppe ord={3} label={'Timer'}>
+              <div className="hx-cg-s"><span>{t('totalTime')}</span><Hilfe k="classic"/></div>
+              <div className="hx-opts">
+                <TimeBtn val="none" label={t('noTimer')}/>
+                <TimeBtn val="classic-3" label={'3 '+t('minLabel')} disabled={!feat('classicTime3')}/>
+                <TimeBtn val="classic-5" label={'5 '+t('minLabel')} disabled={!feat('classicTime5')}/>
+              </div>
+              {feat('blitz')&&(<>
+                <div className="hx-cg-s" style={{marginTop:12}}><span>{t('modeBlitz')+' · '+t('perTurn')}</span><Hilfe k="blitz"/></div>
+                <div className="hx-opts">
+                  <TimeBtn val="blitz-5" label={'5 '+t('secLabel')} disabled={(!feat('blitz')||!feat('blitzTime5'))}/>
+                  <TimeBtn val="blitz-8" label={'8 '+t('secLabel')} disabled={(!feat('blitz')||!feat('blitzTime8'))}/>
+                  <TimeBtn val="blitz-10" label={'10 '+t('secLabel')} disabled={(!feat('blitz')||!feat('blitzTime10'))}/>
+                </div>
+              </>)}
+            </Gruppe>
+
+            {/* ── Extras: Chaos, Zufalls-Drop, Hammer ── */}
+            {(feat('chaos')||feat('drop')||feat('hammer'))&&(
+              <Gruppe ord={4} label={t('cfgExtras')}>
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  {feat('chaos')&&<Schalter on={chaosMode} onClick={()=>{if(!chaosMode)setHammerMode(false);setChaosMode(!chaosMode);}} hilfe="chaos"
+                    icon={<CrateIcon size={24}/>} title={t('chaosBarrDrop')} desc={t('chaosBarrDropDesc')}/>}
+                  {feat('drop')&&(
+                    <div className={'hx-tg hx-tgb'+(dropMode?' on':'')} style={{position:'relative',cursor:'default'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:12,width:'100%'}}>
+                        <span className="hx-tg-i"><ModeGlyph kind="burst" size={22} color="#ec4899"/></span>
+                        <span className="hx-tg-t"><b>{t('randomDrop')}</b><small>{t('randomDropDesc')}</small></span>
+                        <Hilfe k="random"/>
+                      </div>
+                      <div className="hx-opts" style={{width:'100%',marginTop:10}}>
+                        <DropBtn val="rare" label={t('dropRare')}/>
+                        <DropBtn val="often" label={t('dropOften')}/>
+                        <DropBtn val="veryoften" label={t('dropVeryOften')}/>
+                      </div>
+                    </div>
+                  )}
+                  {feat('hammer')&&(<>
+                    <Schalter on={hammerMode} onClick={()=>{if(!hammerMode){setChaosMode(false);setDropMode(false);}setHammerMode(!hammerMode);}} hilfe="hammer"
+                      icon={<HammerIcon size={24}/>} title={t('hammerMode')} desc={t('hammerDesc')}/>
+                    {hammerMode&&<div className="hx-opts">
+                      {[{v:1,l:t('hammerOnce')},{v:2,l:t('hammerTwice')}].map(o=><Opt key={o.v} on={hammerDrops===o.v} onClick={()=>setHammerDrops(o.v)}><b style={{fontSize:14}}>{o.l}</b></Opt>)}
+                    </div>}
+                  </>)}
+                </div>
+              </Gruppe>
+            )}
+
+          </div>
+          </div>
+
+          <div className="hx-cfg-go">
           {/* START BUTTON */}
           <button onClick={()=>{setNavDir('fwd');setFlash('');createLobby(false);}}
             className="mi-btn" style={{
@@ -8471,6 +8367,7 @@ function App(){
             </div>
           </button>
 
+          </div>
         </div>
         {helpKey&&<ModeHelpModal kind={helpKey} lang={lang} onClose={()=>setHelpKey(null)}/>}
     </div>
@@ -10425,7 +10322,10 @@ function App(){
         const boardFlip=gameMode==='online'&&onlineRole==='B'&&selectedMap==='duel';
         const gcGoal=selectedMap==='duel'?MC.A:'#22c55e';
         return(
-      <div ref={gridRef} style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,touchAction:'auto',...sGrid,
+      <div ref={gridRef} data-e2e="board" data-hover={previewKey||''} data-walls={[...walls].join(',')}
+        onPointerDown={e=>{rilleMaus.current=e.pointerType==='mouse';}} onPointerMove={rilleBewegt}
+        onPointerLeave={e=>{if(e.pointerType==='mouse'&&!dragging&&!pendingWall)setPreviewKey(null);}} onClickCapture={rilleKlick}
+        style={{position:'relative',width:COLS*CELL,height:ROWS*CELL,touchAction:'auto',...sGrid,
         background:myBoardSkin?myBoardSkin.bg:'linear-gradient(170deg,var(--hx-ca),var(--hx-cb))',
         border:'none',
         boxShadow:'inset 0 0 0 4px var(--hx-bf),inset 0 3px 9px rgba(0,0,0,0.1),0 6px 0 var(--hx-bfe),0 16px 20px -8px var(--hx-sh)',
@@ -10609,7 +10509,7 @@ function App(){
           {!isOnlineWait&&<div className="ww-wallctl" style={{pointerEvents:'none'}}>
             <div className="wl">
               <svg width="12" height="12" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
-              <span>{barrLeft[turn]} {t('wallsLeft')}</span>
+              <span>{barrLeft[turn]} {t('wallsLeft')}</span><span className="wl-klick">{'\u00b7 '+t('wallClick')}</span>
             </div>
             <div className="tools">
               {[['H'],['V']].map(([orient])=>(
@@ -12009,6 +11909,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
   const[winner,setWinner]=React.useState(null);
   const[flash,setFlash]=React.useState('');
   const[dragging,setDragging]=React.useState(null);
+  const rilleMaus=React.useRef(false); // PC: letzter Zeiger war eine echte Maus (Tippen am Handy setzt per Klick nie eine Mauer)
   const[ghostPos,setGhostPos]=React.useState({x:0,y:0});
   const[previewKey,setPreviewKey]=React.useState(null);
   const[previewValid,setPreviewValid]=React.useState(true);
@@ -12487,6 +12388,32 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
   const cancelPendingWall=()=>{
     setPendingWall(null);setPreviewKey(null);setSnapPos(null);
   };
+  // PC: Mauer per Klick auf die Linie (wie im Hauptspiel): Vorschau beim Ueberfahren, Klick setzt, Feldmitte bleibt zum Ziehen der Figur
+  const rilleKey=(e)=>{
+    if(!rilleMaus.current||!canPlace||dragging||pendingWall||!gridRef.current)return null;
+    const rect=gridRef.current.getBoundingClientRect();
+    let ry=e.clientY-rect.top;if(boardFlip)ry=ROWS2*CELL2-ry;
+    return grooveWall(e.clientX-rect.left,ry,CELL2,ROWS2,COLS2);
+  };
+  const rilleBewegt=(e)=>{
+    rilleMaus.current=e.pointerType==='mouse';
+    if(!rilleMaus.current||dragging||pendingWall)return;
+    const k=rilleKey(e);
+    if(k!==previewKey){setPreviewKey(k);if(k)setPreviewValid(quickValidWall2(k,St.current.walls,St.current.tokens,ROWS2,COLS2));}
+  };
+  const rilleKlick=(e)=>{
+    const k=rilleKey(e);
+    if(!k)return;
+    e.stopPropagation(); // nicht zusaetzlich als Zug der Figur zaehlen
+    if(window.__wandBest&&tryWall2(k,St.current.walls,St.current.tokens,ROWS2,COLS2)){
+      const rect=gridRef.current.getBoundingClientRect(),wp=wallPos2(k,CELL2);
+      const top=boardFlip?(ROWS2*CELL2-wp.top-wp.height):wp.top;
+      setPendingWall({key:k,x:rect.left+wp.left+wp.width/2,y:rect.top+top+wp.height/2-CELL2-46});
+      return;
+    }
+    placeWall2Drag(k);setPreviewKey(null);
+  };
+  React.useEffect(()=>{if(!canPlace&&!dragging&&!pendingWall)setPreviewKey(null);},[canPlace]);
 
   // ── Drag-Wand ──
   React.useEffect(()=>{
@@ -13140,7 +13067,10 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
         <div className="ww-edge ww-edge-b" style={kantenStil(KANTE[boardFlip?'A':'B'],darkMode)}/>
         <div className="ww-stud ww-stud-l"/>
         <div className="ww-stud ww-stud-r"/>
-      <div ref={gridRef} style={{position:'relative',width:COLS2*CELL2,height:ROWS2*CELL2,touchAction:'auto',...sGrid,
+      <div ref={gridRef} data-e2e="tv2-board" data-hover={previewKey||''} data-walls={Array.from(walls).join(',')}
+        onPointerDown={e=>{rilleMaus.current=e.pointerType==='mouse';}} onPointerMove={rilleBewegt}
+        onPointerLeave={e=>{if(e.pointerType==='mouse'&&!dragging&&!pendingWall)setPreviewKey(null);}} onClickCapture={rilleKlick}
+        style={{position:'relative',width:COLS2*CELL2,height:ROWS2*CELL2,touchAction:'auto',...sGrid,
         background:'linear-gradient(170deg,var(--hx-ca),var(--hx-cb))',
         border:'none',
         boxShadow:'inset 0 3px 9px rgba(0,0,0,0.1)',
@@ -13372,7 +13302,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
             <div className="ww-wallctl" style={{pointerEvents:'none'}}>
               <div className="wl">
                 <svg width="12" height="12" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
-                <span>{canPlace?teamName(isOnline?myTeam:team)+': '+barr[isOnline?myTeam:team]+' '+t('wallsLeft'):t('opponentTurn')}</span>
+                <span>{canPlace?teamName(isOnline?myTeam:team)+': '+barr[isOnline?myTeam:team]+' '+t('wallsLeft'):t('opponentTurn')}</span>{canPlace&&<span className="wl-klick">{'\u00b7 '+t('wallClick')}</span>}
               </div>
               <div className="tools">
                 {['H','V'].map(function(orient){
@@ -13418,7 +13348,7 @@ function TwoVTwo({t,darkMode,onExit,account,onRecordResult,joinCode,onJoinCodeUs
 // Browser-Gegenstueck zur App. Der Server (kinghill.js) entscheidet alles; der Browser zeigt nur an und sendet kh_move/kh_wall mit der
 // Stand-Version. Farben fest nach Platz wie in der App (Rot oben, Blau rechts, Gruen unten, Orange links): der Browser hat keinen Shop,
 // und vier verschiedene Farben halten die Spieler auseinander. Ungewertet (keine Coins/XP/ELO). Aufbau und Stil wie 2v2.
-const CELLK=Math.max(24,Math.min(36,Math.floor((Math.min(window.innerWidth,520)-42)/11)));
+const CELLK=pcFeld(11,Math.max(24,Math.min(36,Math.floor((Math.min(window.innerWidth,520)-42)/11))),60);
 const KH_COL=['#ef4444','#3b82f6','#22c55e','#f97316'];
 const KH_DARK=['#7f1d1d','#1e3a5f','#14532d','#9a3412'];
 const KH_ROT=[180,90,0,270]; // Drehung des Bretts, damit der eigene Platz unten sitzt (Platz 0 oben, 1 rechts, 2 unten, 3 links)
@@ -13461,6 +13391,7 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
   const[gs,setGs]=React.useState(null); // letzter Stand vom Server
   const[,setTick]=React.useState(0);    // nur zum Neuzeichnen der Uhr
   const[dragging,setDragging]=React.useState(null); // {orient: 'H'|'V'} in BILDSCHIRM-Richtung
+  const rilleMaus=React.useRef(false); // PC: letzter Zeiger war eine echte Maus (Tippen am Handy setzt per Klick nie eine Mauer)
   const[ghostPos,setGhostPos]=React.useState({x:0,y:0});
   const[previewKey,setPreviewKey]=React.useState(null);
   const[previewValid,setPreviewValid]=React.useState(true);
@@ -13579,6 +13510,32 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
   };
   const confirmPendingWall=()=>{if(pendingWall)placeWall(pendingWall.key);setPendingWall(null);setPreviewKey(null);prevRef.current=null;};
   const cancelPendingWall=()=>{setPendingWall(null);setPreviewKey(null);prevRef.current=null;};
+  // PC: Mauer per Klick auf die Linie (wie im Hauptspiel); das Brett ist gedreht, darum dieselbe Umrechnung wie beim Ziehen
+  const rilleKey=(e)=>{
+    if(!rilleMaus.current||!canPlace||dragging||pendingWall||!gridRef.current)return null;
+    const rect=gridRef.current.getBoundingClientRect();
+    const k=((rot/90)|0)%4,co=[1,0,-1,0][k],si=[0,1,0,-1][k];
+    const dx=e.clientX-(rect.left+rect.width/2),dy=e.clientY-(rect.top+rect.height/2),hs=rect.width/2;
+    return grooveWall(hs+(co*dx+si*dy),hs+(-si*dx+co*dy),CELLK,R,C);
+  };
+  const rilleBewegt=(e)=>{
+    rilleMaus.current=e.pointerType==='mouse';
+    if(!rilleMaus.current||dragging||pendingWall)return;
+    const k=rilleKey(e);
+    if(k!==previewKey){setPreviewKey(k);if(k){const s=St.current;setPreviewValid(khWallOk(k,s.walls,s.gs.tokens||[],s.out,s.R,s.C,s.M));}}
+  };
+  const rilleKlick=(e)=>{
+    const k=rilleKey(e);
+    if(!k)return;
+    e.stopPropagation(); // nicht zusaetzlich als Zug der Figur zaehlen
+    const s=St.current;
+    if(window.__wandBest&&khWallOk(k,s.walls,s.gs.tokens||[],s.out,s.R,s.C,s.M)){
+      setPendingWall({key:k,x:e.clientX,y:e.clientY-CELLK-46});
+      return;
+    }
+    placeWall(k);setPreviewKey(null);
+  };
+  React.useEffect(()=>{if(!canPlace&&!dragging&&!pendingWall)setPreviewKey(null);},[canPlace]);
 
   // ── Wand ziehen (Bildschirm-Punkt -> Brett-Punkt ueber die Drehung des Bretts) ──
   React.useEffect(()=>{
@@ -13940,7 +13897,9 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
       {/* Brett (gedreht, damit man selbst unten sitzt) */}
       <div style={{position:'relative',width:boardW+26,margin:'0 auto',borderRadius:24,padding:13,
         background:'var(--hx-bf)',boxShadow:'0 6px 0 var(--hx-bfe),0 18px 24px -8px var(--hx-sh)'}}>
-        <div ref={gridRef} data-e2e="kh-board" data-rot={rot} data-turn={gs.turn} data-v={gs.v} data-seat={seat} data-walls={gs.walls?gs.walls.join(','):''} style={{position:'relative',width:boardW,height:R*CELLK,touchAction:'auto',...sGrid,background:boardBg,border:'none',
+        <div ref={gridRef} data-e2e="kh-board" data-rot={rot} data-turn={gs.turn} data-v={gs.v} data-seat={seat} data-walls={gs.walls?gs.walls.join(','):''} data-hover={previewKey||''}
+          onPointerDown={e=>{rilleMaus.current=e.pointerType==='mouse';}} onPointerMove={rilleBewegt}
+          onPointerLeave={e=>{if(e.pointerType==='mouse'&&!dragging&&!pendingWall)setPreviewKey(null);}} onClickCapture={rilleKlick} style={{position:'relative',width:boardW,height:R*CELLK,touchAction:'auto',...sGrid,background:boardBg,border:'none',
           boxShadow:'inset 0 3px 9px rgba(0,0,0,0.1)',
           transform:'rotate('+rot+'deg)'}}>
           <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,pointerEvents:'none',zIndex:0,
@@ -13989,7 +13948,7 @@ function KingHill({t,darkMode,onExit,account,joinCode,onJoinCodeUsed,resume}){
           <div className="ww-wallctl" style={{pointerEvents:'none'}}>
             <div className="wl">
               <svg width="12" height="12" viewBox="0 0 24 24"><g fill="currentColor"><rect x="2" y="4" width="9" height="6" rx="1"/><rect x="13" y="4" width="9" height="6" rx="1"/><rect x="7" y="12" width="10" height="6" rx="1"/></g></svg>
-              <span>{canPlace?(gs.barr[seat]+' '+t('wallsLeft')):t('opponentTurn')}</span>
+              <span>{canPlace?(gs.barr[seat]+' '+t('wallsLeft')):t('opponentTurn')}</span>{canPlace&&<span className="wl-klick">{'\u00b7 '+t('wallClick')}</span>}
             </div>
             <div className="tools">
               {['H','V'].map(function(orient){
